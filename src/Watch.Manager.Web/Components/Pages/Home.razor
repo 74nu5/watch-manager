@@ -1,0 +1,21 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Watch Manager - Accueil</PageTitle>
+
+
+<FluentCard>
+    <h2>Hello World!</h2>
+    <EditForm Model="this.model">
+        <div>
+            <FluentTextField Class="w-100" @bind-Value="this.model.Url" />
+        </div>
+        <div>
+            <FluentButton Type="ButtonType.Button" Appearance="@Appearance.Outline" @onclick="this.AnalyseArticleHandler">Analyser</FluentButton>
+            <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent">Sauvegarder</FluentButton>
+        </div>
+    </EditForm>
+
+    @this.chatResponse
+
+</FluentCard>
