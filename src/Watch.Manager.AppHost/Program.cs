@@ -1,5 +1,5 @@
 var builder = DistributedApplication.CreateBuilder(args);
-builder.AddAzureCosmosDB("cosmodb");
+//builder.AddAzureCosmosDB("cosmodb");
 
 var apiService = builder.AddProject<Projects.Watch_Manager_ApiService>("apiservice");
 

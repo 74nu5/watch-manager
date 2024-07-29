@@ -3,7 +3,6 @@
 using System.Net.Http.Json;
 
 using AngleSharp;
-using AngleSharp.Dom;
 
 using Azure;
 using Azure.AI.OpenAI;
@@ -25,30 +24,34 @@ public class AnalyzeService
 
     public async Task AnalyzeArticleAsync(string url, CancellationToken cancellationToken = default)
     {
-        var response = await this.client.PostAsJsonAsync("/analyze", new { url }, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        var response = await this.client.PostAsJsonAsync("/analyze", new { url }, cancellationToken).ConfigureAwait(false);
+        _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task<string> GetAnalysisResultAsync(CancellationToken cancellationToken = default)
     {
-        var response = await this.client.GetAsync("/analyze", cancellationToken);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync(cancellationToken);
+        var response = await this.client.GetAsync("/analyze", cancellationToken).ConfigureAwait(false);
+        _ = response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<ChatResponseMessage> Analyse(string url, CancellationToken cancellationToken = default)
     {
-        var contentSite = await this.ExtractTextFromUrlAsync(url, cancellationToken);
+        var contentSite = await this.ExtractTextFromUrlAsync(url, cancellationToken).ConfigureAwait(false);
 
-        return await this.ExtractTagsAsync(contentSite, cancellationToken);
+        return await this.ExtractTagsAsync(contentSite, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<string> ExtractTextFromUrlAsync(string url, CancellationToken cancellationToken)
     {
-        var httpResult = await this.client.GetStringAsync(url, cancellationToken);
+        var httpResult = await this.client.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(req => req.Content(httpResult), cancel: cancellationToken);
+        var document = await context.OpenAsync(req => req.Content(httpResult), cancel: cancellationToken).ConfigureAwait(false);
+        
+        document.QuerySelectorAll("script").ToList().ForEach(x => x.Remove());
+        document.QuerySelectorAll("link").ToList().ForEach(x => x.Remove());
+
         return document.DocumentElement.TextContent;
     }
 
@@ -68,7 +71,11 @@ public class AnalyzeService
             DeploymentName = "TanusGpt35T16k",
             Messages =
             {
-                new ChatRequestSystemMessage("Tu es un assistant de veille technologique d'un responsable technique en développement logiciel en C#. Tes réponses doivent être sous format json"),
+                new ChatRequestSystemMessage("""
+                                             Tu es l'assistant de gestion de veille technologique d'un responsable technique en développement logiciel en C#.
+                                             Tu réponds de la façon la plus factuelle possible.
+                                             Tes réponses doivent être sous format json.
+                                             """),
                 new ChatRequestUserMessage("""
                                            Donne-moi les informations suivantes : 
                                             - une liste de 6 tags pertinants minimum
@@ -80,7 +87,7 @@ public class AnalyzeService
                 new ChatRequestUserMessage("Traduit le résumé en français sans traduire les notions techniques liés aux tags."),
                 new ChatRequestUserMessage(content),
             },
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
 
         return response.Value.Choices[0].Message;
     }
