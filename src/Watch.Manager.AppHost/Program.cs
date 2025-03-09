@@ -1,5 +1,8 @@
+﻿using static Azure.Core.HttpHeader;
+
 var builder = DistributedApplication.CreateBuilder(args);
-//builder.AddAzureCosmosDB("cosmodb");
+var cosmos = builder.AddAzureCosmosDB("cosmodb");
+var cosmosdb = cosmos.AddDatabase("WatchManager");
 
 var apiService = builder.AddProject<Projects.Watch_Manager_ApiService>("apiservice");
 

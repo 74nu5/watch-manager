@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Watch.Manager.Service.Analyse\Watch.Manager.Service.Analyse.csproj" />
+    <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
     <ProjectReference Include="..\Watch.Manager.ServiceDefaults\Watch.Manager.ServiceDefaults.csproj" />
   </ItemGroup>
 

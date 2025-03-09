@@ -1,8 +1,8 @@
 ﻿namespace Watch.Manager.Service.Analyse.Abstractions;
 
-using Azure.AI.OpenAI;
+using Watch.Manager.Service.Analyse.Models;
 
 public interface ISiteAnalyzeService
 {
-    Task<string> ExtractTagsAsync(string content, CancellationToken cancellationToken = default);
+    Task<ExtractAnalyseModel?> ExtractTagsAsync(string content, CancellationToken cancellationToken = default);
 }

@@ -1,11 +1,14 @@
 ﻿namespace Watch.Manager.Service.Analyse;
 
+using System.Text.Json;
+
 using Azure.AI.OpenAI;
 using Watch.Manager.Service.Analyse.Abstractions;
+using Watch.Manager.Service.Analyse.Models;
 
 internal class SiteAnalyzeService(OpenAIClient openAiClient) : ISiteAnalyzeService
 {
-    public async Task<string> ExtractTagsAsync(string content, CancellationToken cancellationToken = default)
+    public async Task<ExtractAnalyseModel?> ExtractTagsAsync(string content, CancellationToken cancellationToken = default)
     {
         var response = await
                                openAiClient.GetChatCompletionsAsync(new()
@@ -37,6 +40,6 @@ internal class SiteAnalyzeService(OpenAIClient openAiClient) : ISiteAnalyzeServi
                                    },
                                    cancellationToken).ConfigureAwait(false);
 
-        return response.Value.Choices[0].Message.Content;
+        return JsonSerializer.Deserialize<ExtractAnalyseModel>(response.Value.Choices[0].Message.Content);
     }
 }
