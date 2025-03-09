@@ -1,24 +1,29 @@
 ﻿namespace Watch.Manager.Service.Database;
 
-using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
+using Pgvector;
+using Pgvector.EntityFrameworkCore;
+
 using Watch.Manager.Service.Database.Abstractions;
+using Watch.Manager.Service.Database.Context;
 using Watch.Manager.Service.Database.Entities;
 
-internal class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, CosmoManagementService cosmoManagementService) : IArticleAnalyseStore
+internal class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, ArticlesContext articlesContext) : IArticleAnalyseStore
 {
-    public async Task StoreArticleAnalyzeAsync(Analyse analyzeModel)
+    public async Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken)
     {
-        var database = await cosmoManagementService.CreateDatabaseAsync().ConfigureAwait(false);
-        Container container = await cosmoManagementService.CreateAnalyzesContainerAsync(database).ConfigureAwait(false);
+        articlesContext.Articles.Add(analyzeModel);
+        await articlesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 
-        try
-        {
-            var analyseResponse = await container.CreateItemAsync(analyzeModel, new PartitionKey(analyzeModel.PartitionKey)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error at cosmos insertion.");
-        }
+    public async Task<Article[]> SearchArticleAsync(float[] embedding, CancellationToken cancellationToken)
+    {
+        var embeddingVector = new Vector(embedding.AsMemory());
+        return await articlesContext.Articles
+                                    .OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector))
+                                    .Take(5)
+                                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
     }
 }

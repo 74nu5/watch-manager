@@ -1,14 +1,12 @@
 ﻿namespace Watch.Manager.Service.Database.Entities;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
-public class Analyse
+using Pgvector;
+
+public class Article
 {
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; }
-
-    [JsonProperty(PropertyName = "partitionKey")]
-    public string PartitionKey { get; set; }
+    public int Id { get; set; }
 
     public string[] Tags { get; set; }
 
@@ -19,4 +17,10 @@ public class Analyse
     public Uri Url { get; set; }
 
     public DateTime AnalyzeDate { get; set; }
+
+    [JsonIgnore]
+    public Vector EmbeddingHead { get; set; }
+
+    [JsonIgnore]
+    public Vector EmbeddingBody { get; set; }
 }

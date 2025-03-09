@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Watch.Manager.Service.Migrations-46104123-61fe-418e-a3de-b05e28db5d15</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
+    <ProjectReference Include="..\Watch.Manager.ServiceDefaults\Watch.Manager.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

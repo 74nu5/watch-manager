@@ -1,10 +1,12 @@
-﻿namespace Watch.Manager.Service.Analyse.Extensions;
+﻿#pragma warning disable KMEXP00
+namespace Watch.Manager.Service.Analyse.Extensions;
 
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.KernelMemory.AI;
 
 using OpenAI;
 
@@ -20,20 +22,7 @@ public static class ServiceAnalyzeExtensions
     {
         builder.Services.TryAddTransient<SanitizeService>();
         builder.Services.TryAddTransient<IWebSiteService, WebSiteService>();
-        /*builder.Services.TryAddTransient<OpenAIClient>(provider =>
-        {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var openApiKey = configuration.GetValue("az-open-ai:key", string.Empty);
-            var openApiUrl = configuration.GetValue("az-open-ai:url", string.Empty);
-            if (string.IsNullOrWhiteSpace(openApiKey))
-                throw new InvalidOperationException("OpenAI key is missing");
-
-            if (string.IsNullOrWhiteSpace(openApiUrl))
-                throw new InvalidOperationException("OpenAI url is missing");
-
-            return new(new(openApiUrl), new AzureKeyCredential(openApiKey));
-        });*/
-
+        
         if (builder.Configuration["OllamaEnabled"] is string ollamaEnabled && bool.Parse(ollamaEnabled))
         {
             _ = builder.AddOllamaApiClient("embedding")
@@ -50,6 +39,8 @@ public static class ServiceAnalyzeExtensions
             if (!string.IsNullOrWhiteSpace(connectionString))
             {
                 var embeddingModel = builder.Configuration["AI:OpenAI:EmbeddingModel"];
+
+                builder.Services.TryAddScoped<ITextTokenizer>(_ => TokenizerFactory.GetTokenizerForModel(embeddingModel ?? string.Empty) ?? throw new InvalidOperationException("Tokenizer not found"));
 
                 builder.AddOpenAIClientFromConfiguration("openai");
                 _ = builder.Services.AddEmbeddingGenerator(sp => sp.GetRequiredService<OpenAIClient>().AsEmbeddingGenerator(embeddingModel!))
@@ -72,6 +63,5 @@ public static class ServiceAnalyzeExtensions
 
         builder.Services.TryAddScoped<IExtractEmbeddingAI, ExtractEmbeddingAI>();
         builder.Services.TryAddScoped<IExtractDataAI, ExtractDataAI>();
-        builder.Services.TryAddTransient<ISiteAnalyzeService, SiteAnalyzeService>();
     }
 }

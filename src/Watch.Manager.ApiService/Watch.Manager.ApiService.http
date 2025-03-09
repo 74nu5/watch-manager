@@ -1,10 +1,13 @@
 ﻿@Watch.Manager.ApiService_HostAddress = https://localhost:7558
 
-GET {{Watch.Manager.ApiService_HostAddress}}/analyse
+POST {{Watch.Manager.ApiService_HostAddress}}/api/catalog/analyse?api-version=1.0
 Content-Type: application/json
 
 {
-    "UriToAnalyze": "https://andrewlock.net/behind-the-scenes-of-collection-expressions-part-5-adding-support-for-collection-expressions-to-your-own-types/"
+    "UriToAnalyze": "https://www.telerik.com/blogs/understanding-solid-principles"
 }
 
 ###
+
+
+GET {{Watch.Manager.ApiService_HostAddress}}/api/catalog/search?text=design+pattern&api-version=1.0

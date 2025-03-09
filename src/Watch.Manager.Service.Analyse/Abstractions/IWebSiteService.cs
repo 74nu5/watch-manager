@@ -2,5 +2,5 @@
 
 public interface IWebSiteService
 {
-    Task<string> GetWebSiteSource(string url, CancellationToken cancellationToken);
+    Task<(string Head, string Body)> GetWebSiteSource(string url, CancellationToken cancellationToken);
 }

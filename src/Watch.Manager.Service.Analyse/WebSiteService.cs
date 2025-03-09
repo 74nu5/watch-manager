@@ -4,7 +4,7 @@ using Watch.Manager.Service.Analyse.Abstractions;
 
 internal class WebSiteService(IHttpClientFactory factory, SanitizeService sanitizeService) : IWebSiteService
 {
-    public async Task<string> GetWebSiteSource(string url, CancellationToken cancellationToken)
+    public async Task<(string Head, string Body)> GetWebSiteSource(string url, CancellationToken cancellationToken)
     {
         var client = factory.CreateClient();
         var httpResult = await client.GetStringAsync(url, cancellationToken).ConfigureAwait(false);

@@ -3,6 +3,7 @@
 using System.Text.Json;
 
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 
 using Watch.Manager.Service.Analyse.Models;
 
@@ -14,9 +15,9 @@ internal class ExtractDataAI : IExtractDataAI
 
     private readonly IList<ChatMessage> messages;
 
-    public ExtractDataAI(IChatClient chatClient)
+    public ExtractDataAI(IServiceProvider serviceProvider)
     {
-        this.chatClient = chatClient;
+        this.chatClient = serviceProvider.GetRequiredService<IChatClient>();
         this.chatOptions = new()
         {
             Tools =

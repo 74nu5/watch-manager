@@ -15,7 +15,10 @@
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
         <PackageReference Include="StyleCop.Analyzers" />
         <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="xunit.runner.visualstudio">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

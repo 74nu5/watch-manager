@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" />
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
         <PackageReference Include="StyleCop.Analyzers" />
         <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" />
@@ -27,6 +28,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Watch.Manager.ApiService\Watch.Manager.ApiService.csproj" />
+        <ProjectReference Include="..\Watch.Manager.Service.Migrations\Watch.Manager.Service.Migrations.csproj" />
         <ProjectReference Include="..\Watch.Manager.Web\Watch.Manager.Web.csproj" />
     </ItemGroup>
 

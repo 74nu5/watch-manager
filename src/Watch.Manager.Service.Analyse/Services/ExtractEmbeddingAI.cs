@@ -10,7 +10,7 @@ using Watch.Manager.Service.Analyse.Models;
 
 public sealed class ExtractEmbeddingAI : IExtractEmbeddingAI
 {
-    private const int EmbeddingDimensions = 384;
+    private const int EmbeddingDimensions = 1536;
 
     private readonly IEmbeddingGenerator<string, Embedding<float>>? embeddingGenerator;
 

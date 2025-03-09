@@ -4,5 +4,7 @@ using Watch.Manager.Service.Database.Entities;
 
 public interface IArticleAnalyseStore
 {
-    Task StoreArticleAnalyzeAsync(Analyse analyzeModel);
+    Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken);
+
+    Task<Article[]> SearchArticleAsync(float[] embeddings, CancellationToken cancellationToken);
 }
