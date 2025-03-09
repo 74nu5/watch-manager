@@ -13,6 +13,11 @@ internal class SanitizeService
         document.QuerySelectorAll("script").ToList().ForEach(x => x.Remove());
         document.QuerySelectorAll("link").ToList().ForEach(x => x.Remove());
 
-        return document.DocumentElement.TextContent;
+        var documentElementTextContent = document.DocumentElement.TextContent;
+
+        return documentElementTextContent
+              .Replace("\t", string.Empty)
+              .Replace("\n", string.Empty)
+              .Replace("\r", string.Empty);
     }
 }

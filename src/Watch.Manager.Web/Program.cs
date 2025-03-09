@@ -1,5 +1,6 @@
 ﻿using Microsoft.FluentUI.AspNetCore.Components;
 
+using Watch.Manager.ServiceDefaults;
 using Watch.Manager.Web.Components;
 using Watch.Manager.Web.Services;
 using Watch.Manager.Web.Services.Extensions;

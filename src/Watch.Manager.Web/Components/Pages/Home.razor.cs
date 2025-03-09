@@ -14,8 +14,8 @@ public partial class Home
 
     private async Task AnalyseArticleHandler()
     {
-        var responseMessage = await this.AnalyzeService.Analyse(this.model.Url).ConfigureAwait(false);
-        this.chatResponse = $"[{responseMessage.Role.ToString().ToUpperInvariant()}]: {responseMessage.Content}";
+        //var responseMessage = await this.AnalyzeService.Analyse(this.model.Url).ConfigureAwait(false);
+        //this.chatResponse = $"[{responseMessage.Role.ToString().ToUpperInvariant()}]: {responseMessage.Content}";
     }
 
     private sealed class ArticleModel

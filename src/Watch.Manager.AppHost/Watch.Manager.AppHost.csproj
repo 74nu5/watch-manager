@@ -1,30 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.1.0" />
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>preview</LangVersion>
+        <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>7c8dcb79-c068-4edb-bf83-66b2a970ea78</UserSecretsId>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    </PropertyGroup>
+    <ItemGroup>
+      <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+    </ItemGroup>
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsAspireHost>true</IsAspireHost>
-    <UserSecretsId>7c8dcb79-c068-4edb-bf83-66b2a970ea78</UserSecretsId>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
+        <PackageReference Include="StyleCop.Analyzers" />
+        <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" />
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Ollama" />
+    </ItemGroup>
 
-  <ItemGroup>
-      <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" Version="8.0.0-preview.7.24251.11" />
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.7.24251.11" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Watch.Manager.ApiService\Watch.Manager.ApiService.csproj" />
-    <ProjectReference Include="..\Watch.Manager.Web\Watch.Manager.Web.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Watch.Manager.ApiService\Watch.Manager.ApiService.csproj" />
+        <ProjectReference Include="..\Watch.Manager.Web\Watch.Manager.Web.csproj" />
+    </ItemGroup>
 
 </Project>

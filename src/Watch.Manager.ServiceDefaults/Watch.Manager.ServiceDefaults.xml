@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Watch.Manager.ServiceDefaults</name>
+    </assembly>
+    <members>
+        <member name="T:Watch.Manager.ServiceDefaults.ConfigurationExtensions">
+            <summary>
+                Extension methods for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.ConfigurationExtensions.GetRequiredValue(Microsoft.Extensions.Configuration.IConfiguration,System.String)">
+            <summary>
+                Gets a required value from the configuration.
+            </summary>
+            <param name="configuration">The configuration to get the value from.</param>
+            <param name="name">The name of the configuration value to get.</param>
+            <returns>The value of the configuration.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the configuration value is missing.</exception>
+        </member>
+    </members>
+</doc>

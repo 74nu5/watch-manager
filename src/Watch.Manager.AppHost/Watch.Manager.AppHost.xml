@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Watch.Manager.AppHost</name>
+    </assembly>
+    <members>
+        <member name="M:Watch.Manager.AppHost.Extensions.AddForwardedHeaders(Aspire.Hosting.IDistributedApplicationBuilder)">
+            <summary>
+                Adds a hook to set the ASPNETCORE_FORWARDEDHEADERS_ENABLED environment variable to true for all projects in the application.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.AppHost.Extensions.AddOpenAI(Aspire.Hosting.IDistributedApplicationBuilder,Aspire.Hosting.ApplicationModel.IResourceBuilder{Aspire.Hosting.ApplicationModel.ProjectResource})">
+            <summary>
+                Configures eShop projects to use OpenAI for text embedding and chat.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.AppHost.Extensions.AddOllama(Aspire.Hosting.IDistributedApplicationBuilder,Aspire.Hosting.ApplicationModel.IResourceBuilder{Aspire.Hosting.ApplicationModel.ProjectResource})">
+            <summary>
+                Configures eShop projects to use Ollama for text embedding and chat.
+            </summary>
+        </member>
+    </members>
+</doc>
