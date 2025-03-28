@@ -7,6 +7,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Http.Client" />
         <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
@@ -14,6 +15,9 @@
     </ItemGroup>
     <ItemGroup>
         <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Watch.Manager.Common\Watch.Manager.Common.csproj" />
     </ItemGroup>
 </Project>
     
