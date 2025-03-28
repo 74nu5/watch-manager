@@ -14,16 +14,24 @@ internal class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, Articles
 {
     public async Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken)
     {
-        articlesContext.Articles.Add(analyzeModel);
-        await articlesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _ = articlesContext.Articles.Add(analyzeModel);
+        _ = await articlesContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken)
+        => await articlesContext.Articles.AnyAsync(p => p.Url == url, cancellationToken).ConfigureAwait(false);
 
     public async Task<Article[]> SearchArticleAsync(float[] embedding, CancellationToken cancellationToken)
     {
         var embeddingVector = new Vector(embedding.AsMemory());
-        return await articlesContext.Articles
-                                    .OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector))
-                                    .Take(5)
-                                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
+        IQueryable<Article> orderedQueryable = articlesContext.Articles;
+
+        if (embedding.Length > 0)
+            orderedQueryable = orderedQueryable.OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector));
+
+
+        return await orderedQueryable
+                    .Take(5)
+                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
     }
 }

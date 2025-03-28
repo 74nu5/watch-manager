@@ -7,4 +7,6 @@ public interface IArticleAnalyseStore
     Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken);
 
     Task<Article[]> SearchArticleAsync(float[] embeddings, CancellationToken cancellationToken);
+
+    Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken);
 }
