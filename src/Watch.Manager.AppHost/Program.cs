@@ -8,6 +8,7 @@ var password = builder.AddParameter("db-password", secret: true);
 var postgres = builder.AddPostgres("postgres", port: 65367)
                       .WithImage("pgvector/pgvector")
                       .WithImageTag("pg17")
+                      .WithDataVolume()
                       .WithLifetime(ContainerLifetime.Persistent);
 
 //var sql = builder.AddSqlServer("sql", port: 1433)
