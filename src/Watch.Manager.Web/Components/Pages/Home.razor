@@ -1,49 +1,73 @@
 ﻿@page "/"
 
 <PageTitle>Watch Manager - Accueil</PageTitle>
+<FluentCard Width="98%">
+    <EditForm Model="this.searchArticleViewModel">
+        <div style="display:flex">
+            <FluentTextField Class="w-100" @bind-Value="this.searchArticleViewModel.Terms" TextFieldType="TextFieldType.Search" Autofocus="true" Placeholder="Rechercher..." Size="100" @bind-Value:after="this.SearchArticleHandlerAsync" />
+            <FluentProgressRing Visible="this.searchInProgress"></FluentProgressRing>
+        </div>
+    </EditForm>
 
+</FluentCard>
 
 <FluentCard Width="98%">
     <h2>Ajouter un site</h2>
-    <EditForm Model="this.viewModel">
+    <EditForm Model="this.addArticleViewModel">
         <div style="display:flex">
-            <FluentTextField Class="w-100" @bind-Value="this.viewModel.Url" Autofocus="true" Placeholder="Url à sauvegarder" Size="100" />
-            <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent" @onclick="this.SaveArticleHandlerAsync">>Sauvegarder</FluentButton>
+            <FluentTextField Class="w-100" @bind-Value="this.addArticleViewModel.Url" Placeholder="Url à sauvegarder" Size="100" Disabled="this.analyzeInProgress" />
+            <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent" @onclick="this.SaveArticleHandlerAsync">Sauvegarder</FluentButton>
             <FluentProgressRing Visible="this.analyzeInProgress"></FluentProgressRing>
-        </div>
-        <div>
-            
         </div>
     </EditForm>
 
 </FluentCard>
 <FluentStack Orientation="Orientation.Horizontal" Class="m-1" Wrap="true" HorizontalAlignment="HorizontalAlignment.Center">
-    @if (this.analyzeInProgress)
+    @if (this.searchInProgress)
     {
-        <FluentCard class="card-padding" Width="400px">
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 20px;margin-bottom: 10px;" Width="75px" Height="30px"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-        </FluentCard>
+        <FluentProgress></FluentProgress>
     }
-    @foreach (var article in this.articles)
+    else
     {
-        <FluentCard Width="400px">
-            <h3>@article.Title</h3>
-            <p>@(new MarkupString(Markdown.ToHtml(article.Summary, MarkdownPipeline)))</p>
-            <p>
-                @foreach (var tag in article.Tags)
-                {
-                    <FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge>
-                }
-            </p>
-            <FluentAnchor Href="@article.Url.ToString()" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
-        </FluentCard>
+        @if (this.analyzeInProgress)
+        {
+            <FluentCard class="card-padding" Width="400px">
+                <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
+                <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
+                <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
+                <FluentSkeleton Style="margin-top: 20px;margin-bottom: 10px;" Width="75px" Height="30px"></FluentSkeleton>
+                <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
+                <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
+                <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
+            </FluentCard>
+        }
+        @foreach (var article in this.articles)
+        {
+            <FluentCard Width="400px">
+                <FluentBadge Circular=true Appearance="Appearance.Neutral">
+                    @article.AnalyzeDate.ToLocalTime().ToString("F")
+                </FluentBadge>
+                <h3>@article.Title</h3>
+                <p>@(new MarkupString(Markdown.ToHtml(article.Summary, MarkdownPipeline)))</p>
+                <p>
+                    @foreach (var tag in article.Tags)
+                    {
+                        <FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge>
+                    }
+                </p>
+                <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.SpaceBetween">
+                    @foreach (var author in article.Authors)
+                    {
+                        <FluentPersona Id="@($"persona-{author.Replace(" ", string.Empty)}")"
+                                       Name="@author"
+                                       ImageSize="30px"
+                                       StatusSize="PresenceBadgeSize.Small">
+                        </FluentPersona>@* 
+                        <FluentTooltip Anchor="@($"persona-{author.Replace(" ", string.Empty)}")" >@author</FluentTooltip> *@
+                    }
+                    <FluentAnchor Href="@article.Url.ToString()" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
+                </FluentStack>
+            </FluentCard>
+        }
     }
-    
-    
 </FluentStack>
