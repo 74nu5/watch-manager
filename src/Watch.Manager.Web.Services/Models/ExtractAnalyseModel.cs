@@ -1,7 +1,9 @@
-﻿namespace Watch.Manager.Service.Analyse.Models;
+﻿namespace Watch.Manager.Web.Services.Models;
 
-public class ExtractAnalyseModel
+public record ExtractAnalyseModel
 {
+    public required string Title { get; set; }
+
     public required string[] Tags { get; set; }
 
     public required string[] Authors { get; set; }
@@ -11,6 +13,4 @@ public class ExtractAnalyseModel
     public string TagsJoin => string.Join(",", this.Tags);
 
     public string AuthorsJoin => string.Join(",", this.Authors);
-
-    public string Title { get; set; }
 }

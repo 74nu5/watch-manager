@@ -35,6 +35,7 @@ internal class ExtractDataAI : IExtractDataAI
                 Tu réponds de la façon la plus factuelle possible.
                 Tes réponses doivent être sous format json avec ce format : 
                 {
+                    "Title": "Titre de l'article",
                     "Tags": ["dotnet", "azure"],
                     "Summary": "Lorem ipsum...",
                     "Authors": ["John Doe"]
