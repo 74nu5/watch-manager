@@ -6,6 +6,8 @@ using AngleSharp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.AI;
 
+using Watch.Manager.Service.Analyse.Models;
+
 internal class SanitizeService
 {
     private const int MaxEmbeddingTokens = 8192;
@@ -18,7 +20,7 @@ internal class SanitizeService
         this.tokenizer = serviceProvider.GetRequiredService<ITextTokenizer>();
     }
 
-    public async Task<(string Head, string Body)> SanitizeWebSiteSource(string source, CancellationToken cancellationToken)
+    public async Task<ExtractedSite> SanitizeWebSiteSource(string source, CancellationToken cancellationToken)
     {
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
@@ -29,12 +31,16 @@ internal class SanitizeService
         var head = document.DocumentElement.GetElementsByTagName("head").FirstOrDefault();
         
         if (head is null || body is null)
-            return (string.Empty, string.Empty);
+            return new(string.Empty, string.Empty, new(""));
 
         head.QuerySelectorAll("script").ToList().ForEach(x => x.Remove());
         head.QuerySelectorAll("link").ToList().ForEach(x => x.Remove());
         head.QuerySelectorAll("style").ToList().ForEach(x => x.Remove());
-        
+
+        var thumbnail = document.QuerySelector("meta[property='og:image']")?.GetAttribute("content") is { } thumbnailUrl
+            ? new Uri(thumbnailUrl)
+            : new Uri("https://www.example.com/default-thumbnail.png");
+
         var headText = head.TextContent
             .Replace("\t", string.Empty)
             .Replace("\n", string.Empty)
@@ -52,6 +58,6 @@ internal class SanitizeService
         if (this.tokenizer.CountTokens(bodyContent) > MaxEmbeddingTokens)
             bodyContent = bodyContent[..MaxTextLengthforEmbedding];
 
-        return (headText, bodyContent);
+        return new(headText, bodyContent, thumbnail);
     }
 }

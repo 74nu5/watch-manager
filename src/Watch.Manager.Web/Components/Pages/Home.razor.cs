@@ -75,6 +75,13 @@ public partial class Home
             return;
         }
 
+        if (apiResult.ApiResultErrorType == ApiResultErrorType.NotFound)
+        {
+            this.analyzeInProgress = false;
+            this.toastService.ShowError("Url non disponible");
+            return;
+        }
+
         await this.ReloadArticlesAsync().ConfigureAwait(true);
         this.addArticleViewModel.Url = string.Empty;
         this.analyzeInProgress = false;

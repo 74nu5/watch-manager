@@ -47,6 +47,7 @@
                 <FluentBadge Circular=true Appearance="Appearance.Neutral">
                     @article.AnalyzeDate.ToLocalTime().ToString("F")
                 </FluentBadge>
+                <img src="@article.Thumbnail.ToString()" alt="@article.Title" style="width: -webkit-fill-available;" />
                 <h3>@article.Title</h3>
                 <p>@(new MarkupString(Markdown.ToHtml(article.Summary, MarkdownPipeline)))</p>
                 <p>

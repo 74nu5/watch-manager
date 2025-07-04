@@ -35,6 +35,9 @@ public class AnalyzeService
             if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
                 return ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.Conflict);
 
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.NotFound);
+
             return ApiResult<ExtractAnalyseModel>.Failure("Failed to save article");
         }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+
+using Microsoft.AspNetCore.Mvc;
 
 using Watch.Manager.ApiService.Parameters;
 using Watch.Manager.ApiService.ViewModels;
@@ -35,37 +37,49 @@ api.MapPost(
     "/save",
     async ([AsParameters] AnalyzeParameter analyzeParameter, CancellationToken cancellationToken) =>
     {
-        var urlAlreadyExists = await analyzeParameter.ArticleAnalyseStore.IsArticleExistsAsync(analyzeParameter.AnalyzeModel.UriToAnalyze, cancellationToken).ConfigureAwait(false);
-        if (urlAlreadyExists)
-            return Results.Conflict("Url already exists");
-
-        var (head, body) = await analyzeParameter.WebSiteService.GetWebSiteSource(analyzeParameter.AnalyzeModel.UriToAnalyze.ToString(), cancellationToken).ConfigureAwait(false);
-        var embeddingsHead = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(head, cancellationToken).ConfigureAwait(false);
-        var embeddingsBody = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(body, cancellationToken).ConfigureAwait(false);
-
-        if (embeddingsHead is null || embeddingsBody is null)
-            return Results.Problem("Embedding failed");
-
-        var analyzeResult = await analyzeParameter.ExtractDataAi.ExtractDatasAsync(body, cancellationToken).ConfigureAwait(false);
-
-        if (analyzeResult is null)
-            return Results.Problem("Analyze failed");
-
-        Article article = new()
+        try
         {
-            Summary = analyzeResult.Summary,
-            Authors = analyzeResult.Authors,
-            Url = analyzeParameter.AnalyzeModel.UriToAnalyze,
-            Title = analyzeResult.Title,
-            EmbeddingHead = new(embeddingsHead.AsMemory()),
-            EmbeddingBody = new(embeddingsBody.AsMemory()),
-            Tags = analyzeResult.Tags,
-            AnalyzeDate = DateTime.UtcNow,
-        };
+            var urlAlreadyExists = await analyzeParameter.ArticleAnalyseStore.IsArticleExistsAsync(analyzeParameter.AnalyzeModel.UriToAnalyze, cancellationToken).ConfigureAwait(false);
+            if (urlAlreadyExists)
+                return Results.Conflict("Url already exists");
 
-        await analyzeParameter.ArticleAnalyseStore.StoreArticleAnalyzeAsync(article, cancellationToken).ConfigureAwait(false);
+            var (head, body, thumbnail) = await analyzeParameter.WebSiteService.GetWebSiteSource(analyzeParameter.AnalyzeModel.UriToAnalyze.ToString(), CancellationToken.None).ConfigureAwait(false);
+            var embeddingsHead = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(head, cancellationToken).ConfigureAwait(false);
+            var embeddingsBody = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(body, cancellationToken).ConfigureAwait(false);
 
-        return Results.Ok(analyzeResult);
+            if (embeddingsHead is null || embeddingsBody is null)
+                return Results.Problem("Embedding failed");
+
+            var analyzeResult = await analyzeParameter.ExtractDataAi.ExtractDatasAsync(body, cancellationToken).ConfigureAwait(false);
+
+            if (analyzeResult is null)
+                return Results.Problem("Analyze failed");
+
+            Article article = new()
+            {
+                Summary = analyzeResult.Summary,
+                Authors = analyzeResult.Authors,
+                Url = analyzeParameter.AnalyzeModel.UriToAnalyze,
+                Thumbnail = thumbnail,
+                Title = analyzeResult.Title,
+                EmbeddingHead = new(embeddingsHead.AsMemory()),
+                EmbeddingBody = new(embeddingsBody.AsMemory()),
+                Tags = analyzeResult.Tags,
+                AnalyzeDate = DateTime.UtcNow,
+            };
+
+            await analyzeParameter.ArticleAnalyseStore.StoreArticleAnalyzeAsync(article, cancellationToken).ConfigureAwait(false);
+
+            return Results.Ok(analyzeResult);
+        }
+        catch (HttpRequestException httpRequestException) when(httpRequestException.StatusCode == HttpStatusCode.NotFound)
+        {
+            return Results.NotFound("Url not found");
+        }
+        catch (Exception e)
+        {
+            return Results.InternalServerError(e);
+        }
     });
 
 api.MapGet(
@@ -73,6 +87,7 @@ api.MapGet(
     async ([FromQuery] string text, [FromServices] IExtractEmbeddingAI extractEmbedding, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken) =>
     {
         float[]? embeddings = [];
+
         if (!string.IsNullOrWhiteSpace(text))
         {
             embeddings = await extractEmbedding.GetEmbeddingAsync(text, cancellationToken).ConfigureAwait(false);
@@ -80,8 +95,9 @@ api.MapGet(
             if (embeddings is null)
                 return Results.Problem("Embedding failed");
         }
+
         var articles = await analyseStore.SearchArticleAsync(embeddings, cancellationToken).ConfigureAwait(false);
-        return Results.Ok(articles.Select(a => new ArticleViewModel()
+        return Results.Ok(articles.Select(a => new ArticleViewModel
         {
             Id = a.Id,
             Summary = a.Summary,
@@ -90,7 +106,16 @@ api.MapGet(
             Title = a.Title,
             Tags = a.Tags,
             AnalyzeDate = a.AnalyzeDate,
+            Thumbnail = a.Thumbnail,
         }));
+    });
+
+api.MapGet(
+    "tags",
+    async (IArticleAnalyseStore articleAnalyseStore, CancellationToken cancellationToken) =>
+    {
+        var tags = await articleAnalyseStore.GetAllTagsAsync(cancellationToken).ConfigureAwait(false);
+        return Results.Ok(tags.Distinct(StringComparer.InvariantCultureIgnoreCase));
     });
 
 app.MapDefaultEndpoints();

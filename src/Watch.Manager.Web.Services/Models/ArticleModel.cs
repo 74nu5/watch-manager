@@ -14,6 +14,7 @@ public class ArticleModel
     public Uri Url { get; set; }
 
     public DateTime AnalyzeDate { get; set; }
+    public Uri Thumbnail { get; set; }
 
     public string TagsJoin => string.Join(",", this.Tags);
 

@@ -42,8 +42,8 @@ public static class ServiceAnalyzeExtensions
 
                 builder.Services.TryAddScoped<ITextTokenizer>(_ => TokenizerFactory.GetTokenizerForModel(embeddingModel ?? string.Empty) ?? throw new InvalidOperationException("Tokenizer not found"));
 
-                builder.AddOpenAIClientFromConfiguration("openai");
-                _ = builder.Services.AddEmbeddingGenerator(sp => sp.GetRequiredService<OpenAIClient>().AsEmbeddingGenerator(embeddingModel!))
+                _ = builder.AddOpenAIClientFromConfiguration("openai");
+                _ = builder.Services.AddEmbeddingGenerator(sp => sp.GetRequiredService<OpenAIClient>().GetEmbeddingClient(embeddingModel!).AsIEmbeddingGenerator())
                            .UseOpenTelemetry()
                            .UseLogging();
 
@@ -51,8 +51,8 @@ public static class ServiceAnalyzeExtensions
 
                 if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(chatModel))
                 {
-                    builder.AddOpenAIClientFromConfiguration("openai");
-                    _ = builder.Services.AddChatClient(sp => sp.GetRequiredService<OpenAIClient>().AsChatClient(chatModel ?? "gpt-4o-mini"))
+                    _ = builder.AddOpenAIClientFromConfiguration("openai");
+                    _ = builder.Services.AddChatClient(sp => sp.GetRequiredService<OpenAIClient>().GetChatClient(chatModel ?? "gpt-4o-mini").AsIChatClient())
                                .UseFunctionInvocation()
                                .UseOpenTelemetry(configure: t => t.EnableSensitiveData = true)
                                .UseLogging();

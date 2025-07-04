@@ -55,7 +55,7 @@ public sealed class ExtractEmbeddingAI : IExtractEmbeddingAI
         {
             var timestamp = Stopwatch.GetTimestamp();
 
-            var embedding = await this.embeddingGenerator!.GenerateEmbeddingVectorAsync(text, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var embedding = await this.embeddingGenerator!.GenerateVectorAsync(text, cancellationToken: cancellationToken).ConfigureAwait(false);
             embedding = embedding[..EmbeddingDimensions];
 
             if (this.logger.IsEnabled(LogLevel.Trace))

@@ -23,10 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Watch.Manager.AppHost\Watch.Manager.AppHost.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Using Include="Aspire.Hosting.Testing" />
         <Using Include="Xunit" />
     </ItemGroup>

@@ -23,6 +23,9 @@
         <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="Microsoft.KernelMemory.AI.Tiktoken" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
+    </ItemGroup>
     
 
 </Project>

@@ -33,4 +33,7 @@ public class Article
 
     [JsonIgnore]
     public Vector EmbeddingBody { get; set; }
+
+    [Required]
+    public Uri Thumbnail { get; set; }
 }

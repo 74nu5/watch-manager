@@ -9,4 +9,6 @@ public interface IArticleAnalyseStore
     Task<Article[]> SearchArticleAsync(float[] embeddings, CancellationToken cancellationToken);
 
     Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken);
+
+    Task<string[]> GetAllTagsAsync(CancellationToken cancellationToken);
 }

@@ -14,4 +14,6 @@ public class ArticleViewModel
     public Uri Url { get; set; }
 
     public DateTime AnalyzeDate { get; set; }
+
+    public Uri Thumbnail { get; set; }
 }

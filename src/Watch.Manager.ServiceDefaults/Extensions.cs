@@ -23,7 +23,7 @@ public static partial class Extensions
         _ = builder.Services.ConfigureHttpClientDefaults(http =>
         {
             // Turn on resilience by default
-            _ = http.AddStandardResilienceHandler();
+            //_ = http.AddStandardResilienceHandler();
 
             // Turn on service discovery by default
             _ = http.AddServiceDiscovery();

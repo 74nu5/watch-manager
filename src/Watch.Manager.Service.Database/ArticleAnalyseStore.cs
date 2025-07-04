@@ -37,7 +37,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
             //    Head = a.EmbeddingHead.CosineDistance(embeddingVector),
             //}).ToList();
             orderedQueryable = orderedQueryable
-                              .Where(p => p.EmbeddingBody.CosineDistance(embeddingVector) < Threshold && p.EmbeddingHead.CosineDistance(embeddingVector) < Threshold)
+                              //.Where(p => p.EmbeddingBody.CosineDistance(embeddingVector) < Threshold && p.EmbeddingHead.CosineDistance(embeddingVector) < Threshold)
                               .OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector));
         }
 
@@ -46,4 +46,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
                     .OrderByDescending(a => a.AnalyzeDate)
                     .ToArrayAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task<string[]> GetAllTagsAsync(CancellationToken cancellationToken)
+        => await articlesContext.Articles.SelectMany(p => p.Tags).Distinct().OrderBy(s => s).ToArrayAsync(cancellationToken).ConfigureAwait(false);
 }
