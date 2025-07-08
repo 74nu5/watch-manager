@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Watch.Manager.Service.Database</name>
+    </assembly>
+    <members>
+        <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions)">
+            <inheritdoc />
+        </member>
+        <member name="F:Watch.Manager.Service.Database.Entities.Article.VectorDimensions">
+            <summary>
+                Represents the fixed number of dimensions for a vector.
+            </summary>
+            <remarks>
+                This constant defines the dimensionality of vectors used in the application.
+                It is set to 1536, indicating that all vectors are 1536-dimensional.
+            </remarks>
+        </member>
+        <member name="F:Watch.Manager.Service.Database.Entities.Article.VectorDistanceFunction">
+            <summary>
+                Represents the distance function used for vector calculations.
+            </summary>
+            <remarks>
+                This constant specifies the use of the cosine distance function for vector distance
+                calculations. It is intended to be used in scenarios where cosine similarity or distance is required.
+            </remarks>
+        </member>
+        <member name="F:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.VectorDimensions">
+            <summary>
+                Represents the fixed number of dimensions for a vector.
+            </summary>
+            <remarks>
+                This constant defines the dimensionality of vectors used in the application.
+                It is set to 1536, indicating that all vectors are 1536-dimensional.
+            </remarks>
+        </member>
+        <member name="F:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.VectorDistanceFunction">
+            <summary>
+                Represents the distance function used for vector calculations.
+            </summary>
+            <remarks>
+                This constant specifies the use of the cosine distance function for vector distance
+                calculations. It is intended to be used in scenarios where cosine similarity or distance is required.
+            </remarks>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.InitDatabase">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.InitDatabase.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.InitDatabase.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.InitDatabase.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.AddThumbnail">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

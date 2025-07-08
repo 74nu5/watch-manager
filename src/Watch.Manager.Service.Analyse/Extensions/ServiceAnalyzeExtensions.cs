@@ -1,4 +1,4 @@
-﻿#pragma warning disable KMEXP00
+#pragma warning disable KMEXP00
 namespace Watch.Manager.Service.Analyse.Extensions;
 
 using Microsoft.Extensions.AI;
@@ -40,7 +40,7 @@ public static class ServiceAnalyzeExtensions
             {
                 var embeddingModel = builder.Configuration["AI:OpenAI:EmbeddingModel"];
 
-                builder.Services.TryAddScoped<ITextTokenizer>(_ => TokenizerFactory.GetTokenizerForModel(embeddingModel ?? string.Empty) ?? throw new InvalidOperationException("Tokenizer not found"));
+                builder.Services.TryAddScoped(_ => TokenizerFactory.GetTokenizerForModel(embeddingModel ?? string.Empty) ?? throw new InvalidOperationException("Tokenizer not found"));
 
                 _ = builder.AddOpenAIClientFromConfiguration("openai");
                 _ = builder.Services.AddEmbeddingGenerator(sp => sp.GetRequiredService<OpenAIClient>().GetEmbeddingClient(embeddingModel!).AsIEmbeddingGenerator())
@@ -52,7 +52,7 @@ public static class ServiceAnalyzeExtensions
                 if (!string.IsNullOrWhiteSpace(connectionString) && !string.IsNullOrWhiteSpace(chatModel))
                 {
                     _ = builder.AddOpenAIClientFromConfiguration("openai");
-                    _ = builder.Services.AddChatClient(sp => sp.GetRequiredService<OpenAIClient>().GetChatClient(chatModel ?? "gpt-4o-mini").AsIChatClient())
+                    _ = builder.Services.AddChatClient(sp => sp.GetRequiredService<OpenAIClient>().GetChatClient(chatModel ?? "gpt-4.1-mini").AsIChatClient())
                                .UseFunctionInvocation()
                                .UseOpenTelemetry(configure: t => t.EnableSensitiveData = true)
                                .UseLogging();

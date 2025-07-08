@@ -5,6 +5,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+        <Features>$(Features);InterceptorsPreview</Features>
     </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
@@ -15,7 +22,7 @@
         <PackageReference Include="Aspire.Azure.AI.OpenAI" />
         <PackageReference Include="Microsoft.Extensions.AI" />
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
-        <PackageReference Include="Microsoft.Extensions.AI.Ollama" />
+        <PackageReference Include="OllamaSharp" />
         <PackageReference Include="CommunityToolkit.Aspire.OllamaSharp" />
 
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />

@@ -1,12 +1,13 @@
 ﻿namespace Watch.Manager.Service.Database.Abstractions;
 
 using Watch.Manager.Service.Database.Entities;
+using Watch.Manager.Service.Database.Models;
 
 public interface IArticleAnalyseStore
 {
     Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken);
 
-    Task<Article[]> SearchArticleAsync(float[] embeddings, CancellationToken cancellationToken);
+    IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, CancellationToken cancellationToken);
 
     Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken);
 

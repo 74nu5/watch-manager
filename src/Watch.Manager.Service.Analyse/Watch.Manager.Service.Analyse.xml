@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Watch.Manager.Service.Analyse</name>
+    </assembly>
+    <members>
+        <member name="P:Watch.Manager.Service.Analyse.AIOptions.OpenAI">
+            <summary>Settings related to the use of OpenAI.</summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.OpenAIOptions.ChatModel">
+            <summary>The name of the chat model to use.</summary>
+            <remarks>When using Azure OpenAI, this should be the "Deployment name" of the chat model.</remarks>
+        </member>
+        <member name="F:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.logger">
+            <summary>Logger for use in AI operations.</summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.IsEnabled">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.GetEmbeddingAsync(Watch.Manager.Service.Analyse.Models.ExtractAnalyseModel,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.GetEmbeddingsAsync(System.Collections.Generic.IEnumerable{Watch.Manager.Service.Analyse.Models.ExtractAnalyseModel},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.GetEmbeddingAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.IExtractEmbeddingAI.IsEnabled">
+            <summary>Gets whether the AI system is enabled.</summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IExtractEmbeddingAI.GetEmbeddingAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Gets an embedding vector for the specified text.</summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IExtractEmbeddingAI.GetEmbeddingAsync(Watch.Manager.Service.Analyse.Models.ExtractAnalyseModel,System.Threading.CancellationToken)">
+            <summary>Gets an embedding vector for the specified catalog item.</summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IExtractEmbeddingAI.GetEmbeddingsAsync(System.Collections.Generic.IEnumerable{Watch.Manager.Service.Analyse.Models.ExtractAnalyseModel},System.Threading.CancellationToken)">
+            <summary>Gets embedding vectors for the specified catalog items.</summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Configuration.Binder.SourceGeneration.BindingExtensions.Get``1(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>Attempts to bind the configuration instance to a new instance of type T.</summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Configuration.Binder.SourceGeneration.BindingExtensions.ValidateConfigurationKeys(System.Type,System.Lazy{System.Collections.Generic.HashSet{System.String}},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Configuration.BinderOptions)">
+            <summary>If required by the binder options, validates that there are no unknown keys in the input configuration object.</summary>
+        </member>
+    </members>
+</doc>

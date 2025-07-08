@@ -23,7 +23,7 @@ internal static class Extensions
     {
         const string OpenAIName = "openai";
         const string TextEmbeddingModelName = "text-embedding-3-small";
-        const string ChatModelName = "gpt-4o-mini";
+        const string ChatModelName = "model-dev-gpt-4.1-mini";
 
         // to use an existing OpenAI resource as a connection string, add the following to the AppHost user secrets:
         // "ConnectionStrings": {
@@ -74,8 +74,7 @@ internal static class Extensions
            .WithReference(openAI)
            .WithEnvironment("AI__OPENAI__EMBEDDINGMODEL", TextEmbeddingModelName);
 
-
-        servicesApi
+        _ = servicesApi
                .WithReference(openAI)
                .WithEnvironment("AI__OPENAI__CHATMODEL", ChatModelName);
 

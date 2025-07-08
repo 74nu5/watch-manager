@@ -24,7 +24,7 @@ public static partial class Extensions
 
         _ = app.MapOpenApi();
 
-        if (app.Environment.IsDevelopment())
+       /* if (app.Environment.IsDevelopment())
         {
             _ = app.MapScalarApiReference(options =>
             {
@@ -33,7 +33,7 @@ public static partial class Extensions
             });
 
             _ = app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
-        }
+        }*/
 
         return app;
     }

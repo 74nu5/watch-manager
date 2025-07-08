@@ -8,7 +8,12 @@ internal class WebSiteService(IHttpClientFactory factory, SanitizeService saniti
     public async Task<ExtractedSite> GetWebSiteSource(string url, CancellationToken cancellationToken)
     {
         var client = factory.CreateClient();
-        var httpResult = await client.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
+        var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Failed to fetch the website source. Status code: {response.StatusCode}", null, response.StatusCode);
+
+        var httpResult = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return await sanitizeService.SanitizeWebSiteSource(httpResult, cancellationToken).ConfigureAwait(false);
     }
 

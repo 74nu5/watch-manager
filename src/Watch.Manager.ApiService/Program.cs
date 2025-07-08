@@ -62,9 +62,9 @@ api.MapPost(
                 Url = analyzeParameter.AnalyzeModel.UriToAnalyze,
                 Thumbnail = thumbnail,
                 Title = analyzeResult.Title,
-                EmbeddingHead = new(embeddingsHead.AsMemory()),
-                EmbeddingBody = new(embeddingsBody.AsMemory()),
-                Tags = analyzeResult.Tags,
+                EmbeddingHead = embeddingsHead,
+                EmbeddingBody = embeddingsBody,
+                Tags = [.. analyzeResult.Tags],
                 AnalyzeDate = DateTime.UtcNow,
             };
 
@@ -74,41 +74,43 @@ api.MapPost(
         }
         catch (HttpRequestException httpRequestException) when(httpRequestException.StatusCode == HttpStatusCode.NotFound)
         {
+            analyzeParameter.Logger.LogWarning(httpRequestException, "Url not found");
             return Results.NotFound("Url not found");
+        }
+        catch (HttpRequestException httpRequestException) when(httpRequestException.StatusCode == HttpStatusCode.Forbidden)
+        {
+            analyzeParameter.Logger.LogWarning(httpRequestException, "Url is forbidden");
+            return Results.StatusCode(403);
         }
         catch (Exception e)
         {
+            analyzeParameter.Logger.LogError(e, "Failed to save article");
             return Results.InternalServerError(e);
         }
     });
 
 api.MapGet(
     "/search",
-    async ([FromQuery] string text, [FromServices] IExtractEmbeddingAI extractEmbedding, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken) =>
+    Handler);
+
+async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string text, [FromServices] IExtractEmbeddingAI extractEmbedding, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken)
+{
+    await foreach (var article in analyseStore.SearchArticleAsync(text, cancellationToken).ConfigureAwait(false))
     {
-        float[]? embeddings = [];
-
-        if (!string.IsNullOrWhiteSpace(text))
+        yield return new()
         {
-            embeddings = await extractEmbedding.GetEmbeddingAsync(text, cancellationToken).ConfigureAwait(false);
-
-            if (embeddings is null)
-                return Results.Problem("Embedding failed");
-        }
-
-        var articles = await analyseStore.SearchArticleAsync(embeddings, cancellationToken).ConfigureAwait(false);
-        return Results.Ok(articles.Select(a => new ArticleViewModel
-        {
-            Id = a.Id,
-            Summary = a.Summary,
-            Authors = a.Authors,
-            Url = a.Url,
-            Title = a.Title,
-            Tags = a.Tags,
-            AnalyzeDate = a.AnalyzeDate,
-            Thumbnail = a.Thumbnail,
-        }));
-    });
+            Id = article.Id,
+            Summary = article.Summary,
+            Authors = article.Authors,
+            Url = article.Url,
+            Title = article.Title,
+            Tags = article.Tags,
+            AnalyzeDate = article.AnalyzeDate,
+            Thumbnail = article.Thumbnail,
+            Score = article.Score,
+        };
+    }
+}
 
 api.MapGet(
     "tags",

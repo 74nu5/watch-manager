@@ -1,8 +1,9 @@
-﻿namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.Service.Database.Models;
 
-public class ArticleViewModel
+public sealed record ArticleResultDto
 {
     public int Id { get; set; }
+
     public string Title { get; set; }
 
     public string[] Tags { get; set; }

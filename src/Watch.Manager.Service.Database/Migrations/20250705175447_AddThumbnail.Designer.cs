@@ -2,10 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Pgvector;
 using Watch.Manager.Service.Database.Context;
 
 #nullable disable
@@ -13,54 +12,62 @@ using Watch.Manager.Service.Database.Context;
 namespace Watch.Manager.Service.Database.Migrations
 {
     [DbContext(typeof(ArticlesContext))]
-    [Migration("20250309170802_InitDatabase")]
-    partial class InitDatabase
+    [Migration("20250705175447_AddThumbnail")]
+    partial class AddThumbnail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Watch.Manager.Service.Database.Entities.Article", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AnalyzeDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
-                    b.PrimitiveCollection<string[]>("Authors")
+                    b.PrimitiveCollection<string>("Authors")
                         .IsRequired()
-                        .HasColumnType("text[]");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Vector>("EmbeddingBody")
+                    b.PrimitiveCollection<string>("EmbeddingBody")
                         .IsRequired()
                         .HasColumnType("vector(1536)");
 
-                    b.Property<Vector>("EmbeddingHead")
+                    b.PrimitiveCollection<string>("EmbeddingHead")
                         .IsRequired()
                         .HasColumnType("vector(1536)");
 
                     b.Property<string>("Summary")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.PrimitiveCollection<string[]>("Tags")
+                    b.PrimitiveCollection<string>("Tags")
                         .IsRequired()
-                        .HasColumnType("text[]");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

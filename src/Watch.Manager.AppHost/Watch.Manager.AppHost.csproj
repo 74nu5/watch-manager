@@ -9,21 +9,46 @@
         <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
-        <IsAspireHost>true</IsAspireHost>
         <UserSecretsId>7c8dcb79-c068-4edb-bf83-66b2a970ea78</UserSecretsId>
         <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+
     </PropertyGroup>
     <ItemGroup>
       <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
     </ItemGroup>
 
-    <ItemGroup>
+    <!--<ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost" />
         <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
-        <PackageReference Include="StyleCop.Analyzers" />
-        <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" />
-        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Ollama" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="StyleCop.Analyzers">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices"/>
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Ollama"/>
+    </ItemGroup>-->
+
+
+    <ItemGroup>
+        <PackageReference Include="Scalar.Aspire" Version="0.1.6" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.3.1" />
+        <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.3.2" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.3.1" />
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Ollama" Version="9.5.0" />
     </ItemGroup>
 
     <ItemGroup>

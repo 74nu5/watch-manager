@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿namespace Watch.Manager.Tests;
 
-namespace Watch.Manager.Tests;
+using System.Net;
+
+using Projects;
 
 public class WebTests
 {
@@ -8,7 +10,7 @@ public class WebTests
     public async Task GetWebResourceRootReturnsOkStatusCode()
     {
         // Arrange
-        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Watch_Manager_AppHost>().ConfigureAwait(false);
+        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Watch_Manager_AppHost>().ConfigureAwait(false);
         await using var app = await appHost.BuildAsync();
         await app.StartAsync().ConfigureAwait(false);
 

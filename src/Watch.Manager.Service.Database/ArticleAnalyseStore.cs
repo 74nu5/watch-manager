@@ -1,16 +1,17 @@
 ﻿namespace Watch.Manager.Service.Database;
 
+using System.Text.Json;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using Pgvector;
-using Pgvector.EntityFrameworkCore;
+using Microsoft.Extensions.VectorData;
 
 using Watch.Manager.Service.Database.Abstractions;
 using Watch.Manager.Service.Database.Context;
 using Watch.Manager.Service.Database.Entities;
+using Watch.Manager.Service.Database.Models;
 
-internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, ArticlesContext articlesContext) : IArticleAnalyseStore
+internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, ArticlesContext articlesContext, IVectorSearchable<ArticleSearchEntity> searchable) : IArticleAnalyseStore
 {
     private const double Threshold = 0.75;
 
@@ -23,28 +24,67 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
     public async Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken)
         => await articlesContext.Articles.AnyAsync(p => p.Url == url, cancellationToken).ConfigureAwait(false);
 
-    public async Task<Article[]> SearchArticleAsync(float[] embedding, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, CancellationToken cancellationToken)
     {
-        var embeddingVector = new Vector(embedding.AsMemory());
-        IQueryable<Article> orderedQueryable = articlesContext.Articles;
-
-        if (embedding.Length > 0)
+        if (string.IsNullOrWhiteSpace(searchTerms))
         {
-            //var test = orderedQueryable.Select(a => new
-            //{
-            //    a.Title,
-            //    Body = a.EmbeddingBody.CosineDistance(embeddingVector),
-            //    Head = a.EmbeddingHead.CosineDistance(embeddingVector),
-            //}).ToList();
-            orderedQueryable = orderedQueryable
-                              //.Where(p => p.EmbeddingBody.CosineDistance(embeddingVector) < Threshold && p.EmbeddingHead.CosineDistance(embeddingVector) < Threshold)
-                              .OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector));
+            await foreach (var article in articlesContext.Articles.AsNoTracking().OrderByDescending(a => a.AnalyzeDate).AsAsyncEnumerable().WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                yield return new()
+                {
+                    Id = article.Id,
+                    Title = article.Title,
+                    Tags = article.Tags,
+                    Authors = article.Authors,
+                    Summary = article.Summary,
+                    Url = article.Url,
+                    AnalyzeDate = article.AnalyzeDate,
+                    Thumbnail = article.Thumbnail,
+                    Score = 0, // Default score when no search terms are provided
+                };
+            }
+
+            yield break;
+        }
+
+        //var test = orderedQueryable.Select(a => new
+        //{
+        //    a.Title,
+        //    Body = a.EmbeddingBody.CosineDistance(embeddingVector),
+        //    Head = a.EmbeddingHead.CosineDistance(embeddingVector),
+        //}).ToList();
+
+        // Todo search
+        //orderedQueryable = orderedQueryable
+        //.Where(p => p.EmbeddingBody.CosineDistance(embeddingVector) < Threshold && p.EmbeddingHead.CosineDistance(embeddingVector) < Threshold)
+        // OrderBy(p => p.EmbeddingBody.CosineDistance(embeddingVector)).ThenBy(p => p.EmbeddingHead.CosineDistance(embeddingVector));
+
+
+        VectorSearchOptions<ArticleSearchEntity> vectorSearchOptions = new()
+        {
+            VectorProperty = article => article.EmbeddingBody,
+        };
+
+        await foreach (var result in searchable.SearchAsync(searchTerms, 10, vectorSearchOptions, cancellationToken: cancellationToken).ConfigureAwait(false))
+        {
+            yield return new()
+            {
+                Id = result.Record.Id,
+                Title = result.Record.Title,
+                Tags = JsonSerializer.Deserialize<string[]>(result.Record.Tags) ?? [],
+                Authors = JsonSerializer.Deserialize<string[]>(result.Record.Authors) ?? [],
+                Summary = result.Record.Summary,
+                Url = new(result.Record.Url),
+                AnalyzeDate = result.Record.AnalyzeDate,
+                Thumbnail = new(result.Record.Thumbnail),
+                Score = result.Score,
+            };
         }
 
 
-        return await orderedQueryable
+        /*return await orderedQueryable
                     .OrderByDescending(a => a.AnalyzeDate)
-                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);
+                    .ToArrayAsync(cancellationToken).ConfigureAwait(false);*/
     }
 
     public async Task<string[]> GetAllTagsAsync(CancellationToken cancellationToken)

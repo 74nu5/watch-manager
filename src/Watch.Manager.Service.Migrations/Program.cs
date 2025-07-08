@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using Watch.Manager.Service.Database.Context;
+﻿using Watch.Manager.Service.Database.Context;
 using Watch.Manager.Service.Migrations;
 using Watch.Manager.ServiceDefaults;
 
@@ -12,7 +10,7 @@ builder.Services.AddHostedService<Worker>();
 builder.Services.AddOpenTelemetry()
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
 
-builder.AddNpgsqlDbContext<ArticlesContext>("articles-db", configureDbContextOptions: dbContextOptionsBuilder => dbContextOptionsBuilder.UseNpgsql(contextOptionsBuilder => contextOptionsBuilder.UseVector()));
+builder.AddSqlServerDbContext<ArticlesContext>("articles-db");
 
 var host = builder.Build();
 host.Run();

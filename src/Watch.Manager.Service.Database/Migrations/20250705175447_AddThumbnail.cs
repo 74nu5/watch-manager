@@ -5,16 +5,15 @@
 namespace Watch.Manager.Service.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddArticleTitle : Migration
+    public partial class AddThumbnail : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Title",
+                name: "Thumbnail",
                 table: "Articles",
-                type: "character varying(500)",
-                maxLength: 500,
+                type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
         }
@@ -23,7 +22,7 @@ namespace Watch.Manager.Service.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Title",
+                name: "Thumbnail",
                 table: "Articles");
         }
     }

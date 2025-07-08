@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.VectorData;
 
-public class Article
+public class ArticleSearchEntity
 {
     /// <summary>
     ///     Represents the fixed number of dimensions for a vector.
@@ -36,11 +36,11 @@ public class Article
 
     [Required]
     [VectorStoreData]
-    public string[] Tags { get; set; }
+    public string Tags { get; set; }
 
     [Required]
     [VectorStoreData]
-    public string[] Authors { get; set; }
+    public string Authors { get; set; }
 
     [Required]
     [VectorStoreData]
@@ -48,7 +48,7 @@ public class Article
 
     [Required]
     [VectorStoreData]
-    public Uri Url { get; set; }
+    public string Url { get; set; }
 
     [Required]
     [VectorStoreData]
@@ -66,5 +66,5 @@ public class Article
 
     [Required]
     [VectorStoreData]
-    public Uri Thumbnail { get; set; }
+    public string Thumbnail { get; set; }
 }

@@ -1,31 +1,46 @@
 ﻿using Projects;
 
+using Scalar.Aspire;
+
 using Watch.Manager.AppHost;
 
 var builder = DistributedApplication.CreateBuilder(args);
-var password = builder.AddParameter("db-password", secret: true);
+var password = builder.AddParameter("sql-server-password", "Password1234");
 
-var postgres = builder.AddPostgres("postgres", port: 65367)
-                      .WithImage("pgvector/pgvector")
-                      .WithImageTag("pg17")
-                      .WithDataVolume()
-                      .WithLifetime(ContainerLifetime.Persistent);
+
+
+
+//var postgres = builder.AddPostgres("postgres", port: 65367)
+//                      .WithImage("pgvector/pgvector")
+//                      .WithImageTag("pg17")
+//                      .WithDataVolume()
+//                      .WithLifetime(ContainerLifetime.Persistent);
+
+//var articlesDb = postgres.AddDatabase("articles-db");
+
+var sqlServer = builder.AddSqlServer("sql-server", password, 1434)
+                       .WithEnvironment("MSSQL_SA_PASSWORD", "Password1234")
+                       .WithEnvironment("ACCEPT_EULA", "Y")
+                       .WithImageTag("2025-latest")
+                       .WithDataVolume()
+                       .WithLifetime(ContainerLifetime.Persistent);
+
+var articlesDb = sqlServer.AddDatabase("articles-db");
+
+var migrations = builder.AddProject<Watch_Manager_Service_Migrations>("migrations")
+       .WithReference(articlesDb)
+       .WaitFor(articlesDb);
+
 
 //var sql = builder.AddSqlServer("sql", port: 1433)
 //                 .WithEndpoint("tcp", annotation => annotation.IsProxied = false)
 //                 .WithDataVolume()
 //                 .WithLifetime(ContainerLifetime.Persistent);
 
-var articleDb = postgres.AddDatabase("articles-db");
-
-
 var apiService = builder.AddProject<Watch_Manager_ApiService>("apiservice")
-                        .WithReference(articleDb)
-                        .WaitFor(articleDb);
-
-builder.AddProject<Projects.Watch_Manager_Service_Migrations>("migrations")
-       .WithReference(articleDb)
-       .WaitFor(articleDb);
+                        .WithReference(articlesDb)
+                        .WaitFor(articlesDb)
+                        .WaitFor(migrations);
 
 // set to true if you want to use OpenAI
 var useOpenAI = true;
@@ -36,6 +51,19 @@ var useOllama = false;
 if (useOllama)
     _ = builder.AddOllama(apiService);
 
-builder.AddProject<Watch_Manager_Web>("webfrontend").WithReference(apiService);
+builder.AddProject<Watch_Manager_Web>("webfrontend")
+       .WithReference(apiService)
+       .WaitFor(migrations);
+
+// Add Scalar API Reference for all services
+var scalar = builder.AddScalarApiReference(options =>
+{
+    // Configure global options. They will apply to all services
+    options.WithTheme(ScalarTheme.Purple);
+});
+
+scalar.WithApiReference(apiService)
+      .WithApiReference(migrations);
+
 
 builder.Build().Run();

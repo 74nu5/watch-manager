@@ -29,4 +29,7 @@
     <ItemGroup>
         <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Watch.Manager.AppHost\Watch.Manager.AppHost.csproj" />
+    </ItemGroup>
 </Project>

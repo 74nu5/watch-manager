@@ -27,44 +27,44 @@ public sealed class ExtractEmbeddingAI : IExtractEmbeddingAI
     public bool IsEnabled => this.embeddingGenerator is not null;
 
     /// <inheritdoc />
-    public ValueTask<float[]?> GetEmbeddingAsync(ExtractAnalyseModel item, CancellationToken cancellationToken) => this.IsEnabled ? this.GetEmbeddingAsync(CatalogItemToString(item), cancellationToken: cancellationToken) : ValueTask.FromResult<float[]?>(null);
+    public ValueTask<float[]?> GetEmbeddingAsync(ExtractAnalyseModel item, CancellationToken cancellationToken)
+        => this.IsEnabled
+                   ? this.GetEmbeddingAsync(CatalogItemToString(item), cancellationToken: cancellationToken)
+                   : ValueTask.FromResult<float[]?>(null);
 
     /// <inheritdoc />
     public async ValueTask<IReadOnlyList<float[]>?> GetEmbeddingsAsync(IEnumerable<ExtractAnalyseModel> items, CancellationToken cancellationToken)
     {
-        if (this.IsEnabled)
-        {
-            var timestamp = Stopwatch.GetTimestamp();
+        if (!this.IsEnabled)
+            return null;
 
-            var embeddings = await this.embeddingGenerator!.GenerateAsync(items.Select(CatalogItemToString), cancellationToken: cancellationToken).ConfigureAwait(false);
-            var results = embeddings.Select(m => m.Vector[..EmbeddingDimensions].ToArray()).ToList();
+        var timestamp = Stopwatch.GetTimestamp();
 
-            if (this.logger.IsEnabled(LogLevel.Trace))
-                this.logger.LogTrace("Generated {EmbeddingsCount} embeddings in {ElapsedMilliseconds}s", results.Count, Stopwatch.GetElapsedTime(timestamp).TotalSeconds);
+        var embeddings = await this.embeddingGenerator!.GenerateAsync(items.Select(CatalogItemToString), cancellationToken: cancellationToken).ConfigureAwait(false);
+        var results = embeddings.Select(m => m.Vector[..EmbeddingDimensions].ToArray()).ToList();
 
-            return results;
-        }
+        if (this.logger.IsEnabled(LogLevel.Trace))
+            this.logger.LogTrace("Generated {EmbeddingsCount} embeddings in {ElapsedMilliseconds}s", results.Count, Stopwatch.GetElapsedTime(timestamp).TotalSeconds);
 
-        return null;
+        return results;
+
     }
 
     /// <inheritdoc />
     public async ValueTask<float[]?> GetEmbeddingAsync(string text, CancellationToken cancellationToken)
     {
-        if (this.IsEnabled)
-        {
-            var timestamp = Stopwatch.GetTimestamp();
+        if (!this.IsEnabled)
+            return null;
 
-            var embedding = await this.embeddingGenerator!.GenerateVectorAsync(text, cancellationToken: cancellationToken).ConfigureAwait(false);
-            embedding = embedding[..EmbeddingDimensions];
+        var timestamp = Stopwatch.GetTimestamp();
+        var embedding = await this.embeddingGenerator!.GenerateVectorAsync(text, cancellationToken: cancellationToken).ConfigureAwait(false);
+        embedding = embedding[..EmbeddingDimensions];
 
-            if (this.logger.IsEnabled(LogLevel.Trace))
-                this.logger.LogTrace("Generated embedding in {ElapsedMilliseconds}s: '{Text}'", Stopwatch.GetElapsedTime(timestamp).TotalSeconds, text);
+        if (this.logger.IsEnabled(LogLevel.Trace))
+            this.logger.LogTrace("Generated embedding in {ElapsedMilliseconds}s: '{Text}'", Stopwatch.GetElapsedTime(timestamp).TotalSeconds, text);
 
-            return embedding.ToArray();
-        }
+        return embedding.ToArray();
 
-        return null;
     }
 
     private static string CatalogItemToString(ExtractAnalyseModel item) => $"{item.TagsJoin} {item.Summary} {item.AuthorsJoin}";

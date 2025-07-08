@@ -68,18 +68,38 @@ public partial class Home
         this.analyzeInProgress = true;
         var apiResult = await this.analyzeService.SaveArticleAsync(this.addArticleViewModel.Url).ConfigureAwait(true);
 
-        if (apiResult.ApiResultErrorType == ApiResultErrorType.Conflict)
+        switch (apiResult.ApiResultErrorType)
         {
-            this.analyzeInProgress = false;
-            this.toastService.ShowWarning("Url déjà sauvegardée");
-            return;
-        }
-
-        if (apiResult.ApiResultErrorType == ApiResultErrorType.NotFound)
-        {
-            this.analyzeInProgress = false;
-            this.toastService.ShowError("Url non disponible");
-            return;
+            case ApiResultErrorType.Conflict:
+                this.analyzeInProgress = false;
+                this.toastService.ShowWarning("Url déjà sauvegardée");
+                return;
+            case ApiResultErrorType.NotFound:
+                this.analyzeInProgress = false;
+                this.toastService.ShowError("Url non disponible");
+                return;
+            case ApiResultErrorType.None:
+                break;
+            case ApiResultErrorType.BadRequest:
+                this.analyzeInProgress = false;
+                this.toastService.ShowError("Requête incorrecte");
+                break;
+            case ApiResultErrorType.Unauthorized:
+                this.analyzeInProgress = false;
+                this.toastService.ShowError("Non autorisé");
+                break;
+            case ApiResultErrorType.Forbidden:
+                this.analyzeInProgress = false;
+                this.toastService.ShowError("Url interdite");
+                break;
+            case ApiResultErrorType.InternalServerError:
+                this.analyzeInProgress = false;
+                this.toastService.ShowError("Erreur interne du serveur");
+                break;
+            case null:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         await this.ReloadArticlesAsync().ConfigureAwait(true);

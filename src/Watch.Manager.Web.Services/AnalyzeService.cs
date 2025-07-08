@@ -32,13 +32,13 @@ public class AnalyzeService
 
         if (!response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
-                return ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.Conflict);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                return ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.NotFound);
-
-            return ApiResult<ExtractAnalyseModel>.Failure("Failed to save article");
+            return response.StatusCode switch
+            {
+                System.Net.HttpStatusCode.Conflict => ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.Conflict),
+                System.Net.HttpStatusCode.NotFound => ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.NotFound),
+                System.Net.HttpStatusCode.Forbidden => ApiResult<ExtractAnalyseModel>.Failure(ApiResultErrorType.Forbidden),
+                _ => ApiResult<ExtractAnalyseModel>.Failure("Failed to save article")
+            };
         }
 
         var analyseModel = await response.Content.ReadFromJsonAsync<ExtractAnalyseModel>(cancellationToken).ConfigureAwait(false);

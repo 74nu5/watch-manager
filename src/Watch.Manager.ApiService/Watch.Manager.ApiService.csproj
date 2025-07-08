@@ -2,24 +2,32 @@
     <ItemGroup>
         <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
     </ItemGroup>
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+        <Features>$(Features);InterceptorsPreview</Features>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
         <PackageReference Include="StyleCop.Analyzers" />
     </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Watch.Manager.Service.Analyse\Watch.Manager.Service.Analyse.csproj" />
-    <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
-    <ProjectReference Include="..\Watch.Manager.ServiceDefaults\Watch.Manager.ServiceDefaults.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Watch.Manager.Service.Analyse\Watch.Manager.Service.Analyse.csproj" />
+        <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
+        <ProjectReference Include="..\Watch.Manager.ServiceDefaults\Watch.Manager.ServiceDefaults.csproj" />
+    </ItemGroup>
 
 </Project>

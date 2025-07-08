@@ -1,4 +1,4 @@
-﻿namespace Watch.Manager.Service.Analyse.Services;
+namespace Watch.Manager.Service.Analyse.Services;
 
 using System.ComponentModel;
 using System.Text.Json;
