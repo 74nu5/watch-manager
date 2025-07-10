@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,15 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builderCors => builderCors.WithOrigins("https://localhost:7020")
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod());
+});
+
+
 builder.Configuration.AddAnalyzeConfiguration();
 
 var withApiVersioning = builder.Services.AddApiVersioning();
@@ -28,6 +38,8 @@ builder.AddAnalyzeServices();
 builder.AddDatabaseServices();
 
 var app = builder.Build();
+
+app.UseCors("AllowSpecificOrigin");
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
@@ -43,14 +55,14 @@ api.MapPost(
             if (urlAlreadyExists)
                 return Results.Conflict("Url already exists");
 
-            var (head, body, thumbnail) = await analyzeParameter.WebSiteService.GetWebSiteSource(analyzeParameter.AnalyzeModel.UriToAnalyze.ToString(), CancellationToken.None).ConfigureAwait(false);
-            var embeddingsHead = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(head, cancellationToken).ConfigureAwait(false);
-            var embeddingsBody = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(body, cancellationToken).ConfigureAwait(false);
+            var webSiteSource = await analyzeParameter.WebSiteService.GetWebSiteSource(analyzeParameter.AnalyzeModel.UriToAnalyze, CancellationToken.None).ConfigureAwait(false);
+            var embeddingsHead = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(webSiteSource.Head, cancellationToken).ConfigureAwait(false);
+            var embeddingsBody = await analyzeParameter.ExtractEmbeddingAi.GetEmbeddingAsync(webSiteSource.Body, cancellationToken).ConfigureAwait(false);
 
             if (embeddingsHead is null || embeddingsBody is null)
                 return Results.Problem("Embedding failed");
 
-            var analyzeResult = await analyzeParameter.ExtractDataAi.ExtractDatasAsync(body, cancellationToken).ConfigureAwait(false);
+            var analyzeResult = await analyzeParameter.ExtractDataAi.ExtractDatasAsync(webSiteSource.Body, cancellationToken).ConfigureAwait(false);
 
             if (analyzeResult is null)
                 return Results.Problem("Analyze failed");
@@ -60,7 +72,8 @@ api.MapPost(
                 Summary = analyzeResult.Summary,
                 Authors = analyzeResult.Authors,
                 Url = analyzeParameter.AnalyzeModel.UriToAnalyze,
-                Thumbnail = thumbnail,
+                Thumbnail = webSiteSource.Thumbnail,
+                ThumbnailBase64 = webSiteSource.ThumbnailBase64,
                 Title = analyzeResult.Title,
                 EmbeddingHead = embeddingsHead,
                 EmbeddingBody = embeddingsBody,
@@ -111,6 +124,14 @@ async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string text, [FromS
         };
     }
 }
+
+api.MapGet(
+    "/thumbnail/{id:int}.png",
+    async ([FromRoute] int id, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken) =>
+    {
+        var (memoryStream, fileName) = await analyseStore.GetThumbnailAsync(id, cancellationToken).ConfigureAwait(false);
+        return Results.File(memoryStream, fileDownloadName: fileName, contentType: $"image/{Path.GetExtension(fileName)?.Replace(".", string.Empty)?.ToLower(CultureInfo.CurrentCulture) ?? "png"}");
+    });
 
 api.MapGet(
     "tags",

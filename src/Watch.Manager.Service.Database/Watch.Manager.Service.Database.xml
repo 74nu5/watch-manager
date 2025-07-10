@@ -4,6 +4,9 @@
         <name>Watch.Manager.Service.Database</name>
     </assembly>
     <members>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GetThumbnailAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions)">
             <inheritdoc />
         </member>
@@ -65,6 +68,18 @@
             <inheritdoc />
         </member>
         <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.ThumbnailBase64">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

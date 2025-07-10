@@ -3,18 +3,28 @@
 using Watch.Manager.Service.Analyse.Abstractions;
 using Watch.Manager.Service.Analyse.Models;
 
-internal class WebSiteService(IHttpClientFactory factory, SanitizeService sanitizeService) : IWebSiteService
+internal class WebSiteService(IHttpClientFactory factory, SanitizeService sanitizeService, SanitizeYoutubeService sanitizeYoutubeService) : IWebSiteService
 {
-    public async Task<ExtractedSite> GetWebSiteSource(string url, CancellationToken cancellationToken)
+    public async Task<ExtractedSite> GetWebSiteSource(Uri url, CancellationToken cancellationToken)
     {
-        var client = factory.CreateClient();
-        var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        var client = new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+        });
 
-        if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"Failed to fetch the website source. Status code: {response.StatusCode}", null, response.StatusCode);
+        ExtractedSite sanitizeWebSiteSource;
 
-        var httpResult = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return await sanitizeService.SanitizeWebSiteSource(httpResult, cancellationToken).ConfigureAwait(false);
+        if (url.Host.Contains("youtube", StringComparison.CurrentCultureIgnoreCase))
+            sanitizeWebSiteSource = await sanitizeYoutubeService.SanitizeWebSiteSource(url, cancellationToken).ConfigureAwait(false);
+        else
+            sanitizeWebSiteSource = await sanitizeService.SanitizeWebSiteSource(url, cancellationToken).ConfigureAwait(false);
+
+        var thumbnail = await client.GetByteArrayAsync(sanitizeWebSiteSource.Thumbnail, cancellationToken).ConfigureAwait(false);
+        var thumbnailBase64 = Convert.ToBase64String(thumbnail);
+
+        return sanitizeWebSiteSource with
+        {
+            ThumbnailBase64 = thumbnailBase64,
+        };
     }
-
 }

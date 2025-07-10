@@ -10,7 +10,7 @@ using Microsoft.KernelMemory.AI;
 
 using Watch.Manager.Service.Analyse.Models;
 
-internal sealed class SanitizeService
+internal class SanitizeYoutubeService
 {
     private const int MaxEmbeddingTokens = 8192;
 
@@ -19,10 +19,12 @@ internal sealed class SanitizeService
     private readonly ITextTokenizer tokenizer;
 
     private readonly ILogger<SanitizeService> logger;
+    private readonly HttpClient client;
 
-    public SanitizeService(IServiceProvider serviceProvider)
+    public SanitizeYoutubeService(IServiceProvider serviceProvider)
     {
         this.tokenizer = serviceProvider.GetRequiredService<ITextTokenizer>();
+        this.client = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
         this.logger = serviceProvider.GetRequiredService<ILogger<SanitizeService>>();
     }
 
@@ -33,26 +35,37 @@ internal sealed class SanitizeService
         var document = await context.OpenAsync(req => req.Content(source), cancellationToken).ConfigureAwait(false);
 
 
-        return this.SanitizeInternal(document);
+        return await this.SanitizeInternal(document).ConfigureAwait(false);
     }
+
     public async Task<ExtractedSite> SanitizeWebSiteSource(Uri source, CancellationToken cancellationToken)
     {
-        var config = Configuration.Default.WithDefaultLoader(); 
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(new Url(source.ToString()), cancellationToken).ConfigureAwait(false);
 
-        return this.SanitizeInternal(document);
+        return await this.SanitizeInternal(document).ConfigureAwait(false);
     }
 
-    private ExtractedSite SanitizeInternal(IDocument document)
+    private async Task<ExtractedSite> SanitizeInternal(IDocument document)
     {
-        var body = document.DocumentElement.GetElementsByTagName("body").FirstOrDefault();
         var head = document.DocumentElement.GetElementsByTagName("head").FirstOrDefault();
 
-        if (head is null || body is null)
+        if (head is null)
             return new(string.Empty, string.Empty, new(""));
 
         head.QuerySelectorAll("script").ToList().ForEach(x => x.Remove());
+
+        var alternate = string.Empty;
+        var linkAlternateJsonSelector = head.QuerySelector("link[rel='alternate'][type^='application/json']");
+
+        if (linkAlternateJsonSelector is not null)
+        {
+            var jsonContent = linkAlternateJsonSelector.GetAttribute("href");
+            if (!string.IsNullOrEmpty(jsonContent))
+                alternate = await this.client.GetStringAsync(new Uri(jsonContent)).ConfigureAwait(false);
+        }
+
         head.QuerySelectorAll("link").ToList().ForEach(x => x.Remove());
         head.QuerySelectorAll("style").ToList().ForEach(x => x.Remove());
 
@@ -66,27 +79,11 @@ internal sealed class SanitizeService
                            .Replace("\n", string.Empty)
                            .Replace("\r", string.Empty);
 
-        body.QuerySelectorAll("script").ToList().ForEach(x => x.Remove());
-        body.QuerySelectorAll("link").ToList().ForEach(x => x.Remove());
-        body.QuerySelectorAll("style").ToList().ForEach(x => x.Remove());
-
-        var bodyContent = body.TextContent
-                              .Replace("\t", string.Empty)
-                              .Replace("\n", string.Empty)
-                              .Replace("\r", string.Empty);
-
         this.logger.LogInformation("Head text length: {Length}", headText.Length);
-        this.logger.LogInformation("Body content length: {Length}", bodyContent.Length);
-        this.logger.LogInformation("Initial body content token count: {TokenCount}", this.tokenizer.CountTokens(bodyContent));
 
-        if (this.tokenizer.CountTokens(bodyContent) > MaxEmbeddingTokens)
-            bodyContent = bodyContent[..MaxTextLengthforEmbedding];
+        var descriptionSelector = document.QuerySelector("meta[name='description']");
+        var description = descriptionSelector?.GetAttribute("content") ?? string.Empty;
 
-        while (this.tokenizer.CountTokens(bodyContent) > MaxEmbeddingTokens)
-            bodyContent = bodyContent[..^1];
-
-        this.logger.LogInformation("Sanitized body content token count: {TokenCount}", this.tokenizer.CountTokens(bodyContent));
-
-        return new(headText, bodyContent, thumbnail);
+        return new(headText, string.IsNullOrEmpty(alternate) ? description : alternate, thumbnail);
     }
 }

@@ -4,5 +4,5 @@ using Watch.Manager.Service.Analyse.Models;
 
 public interface IWebSiteService
 {
-    Task<ExtractedSite> GetWebSiteSource(string url, CancellationToken cancellationToken);
+    Task<ExtractedSite> GetWebSiteSource(Uri url, CancellationToken cancellationToken);
 }

@@ -1,4 +1,4 @@
-#pragma warning disable KMEXP00
+﻿#pragma warning disable KMEXP00
 namespace Watch.Manager.Service.Analyse.Extensions;
 
 using Microsoft.Extensions.AI;
@@ -21,6 +21,7 @@ public static class ServiceAnalyzeExtensions
     public static void AddAnalyzeServices(this IHostApplicationBuilder builder)
     {
         builder.Services.TryAddTransient<SanitizeService>();
+        builder.Services.TryAddTransient<SanitizeYoutubeService>();
         builder.Services.TryAddTransient<IWebSiteService, WebSiteService>();
         
         if (builder.Configuration["OllamaEnabled"] is string ollamaEnabled && bool.Parse(ollamaEnabled))

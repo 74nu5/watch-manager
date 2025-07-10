@@ -12,4 +12,6 @@ public interface IArticleAnalyseStore
     Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken);
 
     Task<string[]> GetAllTagsAsync(CancellationToken cancellationToken);
+
+    ValueTask<(MemoryStream, string? FileName)> GetThumbnailAsync(int id, CancellationToken cancellationToken);
 }

@@ -67,4 +67,8 @@ public class ArticleSearchEntity
     [Required]
     [VectorStoreData]
     public string Thumbnail { get; set; }
+
+    [Required]
+    [VectorStoreData]
+    public string ThumbnailBase64 { get; set; }
 }

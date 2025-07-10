@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.VectorData;
 
-public class Article
+public sealed class Article
 {
     /// <summary>
     ///     Represents the fixed number of dimensions for a vector.
@@ -26,45 +26,38 @@ public class Article
     /// </remarks>
     private const string VectorDistanceFunction = DistanceFunction.CosineDistance;
 
-    [VectorStoreKey]
     public int Id { get; set; }
 
     [StringLength(500)]
-    [VectorStoreData]
     [Required]
     public string Title { get; set; }
 
     [Required]
-    [VectorStoreData]
     public string[] Tags { get; set; }
 
     [Required]
-    [VectorStoreData]
     public string[] Authors { get; set; }
 
     [Required]
-    [VectorStoreData]
     public string Summary { get; set; }
 
     [Required]
-    [VectorStoreData]
     public Uri Url { get; set; }
 
     [Required]
-    [VectorStoreData]
     public DateTime AnalyzeDate { get; set; }
 
-    [VectorStoreVector(VectorDimensions, DistanceFunction = VectorDistanceFunction)]
     [Column(TypeName = "vector(1536)")]
     [JsonIgnore]
     public float[] EmbeddingHead { get; set; }
 
-    [VectorStoreVector(VectorDimensions, DistanceFunction = VectorDistanceFunction)]
     [Column(TypeName = "vector(1536)")]
     [JsonIgnore]
     public float[] EmbeddingBody { get; set; }
 
     [Required]
-    [VectorStoreData]
     public Uri Thumbnail { get; set; }
+
+    [Required]
+    public string ThumbnailBase64 { get; set; }
 }

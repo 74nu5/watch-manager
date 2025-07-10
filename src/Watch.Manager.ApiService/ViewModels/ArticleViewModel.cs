@@ -18,4 +18,6 @@ public class ArticleViewModel
     public Uri Thumbnail { get; set; }
 
     public double? Score { get; set; }
+
+    public Uri ThumbnailBase64 { get; set; }
 }

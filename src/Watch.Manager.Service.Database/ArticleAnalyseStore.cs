@@ -65,7 +65,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
             VectorProperty = article => article.EmbeddingBody,
         };
 
-        await foreach (var result in searchable.SearchAsync(searchTerms, 10, vectorSearchOptions, cancellationToken: cancellationToken).ConfigureAwait(false))
+        await foreach (var result in searchable.SearchAsync(searchTerms, 10, vectorSearchOptions, cancellationToken).ConfigureAwait(false))
         {
             yield return new()
             {
@@ -89,4 +89,20 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
 
     public async Task<string[]> GetAllTagsAsync(CancellationToken cancellationToken)
         => await articlesContext.Articles.SelectMany(p => p.Tags).Distinct().OrderBy(s => s).ToArrayAsync(cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc />
+    public async ValueTask<(MemoryStream, string? FileName)> GetThumbnailAsync(int id, CancellationToken cancellationToken)
+    {
+        var articleThumbnail = await articlesContext.Articles.Where(article => article.Id == id).Select(article => new
+        {
+            FileName = Path.GetFileName(article.Thumbnail.LocalPath),
+            article.ThumbnailBase64,
+        }).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        if (articleThumbnail is null)
+            return ((MemoryStream, string? FileName))(Stream.Null, null);
+
+        // base64 to stream
+        var thumbnailBytes = Convert.FromBase64String(articleThumbnail.ThumbnailBase64);
+        return (new(thumbnailBytes) { Position = 0 }, articleThumbnail.FileName);
+    }
 }

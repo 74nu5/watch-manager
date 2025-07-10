@@ -5,12 +5,9 @@ using Asp.Versioning;
 using eShop.ServiceDefaults;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using Scalar.AspNetCore;
 
 public static partial class Extensions
 {
@@ -24,16 +21,16 @@ public static partial class Extensions
 
         _ = app.MapOpenApi();
 
-       /* if (app.Environment.IsDevelopment())
-        {
-            _ = app.MapScalarApiReference(options =>
-            {
-                // Disable default fonts to avoid download unnecessary fonts
-                options.DefaultFonts = false;
-            });
+        /* if (app.Environment.IsDevelopment())
+         {
+             _ = app.MapScalarApiReference(options =>
+             {
+                 // Disable default fonts to avoid download unnecessary fonts
+                 options.DefaultFonts = false;
+             });
 
-            _ = app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
-        }*/
+             _ = app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
+         }*/
 
         return app;
     }
@@ -46,7 +43,7 @@ public static partial class Extensions
 
         var scopes = identitySection.Exists()
                              ? identitySection.GetRequiredSection("Scopes").GetChildren().ToDictionary(p => p.Key, p => p.Value)
-                             : new();
+                             : [];
 
 
         if (!openApi.Exists())

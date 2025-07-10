@@ -398,3 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 src/Watch.Manager.Web/wwwroot/lib/
+
+.idea/

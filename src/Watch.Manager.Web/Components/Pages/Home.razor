@@ -43,15 +43,16 @@
         }
         @foreach (var article in this.articles)
         {
-            <FluentCard Width="400px">
+            <FluentCard Width="400px" Class="article-card">
+                <a href="@article.Url.ToString()" target="_blank">
+                    <div class="article-card-header">
+                        <img src="@($"https://localhost:7558/api/articles/thumbnail/{article.Id}.png?api-version=1.0")" alt="@article.Title" crossorigin="anonymous" />
+                        <h3 class="article-card-title">@article.Title</h3>
+                    </div>
+                </a>
                 <FluentBadge Circular=true Appearance="Appearance.Neutral">
                     @article.AnalyzeDate.ToLocalTime().ToString("F")
                 </FluentBadge>
-                @if(article.Thumbnail is not null)
-                {
-                    <img src="@article.Thumbnail" alt="@article.Title" style="width: -webkit-fill-available;" crossorigin="anonymous" />
-                }
-                <h3>@article.Title</h3>
                 <p>@(new MarkupString(Markdown.ToHtml(article.Summary, MarkdownPipeline)))</p>
                 <p>
                     @foreach (var tag in article.Tags)
@@ -69,7 +70,7 @@
                         </FluentPersona>@* 
                         <FluentTooltip Anchor="@($"persona-{author.Replace(" ", string.Empty)}")" >@author</FluentTooltip> *@
                     }
-                    <FluentAnchor Href="@article.Url.ToString()" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
+                    <FluentAnchor Href="@article.Url.ToString()" Target="_blank" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
                 </FluentStack>
             </FluentCard>
         }
