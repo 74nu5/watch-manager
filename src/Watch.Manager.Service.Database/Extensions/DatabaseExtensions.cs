@@ -15,11 +15,11 @@ public static class DatabaseExtensions
     public static void AddDatabaseServices(this IHostApplicationBuilder builder)
     {
         builder.Services.TryAddTransient<IArticleAnalyseStore, ArticleAnalyseStore>();
-        builder.AddSqlServerDbContext<ArticlesContext>("articles-db");
+        builder.AddSqlServerDbContext<ArticlesContext>("articlesdb");
         _ = builder.Services.AddSqlServerVectorStore(
-            connectionStringProvider: provider => provider.GetRequiredService<IConfiguration>().GetConnectionString("articles-db") ?? throw new InvalidOperationException("Connection string 'articles-db' is not configured."),
+            connectionStringProvider: provider => provider.GetRequiredService<IConfiguration>().GetConnectionString("articlesdb") ?? throw new InvalidOperationException("Connection string 'articlesdb' is not configured."),
             optionsProvider: provider => new() { EmbeddingGenerator = provider.GetService<IEmbeddingGenerator>() });
 
-        _ = builder.Services.AddSqlServerCollection<int, ArticleSearchEntity>("Articles", builder.Configuration.GetConnectionString("articles-db") ?? throw new InvalidOperationException("Connection string 'articles-db' is not configured."));
+        _ = builder.Services.AddSqlServerCollection<int, ArticleSearchEntity>("Articles", builder.Configuration.GetConnectionString("articlesdb") ?? throw new InvalidOperationException("Connection string 'articlesdb' is not configured."));
     }
 }

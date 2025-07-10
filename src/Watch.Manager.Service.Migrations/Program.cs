@@ -10,7 +10,7 @@ builder.Services.AddHostedService<Worker>();
 builder.Services.AddOpenTelemetry()
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
 
-builder.AddSqlServerDbContext<ArticlesContext>("articles-db");
+builder.AddSqlServerDbContext<ArticlesContext>("articlesdb");
 
 var host = builder.Build();
 host.Run();

@@ -1,4 +1,4 @@
-﻿using Projects;
+using Projects;
 
 using Scalar.Aspire;
 
@@ -31,7 +31,8 @@ var sqlServer = builder.AddSqlServer("sql-server", password, 1434)
                        .WithDataVolume()
                        .WithLifetime(ContainerLifetime.Persistent);
 
-var articlesDb = sqlServer.AddDatabase("articles-db");
+
+var articlesDb = sqlServer.AddDatabase("articlesdb");
 
 var migrations = builder.AddProject<Watch_Manager_Service_Migrations>("migrations")
        .WithReference(articlesDb)
