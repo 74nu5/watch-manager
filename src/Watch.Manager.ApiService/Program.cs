@@ -22,8 +22,12 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
+    options.AddPolicy("AllowLocalOrigin",
         builderCors => builderCors.WithOrigins("https://localhost:7020")
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod());
+    options.AddPolicy("AllowAzureOrigin",
+        builderCors => builderCors.WithOrigins("https://app-watch-manager-web-fmc7d9f9cfekg6e6.francecentral-01.azurewebsites.net")
                                   .AllowAnyHeader()
                                   .AllowAnyMethod());
 });
@@ -39,7 +43,8 @@ builder.AddDatabaseServices();
 
 var app = builder.Build();
 
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowLocalOrigin");
+app.UseCors("AllowAzureOrigin");
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
