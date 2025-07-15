@@ -46,7 +46,7 @@
             <FluentCard Width="400px" Class="article-card">
                 <a href="@article.Url.ToString()" target="_blank">
                     <div class="article-card-header">
-                        <img src="@($"https://localhost:7558/api/articles/thumbnail/{article.Id}.png?api-version=1.0")" alt="@article.Title" crossorigin="anonymous" />
+                        <img src="@($"{this.ApiUrl}/api/articles/thumbnail/{article.Id}.png?api-version=1.0")" alt="@article.Title" crossorigin="anonymous" />
                         <h3 class="article-card-title">@article.Title</h3>
                     </div>
                 </a>
@@ -67,7 +67,7 @@
                                        Name="@author"
                                        ImageSize="30px"
                                        StatusSize="PresenceBadgeSize.Small">
-                        </FluentPersona>@* 
+                        </FluentPersona>@*
                         <FluentTooltip Anchor="@($"persona-{author.Replace(" ", string.Empty)}")" >@author</FluentTooltip> *@
                     }
                     <FluentAnchor Href="@article.Url.ToString()" Target="_blank" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
