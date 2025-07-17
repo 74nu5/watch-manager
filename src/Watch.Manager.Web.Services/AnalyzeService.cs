@@ -74,4 +74,10 @@ public class AnalyzeService
     //private async Task ExtractTagsAsync(string content, CancellationToken cancellationToken = default)
     //{
     //}
+    public async Task<string[]> GetTagsAsync(CancellationToken cancellationToken)
+    {
+        var response = await this.client.GetAsync($"/api/articles/tags", cancellationToken).ConfigureAwait(false);
+        _ = response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<string[]>(cancellationToken).ConfigureAwait(false) ?? [];
+    }
 }
