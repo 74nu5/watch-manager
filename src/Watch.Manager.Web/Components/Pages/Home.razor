@@ -43,36 +43,7 @@
         }
         @foreach (var article in this.articles)
         {
-            <FluentCard Width="400px" Class="article-card">
-                <a href="@article.Url.ToString()" target="_blank">
-                    <div class="article-card-header">
-                        <img src="@($"{this.ApiUrl}/api/articles/thumbnail/{article.Id}.png?api-version=1.0")" alt="@article.Title" crossorigin="anonymous" />
-                        <h3 class="article-card-title">@article.Title</h3>
-                    </div>
-                </a>
-                <FluentBadge Circular=true Appearance="Appearance.Neutral">
-                    @article.AnalyzeDate.ToLocalTime().ToString("F")
-                </FluentBadge>
-                <p>@(new MarkupString(Markdown.ToHtml(article.Summary, MarkdownPipeline)))</p>
-                <p>
-                    @foreach (var tag in article.Tags)
-                    {
-                        <FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge>
-                    }
-                </p>
-                <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.SpaceBetween">
-                    @foreach (var author in article.Authors)
-                    {
-                        <FluentPersona Id="@($"persona-{author.Replace(" ", string.Empty)}")"
-                                       Name="@author"
-                                       ImageSize="30px"
-                                       StatusSize="PresenceBadgeSize.Small">
-                        </FluentPersona>@*
-                        <FluentTooltip Anchor="@($"persona-{author.Replace(" ", string.Empty)}")" >@author</FluentTooltip> *@
-                    }
-                    <FluentAnchor Href="@article.Url.ToString()" Target="_blank" IconStart="@(new Size20.Globe())">@article.Url.Host</FluentAnchor>
-                </FluentStack>
-            </FluentCard>
+            <Article ArticleModel="article"></Article>
         }
     }
 </FluentStack>

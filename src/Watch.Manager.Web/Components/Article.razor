@@ -1,0 +1,42 @@
+﻿<FluentCard Width="400px" Class="article-card">
+    <a href="@(this.ArticleModel.Url.ToString())" target="_blank">
+        <div class="article-card-header">
+            <img src="@($"{this.ApiUrl}/api/articles/thumbnail/{this.ArticleModel.Id}.png?api-version=1.0")" alt="@(this.ArticleModel.Title)" crossorigin="anonymous"  height="200" />
+            <h3 class="article-card-title">@(this.ArticleModel.Title)</h3>
+        </div>
+    </a>
+    <FluentBadge Circular=true Appearance="Appearance.Neutral">
+        @(this.ArticleModel.AnalyzeDate.ToLocalTime().ToString("F"))
+    </FluentBadge>
+
+    <p>
+        @if (this.showMore)
+        {
+            <p>@(new MarkupString(this.GetFullMarkdownContent(this.ArticleModel.Summary)))</p>
+            <FluentButton Appearance="Appearance.Hypertext" Size="ButtonSize.Small" @onclick="this.ToggleShowMore">Voir moins</FluentButton>
+        }
+        else
+        {
+            <p>@(new MarkupString(this.GetShortMarkdownContent(this.ArticleModel.Summary)))</p>
+            <FluentButton Appearance="Appearance.Hypertext" Size="ButtonSize.Small" @onclick="this.ToggleShowMore">Voir plus</FluentButton>
+        }
+    </p>
+    <p>
+        @foreach (var tag in this.ArticleModel.Tags)
+        {
+            <FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge>
+        }
+    </p>
+    <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.SpaceBetween">
+        @foreach (var author in this.ArticleModel.Authors)
+        {
+            <FluentPersona Id="@($"persona-{author.Replace(" ", string.Empty)}")"
+                           Name="@author"
+                           ImageSize="30px"
+                           StatusSize="PresenceBadgeSize.Small">
+            </FluentPersona>@*
+                        <FluentTooltip Anchor="@($"persona-{author.Replace(" ", string.Empty)}")" >@author</FluentTooltip> *@
+        }
+        <FluentAnchor Href="@this.ArticleModel.Url.ToString()" Target="_blank" IconStart="@(new Size20.Globe())">@(this.ArticleModel.Url.Host)</FluentAnchor>
+    </FluentStack>
+</FluentCard>
