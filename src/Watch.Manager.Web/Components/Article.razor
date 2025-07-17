@@ -13,12 +13,12 @@
         @if (this.showMore)
         {
             <p>@(new MarkupString(this.GetFullMarkdownContent(this.ArticleModel.Summary)))</p>
-            <FluentButton Appearance="Appearance.Hypertext" Size="ButtonSize.Small" @onclick="this.ToggleShowMore">Voir moins</FluentButton>
+            <FluentButton Appearance="Appearance.Neutral" Size="ButtonSize.Small" @onclick="this.ToggleShowMore" IconStart="@(new Size20.ArrowCollapseAll())">Voir moins</FluentButton>
         }
         else
         {
             <p>@(new MarkupString(this.GetShortMarkdownContent(this.ArticleModel.Summary)))</p>
-            <FluentButton Appearance="Appearance.Hypertext" Size="ButtonSize.Small" @onclick="this.ToggleShowMore">Voir plus</FluentButton>
+            <FluentButton Appearance="Appearance.Neutral" Size="ButtonSize.Small" @onclick="this.ToggleShowMore" IconStart="@(new Size20.ArrowExpandAll())">Voir plus</FluentButton>
         }
     </p>
     <p>
