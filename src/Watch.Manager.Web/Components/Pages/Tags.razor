@@ -17,7 +17,7 @@
     {
         @foreach (var tag in this.tags)
         {
-            <FluentBadge Appearance="@Appearance.Accent">@tag</FluentBadge>
+            <a href="@($"/?tag={tag}")"><FluentBadge Appearance="@Appearance.Accent">@tag</FluentBadge></a>
         }
     }
 </FluentStack>
