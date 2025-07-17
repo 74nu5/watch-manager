@@ -7,7 +7,7 @@ public interface IArticleAnalyseStore
 {
     Task StoreArticleAnalyzeAsync(Article analyzeModel, CancellationToken cancellationToken);
 
-    IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, CancellationToken cancellationToken);
+    IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, string tag, CancellationToken cancellationToken);
 
     Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken);
 

@@ -49,9 +49,9 @@ public class AnalyzeService
         return ApiResult<ExtractAnalyseModel>.Success(analyseModel);
     }
 
-    public async Task<ArticleModel[]> SearchArticleAsync(string text, CancellationToken cancellationToken = default)
+    public async Task<ArticleModel[]> SearchArticleAsync(string text, string? tag, CancellationToken cancellationToken = default)
     {
-        var response = await this.client.GetAsync($"/api/articles/search?text={text}", cancellationToken).ConfigureAwait(false);
+        var response = await this.client.GetAsync($"/api/articles/search?text={text}&tag={tag}", cancellationToken).ConfigureAwait(false);
         _ = response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<ArticleModel[]>(cancellationToken).ConfigureAwait(false) ?? [];
     }

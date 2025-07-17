@@ -4,6 +4,7 @@ using Markdig;
 
 using Markdown.ColorCode;
 
+using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 using Watch.Manager.Common;
@@ -42,6 +43,12 @@ public partial class Home
         this.configuration = configuration;
     }
 
+    /// <summary>
+    ///    Gets or sets the tag search term for articles.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = "tag")]
+    public string? TagSearch { get; set; }
+
     private string ApiUrl => this.configuration.GetValue<string>("services:apiservice:https:0", string.Empty);
 
     /// <inheritdoc />
@@ -49,12 +56,12 @@ public partial class Home
         => await this.ReloadArticlesAsync().ConfigureAwait(true);
 
     private async Task ReloadArticlesAsync()
-        => this.articles = await this.analyzeService.SearchArticleAsync(string.Empty).ConfigureAwait(true);
+        => this.articles = await this.analyzeService.SearchArticleAsync(string.Empty, this.TagSearch).ConfigureAwait(true);
 
     private async Task SearchArticleHandlerAsync()
     {
         this.searchInProgress = true;
-        var apiResult = await this.analyzeService.SearchArticleAsync(this.searchArticleViewModel.Terms).ConfigureAwait(true);
+        var apiResult = await this.analyzeService.SearchArticleAsync(this.searchArticleViewModel.Terms, this.TagSearch).ConfigureAwait(true);
 
         if (apiResult.Length == 0)
         {

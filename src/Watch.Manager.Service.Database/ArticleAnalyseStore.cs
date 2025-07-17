@@ -24,8 +24,35 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
     public async Task<bool> IsArticleExistsAsync(Uri url, CancellationToken cancellationToken)
         => await articlesContext.Articles.AnyAsync(p => p.Url == url, cancellationToken).ConfigureAwait(false);
 
-    public async IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string searchTerms, string tag, CancellationToken cancellationToken)
     {
+        if(!string.IsNullOrWhiteSpace(tag))
+        {
+            // Filter by tag if provided
+            await foreach (var article in articlesContext.Articles.AsNoTracking().AsQueryable()
+                .Where(a => a.Tags.Contains(tag))
+                .OrderByDescending(a => a.AnalyzeDate)
+                .AsAsyncEnumerable()
+                .WithCancellation(cancellationToken)
+                .ConfigureAwait(false))
+            {
+                yield return new()
+                {
+                    Id = article.Id,
+                    Title = article.Title,
+                    Tags = article.Tags,
+                    Authors = article.Authors,
+                    Summary = article.Summary,
+                    Url = article.Url,
+                    AnalyzeDate = article.AnalyzeDate,
+                    Thumbnail = article.Thumbnail,
+                    Score = 0, // Default score when no search terms are provided
+                };
+            }
+
+            yield break;
+        }
+
         if (string.IsNullOrWhiteSpace(searchTerms))
         {
             await foreach (var article in articlesContext.Articles.AsNoTracking().OrderByDescending(a => a.AnalyzeDate).AsAsyncEnumerable().WithCancellation(cancellationToken).ConfigureAwait(false))
