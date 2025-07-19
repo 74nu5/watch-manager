@@ -111,7 +111,7 @@ api.MapGet(
     "/search",
     Handler);
 
-async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string text, [FromQuery] string tag, [FromServices] IExtractEmbeddingAI extractEmbedding, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken)
+async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string? text, [FromQuery] string? tag, [FromServices] IExtractEmbeddingAI extractEmbedding, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken)
 {
     await foreach (var article in analyseStore.SearchArticleAsync(text, tag, cancellationToken).ConfigureAwait(false))
     {
