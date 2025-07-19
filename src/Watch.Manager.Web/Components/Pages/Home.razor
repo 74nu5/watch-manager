@@ -16,7 +16,7 @@
     <EditForm Model="this.addArticleViewModel">
         <div style="display:flex">
             <FluentTextField Class="w-100" @bind-Value="this.addArticleViewModel.Url" Placeholder="Url à sauvegarder" Size="100" Disabled="this.analyzeInProgress" />
-            <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent" @onclick="this.SaveArticleHandlerAsync">Sauvegarder</FluentButton>
+            <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent" @onclick="this.SaveArticleHandlerAsync" Disabled="this.analyzeInProgress">Sauvegarder</FluentButton>
             <FluentProgressRing Visible="this.analyzeInProgress"></FluentProgressRing>
         </div>
     </EditForm>
