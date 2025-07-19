@@ -1,7 +1,7 @@
 ﻿<FluentCard Width="400px" Class="article-card">
     <a href="@(this.ArticleModel.Url.ToString())" target="_blank">
         <div class="article-card-header">
-            <img src="@($"{this.ApiUrl}/api/articles/thumbnail/{this.ArticleModel.Id}.png?api-version=1.0")" alt="@(this.ArticleModel.Title)" crossorigin="anonymous"  height="200" />
+            <img src="@($"{this.ApiUrl}/api/articles/thumbnail/{this.ArticleModel.Id}.png?api-version=1.0")"  alt="@(this.ArticleModel.Title)" crossorigin="anonymous" height="200" />
             <h3 class="article-card-title">@(this.ArticleModel.Title)</h3>
         </div>
     </a>
@@ -24,7 +24,7 @@
     <p>
         @foreach (var tag in this.ArticleModel.Tags)
         {
-            <FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge>
+            <a href="@($"/?tag={tag}")"><FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge></a>
         }
     </p>
     <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.SpaceBetween">
