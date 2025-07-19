@@ -1,7 +1,8 @@
 ﻿@page "/"
 
 <PageTitle>Watch Manager - Accueil</PageTitle>
-<FluentCard Width="98%">
+
+<FluentCard>
     <EditForm Model="this.searchArticleViewModel">
         <div style="display:flex">
             <FluentTextField Class="w-100" @bind-Value="this.searchArticleViewModel.Terms" TextFieldType="TextFieldType.Search" Autofocus="true" Placeholder="Rechercher..." Size="100" @bind-Value:after="this.SearchArticleHandlerAsync" />
@@ -11,7 +12,7 @@
 
 </FluentCard>
 
-<FluentCard Width="98%">
+<FluentCard>
     <h2>Ajouter un site</h2>
     <EditForm Model="this.addArticleViewModel">
         <div style="display:flex">
