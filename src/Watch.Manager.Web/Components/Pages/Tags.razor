@@ -3,15 +3,10 @@
 <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalAlignment="HorizontalAlignment.Center">
     @if (this.tags.Length == 0)
     {
-        <FluentCard Width="400px" Class="card-padding">
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 10px" Height="10px;"></FluentSkeleton>
-            <FluentSkeleton Style="margin-top: 20px;margin-bottom: 10px;" Width="75px" Height="30px"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-            <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
-        </FluentCard>
+        @foreach(var i in Enumerable.Range(1, 30))
+        {
+            <FluentSkeleton Height="20px;" Width="75px" />
+        }
     }
     else
     {
