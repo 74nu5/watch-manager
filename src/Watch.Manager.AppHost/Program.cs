@@ -1,4 +1,4 @@
-using Projects;
+﻿using Projects;
 
 using Scalar.Aspire;
 
@@ -7,21 +7,8 @@ using Watch.Manager.AppHost;
 var builder = DistributedApplication.CreateBuilder(args);
 var password = builder.AddParameter("sql-server-password", "Password1234");
 
-
-// Add Scalar API Reference for all services
-var scalar = builder.AddScalarApiReference(options =>
-{
-    // Configure global options. They will apply to all services
-    options.WithTheme(ScalarTheme.Purple);
-});
-
-//var postgres = builder.AddPostgres("postgres", port: 65367)
-//                      .WithImage("pgvector/pgvector")
-//                      .WithImageTag("pg17")
-//                      .WithDataVolume()
-//                      .WithLifetime(ContainerLifetime.Persistent);
-
-//var articlesDb = postgres.AddDatabase("articles-db");
+var scalar = builder.AddScalarApiReference(options => _ = options.WithTheme(ScalarTheme.Purple))
+                    .WithLifetime(ContainerLifetime.Persistent);
 
 var sqlServer = builder.AddSqlServer("sql-server", password, 1434)
                        .WithHostPort(1434)
@@ -31,18 +18,11 @@ var sqlServer = builder.AddSqlServer("sql-server", password, 1434)
                        .WithDataVolume()
                        .WithLifetime(ContainerLifetime.Persistent);
 
-
 var articlesDb = sqlServer.AddDatabase("articlesdb");
 
 var migrations = builder.AddProject<Watch_Manager_Service_Migrations>("migrations")
-       .WithReference(articlesDb)
-       .WaitFor(articlesDb);
-
-
-//var sql = builder.AddSqlServer("sql", port: 1433)
-//                 .WithEndpoint("tcp", annotation => annotation.IsProxied = false)
-//                 .WithDataVolume()
-//                 .WithLifetime(ContainerLifetime.Persistent);
+                        .WithReference(articlesDb)
+                        .WaitFor(articlesDb);
 
 var apiService = builder.AddProject<Watch_Manager_ApiService>("apiservice")
                         .WithReference(articlesDb)
@@ -63,7 +43,6 @@ builder.AddProject<Watch_Manager_Web>("webfrontend")
        .WithReference(apiService)
        .WaitFor(scalar)
        .WaitFor(migrations);
-
 
 
 scalar.WithApiReference(apiService)
