@@ -52,7 +52,7 @@ public partial class Home
     private string ApiUrl => this.configuration.GetValue<string>("services:apiservice:https:0", string.Empty);
 
     /// <inheritdoc />
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
         => await this.ReloadArticlesAsync().ConfigureAwait(true);
 
     private async Task ReloadArticlesAsync()
