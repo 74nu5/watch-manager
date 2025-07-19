@@ -132,10 +132,11 @@ async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string? text, [From
 
 api.MapGet(
     "/thumbnail/{id:int}.png",
-    async ([FromRoute] int id, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken) =>
+    async (HttpContext httpContext, [FromRoute] int id, [FromServices] IArticleAnalyseStore analyseStore, CancellationToken cancellationToken) =>
     {
         var (memoryStream, fileName) = await analyseStore.GetThumbnailAsync(id, cancellationToken).ConfigureAwait(false);
-        return Results.File(memoryStream, fileDownloadName: fileName, contentType: $"image/{Path.GetExtension(fileName)?.Replace(".", string.Empty)?.ToLower(CultureInfo.CurrentCulture) ?? "png"}");
+        httpContext.Response.Headers.ContentDisposition = $"inline; filename=\"{fileName ?? "thumbnail.png"}\"";
+        return Results.File(memoryStream, contentType: $"image/{Path.GetExtension(fileName)?.Replace(".", string.Empty).ToLower(CultureInfo.CurrentCulture) ?? "png"}");
     });
 
 api.MapGet(
