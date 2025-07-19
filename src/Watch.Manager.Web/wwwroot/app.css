@@ -25,8 +25,12 @@
     }
 
 fluent-card {
-    margin: 0.825rem;
+    margin: 0.825rem 0;
 }
+
+    fluent-card.article-card {
+        margin: 0.825rem;
+    }
 
 fluent-badge {
     margin: 0.125rem;
@@ -82,3 +86,9 @@ fluent-badge {
     .article-card-header:hover .article-card-title {
         opacity: 0;
     }
+
+
+.body-content {
+    padding: 15px;
+}
+
