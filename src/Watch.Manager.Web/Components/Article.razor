@@ -5,7 +5,7 @@
             <h3 class="article-card-title">@(this.ArticleModel.Title)</h3>
         </div>
     </a>
-    <FluentBadge Circular=true Appearance="Appearance.Neutral">
+    <FluentBadge Circular="true" Appearance="Appearance.Neutral">
         @(this.ArticleModel.AnalyzeDate.ToLocalTime().ToString("F"))
     </FluentBadge>
 

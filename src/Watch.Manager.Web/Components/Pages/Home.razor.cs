@@ -28,7 +28,9 @@ public partial class Home
     private readonly AddArticleViewModel addArticleViewModel = new();
     private ArticleModel[] articles = [];
     private bool analyzeInProgress;
+    private bool searchDisabled;
     private bool searchInProgress;
+    private bool popoverIsVisible;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Home" /> class.
@@ -44,19 +46,38 @@ public partial class Home
     }
 
     /// <summary>
-    ///    Gets or sets the tag search term for articles.
+    ///     Gets or sets the tag search term for articles.
     /// </summary>
     [SupplyParameterFromQuery(Name = "tag")]
     public string? TagSearch { get; set; }
 
-    private string ApiUrl => this.configuration.GetValue<string>("services:apiservice:https:0", string.Empty);
+    /// <summary>
+    ///     Gets or sets the search query for articles.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? QuerySearch { get; set; }
+
+    /// <inheritdoc />
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters).ConfigureAwait(true);
+
+        if (!string.IsNullOrWhiteSpace(this.QuerySearch))
+            this.searchArticleViewModel.Terms = this.QuerySearch;
+
+        this.searchDisabled = !string.IsNullOrWhiteSpace(this.TagSearch);
+    }
 
     /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
-        => await this.ReloadArticlesAsync().ConfigureAwait(true);
+        => await this.SearchArticleHandlerAsync().ConfigureAwait(true);
 
     private async Task ReloadArticlesAsync()
-        => this.articles = await this.analyzeService.SearchArticleAsync(string.Empty, this.TagSearch).ConfigureAwait(true);
+    {
+        this.searchArticleViewModel.Terms = string.Empty;
+        await this.SearchArticleHandlerAsync().ConfigureAwait(true);
+        this.searchDisabled = false;
+    }
 
     private async Task SearchArticleHandlerAsync()
     {
@@ -117,6 +138,12 @@ public partial class Home
         await this.ReloadArticlesAsync().ConfigureAwait(true);
         this.addArticleViewModel.Url = string.Empty;
         this.analyzeInProgress = false;
+    }
+
+    private async Task DismissTagAsync()
+    {
+        this.TagSearch = string.Empty;
+        await this.ReloadArticlesAsync().ConfigureAwait(true);
     }
 
     private sealed class SearchArticleViewModel

@@ -2,29 +2,43 @@
 
 <PageTitle>Watch Manager - Accueil</PageTitle>
 
-<FluentCard>
-    <EditForm Model="this.searchArticleViewModel">
-        <div style="display:flex">
-            <FluentTextField Class="w-100" @bind-Value="this.searchArticleViewModel.Terms" TextFieldType="TextFieldType.Search" Autofocus="true" Placeholder="Rechercher..." Size="100" @bind-Value:after="this.SearchArticleHandlerAsync" />
-            <FluentProgressRing Visible="this.searchInProgress"></FluentProgressRing>
-        </div>
-    </EditForm>
+<FluentButton id="myPopoverButtonl" Appearance="Appearance.Accent" @onclick="() => this.popoverIsVisible = !this.popoverIsVisible">
+    Ajouter un article
+</FluentButton>
 
-</FluentCard>
-
-<FluentCard>
-    <h2>Ajouter un site</h2>
+<FluentPopover VerticalThreshold="170" AnchorId="myPopoverButtonl" @bind-Open="this.popoverIsVisible">
+    <Header>Url de l'article</Header>
+    <Body>
     <EditForm Model="this.addArticleViewModel">
         <div style="display:flex">
-            <FluentTextField Class="w-100" @bind-Value="this.addArticleViewModel.Url" Placeholder="Url à sauvegarder" Size="100" Disabled="this.analyzeInProgress" />
+            <FluentTextField Class="w-100" @bind-Value="this.addArticleViewModel.Url" Placeholder="Url à sauvegarder" Size="100" Disabled="this.analyzeInProgress"/>
             <FluentButton Type="ButtonType.Submit" Appearance="@Appearance.Accent" @onclick="this.SaveArticleHandlerAsync" Disabled="this.analyzeInProgress">Sauvegarder</FluentButton>
             <FluentProgressRing Visible="this.analyzeInProgress"></FluentProgressRing>
         </div>
     </EditForm>
+    </Body>
+</FluentPopover>
 
+<FluentCard>
+    @if (string.IsNullOrWhiteSpace(this.TagSearch))
+    {
+        <EditForm Model="this.searchArticleViewModel">
+            <div style="display:flex">
+                <FluentTextField Class="w-100" @bind-Value="this.searchArticleViewModel.Terms" TextFieldType="TextFieldType.Search" Autofocus="true" Placeholder="Rechercher..." Disabled="this.searchInProgress" Size="100" @bind-Value:after="this.SearchArticleHandlerAsync" />
+                <FluentProgressRing Visible="this.searchInProgress"></FluentProgressRing>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <FluentBadge Appearance="Appearance.Neutral" Circular="true" Class="m-1 p-1" OnDismissClick="this.DismissTagAsync" DismissTitle="Supprimer le tag">
+            @this.TagSearch
+        </FluentBadge>
+    }
 </FluentCard>
+
 <FluentStack Orientation="Orientation.Horizontal" Class="m-1" Wrap="true" HorizontalAlignment="HorizontalAlignment.Center">
-    @if (this.searchInProgress)
+    @if (this.searchDisabled)
     {
         <FluentProgress></FluentProgress>
     }
@@ -42,6 +56,7 @@
                 <FluentSkeleton Shape="SkeletonShape.Rect"></FluentSkeleton>
             </FluentCard>
         }
+
         @foreach (var article in this.articles)
         {
             <Article ArticleModel="article"></Article>
