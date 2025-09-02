@@ -1,3 +1,26 @@
+
+## 🗺️ Timeline des fonctionnalités
+
+```mermaid
+timeline
+  title Roadmap Fonctionnalités Watch Manager
+  2024-06 : Ajout d'articles avec analyse IA
+  2024-07 : Attribution de tags automatiques
+  2024-08 : Stockage vectoriel des contenus
+  2024-09 : API RESTful pour articles
+  2024-10 : Catégorisation avancée
+  2024-11 : Interface de gestion des catégories
+  2025-01 : Classification automatique par IA
+  2025-03 : Organisation hiérarchique des catégories
+  2025-06 : Filtres et recherche multicritères
+  2025-09 : Recherche assistée par IA
+  2025-12 : Plans de veille personnalisés
+  2026-03 : Application mobile native
+  2026-06 : Fonctionnalités collaboratives
+  2026-09 : Intégrations avancées (RSS, APIs)
+  2026-12 : Système d'authentification et analytics
+```
+
 # Roadmap - Watch Manager
 
 ## 🎯 Vision
