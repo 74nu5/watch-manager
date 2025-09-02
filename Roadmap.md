@@ -16,10 +16,33 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 ### 🔄 Phase 2 : Organisation (En cours)
 - [x] **API RESTful** pour la gestion des articles
 - [ ] **Catégorisation avancée des articles**
-  - Interface de gestion des catégories
-  - Classification automatique par IA
-  - Organisation hiérarchique des catégories
-  - Filtres et recherche par catégorie
+
+  #### 🎛️ Interface de gestion des catégories
+  - **Création et édition de catégories** : Interface intuitive pour créer, modifier et supprimer des catégories personnalisées
+  - **Métadonnées enrichies** : Description, couleur, icône et mots-clés pour chaque catégorie
+  - **Gestion des règles de classification** : Définition de critères automatiques (mots-clés, domaines, sources)
+  - **Aperçu en temps réel** : Prévisualisation du nombre d'articles affectés par catégorie
+
+  #### 🤖 Classification automatique par IA
+  - **Analyse sémantique** : Utilisation des embeddings existants pour comprendre le contenu des articles
+  - **Apprentissage supervisé** : Amélioration continue basée sur les corrections manuelles des utilisateurs
+  - **Classification multi-label** : Possibilité d'assigner plusieurs catégories à un même article
+  - **Score de confiance** : Indication du niveau de certitude de la classification automatique
+  - **Suggestions intelligentes** : Proposition de nouvelles catégories basées sur les contenus analysés
+
+  #### 🌳 Organisation hiérarchique des catégories
+  - **Structure arborescente** : Catégories parentes et sous-catégories pour une organisation logique
+  - **Héritage des propriétés** : Les sous-catégories héritent automatiquement des règles de leurs parents
+  - **Réorganisation par glisser-déposer** : Interface intuitive pour restructurer la hiérarchie
+  - **Chemins de navigation** : Breadcrumbs pour naviguer facilement dans l'arborescence
+  - **Vues multiples** : Affichage en liste, arbre ou grille selon les préférences
+
+  #### 🔍 Filtres et recherche par catégorie
+  - **Filtrage multicritères** : Combinaison de catégories, tags, dates et sources
+  - **Recherche facettée** : Navigation par facettes avec compteurs d'articles
+  - **Sauvegarde de filtres** : Création de vues personnalisées réutilisables
+  - **Recherche textuelle enrichie** : Recherche dans les catégories, descriptions et métadonnées
+  - **Exports ciblés** : Possibilité d'exporter des articles filtrés par catégorie
 
 ### 🔮 Phase 3 : Accompagnement intelligent à la veille
 

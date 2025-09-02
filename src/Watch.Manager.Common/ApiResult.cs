@@ -1,6 +1,44 @@
 ﻿namespace Watch.Manager.Common;
 
 /// <summary>
+///     Represents the result of an API call without result data.
+/// </summary>
+public sealed record ApiResult(ApiResultErrorType? ApiResultErrorType = null, string? Error = null)
+{
+    /// <summary>
+    ///     Creates a successful <see cref="ApiResult" />.
+    /// </summary>
+    /// <returns>A successful <see cref="ApiResult" />.</returns>
+    public static ApiResult Success()
+        => new();
+
+    /// <summary>
+    ///     Creates a failed <see cref="ApiResult" /> with the specified error type.
+    /// </summary>
+    /// <param name="apiResultErrorType">The type of the error.</param>
+    /// <returns>A failed <see cref="ApiResult" />.</returns>
+    public static ApiResult Failure(ApiResultErrorType apiResultErrorType)
+        => new(apiResultErrorType);
+
+    /// <summary>
+    ///     Creates a failed <see cref="ApiResult" /> with the specified error message.
+    /// </summary>
+    /// <param name="error">The error message.</param>
+    /// <returns>A failed <see cref="ApiResult" />.</returns>
+    public static ApiResult Failure(string error)
+        => new(null, error);
+
+    /// <summary>
+    ///     Creates a failed <see cref="ApiResult" /> with the specified error type and error message.
+    /// </summary>
+    /// <param name="apiResultErrorType">The type of the error.</param>
+    /// <param name="error">The error message.</param>
+    /// <returns>A failed <see cref="ApiResult" />.</returns>
+    public static ApiResult Failure(ApiResultErrorType apiResultErrorType, string error)
+        => new(apiResultErrorType, error);
+}
+
+/// <summary>
 ///     Represents the result of an API call, including the result data, error type, and error message.
 /// </summary>
 /// <typeparam name="TResult">The type of the result data.</typeparam>

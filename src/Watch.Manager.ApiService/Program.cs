@@ -147,6 +147,307 @@ api.MapGet(
         return Results.Ok(tags.Distinct(StringComparer.InvariantCultureIgnoreCase));
     });
 
+// API pour les catégories
+var categoriesApi = vApi.MapGroup("api/categories");
+
+categoriesApi.MapGet(
+    "/",
+    async ([FromServices] ICategoryStore categoryStore, [FromQuery] bool includeInactive = false, CancellationToken cancellationToken = default) =>
+    {
+        var categories = await categoryStore.GetAllCategoriesAsync(includeInactive, cancellationToken).ConfigureAwait(false);
+        var viewModels = categories.Select(c => new CategoryViewModel
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Color = c.Color,
+            Icon = c.Icon,
+            Keywords = c.Keywords,
+            ParentId = c.ParentId,
+            ParentName = c.Parent?.Name,
+            Children = c.Children.Select(child => new CategoryViewModel
+            {
+                Id = child.Id,
+                Name = child.Name,
+                Description = child.Description,
+                Color = child.Color,
+                Icon = child.Icon,
+                Keywords = child.Keywords,
+                ParentId = child.ParentId,
+                CreatedAt = child.CreatedAt,
+                UpdatedAt = child.UpdatedAt,
+                IsActive = child.IsActive,
+                ConfidenceThreshold = child.ConfidenceThreshold
+            }).ToList(),
+            CreatedAt = c.CreatedAt,
+            UpdatedAt = c.UpdatedAt,
+            IsActive = c.IsActive,
+            ConfidenceThreshold = c.ConfidenceThreshold
+        });
+        return Results.Ok(viewModels);
+    })
+    .WithName("GetAllCategories")
+    .WithSummary("Récupère toutes les catégories");
+
+categoriesApi.MapGet(
+    "/{id:int}",
+    async ([FromRoute] int id, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        var category = await categoryStore.GetCategoryByIdAsync(id, cancellationToken).ConfigureAwait(false);
+        if (category == null)
+        {
+            return Results.NotFound($"Catégorie avec l'ID {id} non trouvée");
+        }
+
+        var articleCount = await categoryStore.GetArticleCountInCategoryAsync(id, true, cancellationToken).ConfigureAwait(false);
+
+        var viewModel = new CategoryViewModel
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            Color = category.Color,
+            Icon = category.Icon,
+            Keywords = category.Keywords,
+            ParentId = category.ParentId,
+            ParentName = category.Parent?.Name,
+            Children = category.Children.Select(child => new CategoryViewModel
+            {
+                Id = child.Id,
+                Name = child.Name,
+                Description = child.Description,
+                Color = child.Color,
+                Icon = child.Icon,
+                Keywords = child.Keywords,
+                ParentId = child.ParentId,
+                CreatedAt = child.CreatedAt,
+                UpdatedAt = child.UpdatedAt,
+                IsActive = child.IsActive,
+                ConfidenceThreshold = child.ConfidenceThreshold
+            }).ToList(),
+            ArticleCount = articleCount,
+            CreatedAt = category.CreatedAt,
+            UpdatedAt = category.UpdatedAt,
+            IsActive = category.IsActive,
+            ConfidenceThreshold = category.ConfidenceThreshold
+        };
+        return Results.Ok(viewModel);
+    })
+    .WithName("GetCategoryById")
+    .WithSummary("Récupère une catégorie par son ID");
+
+categoriesApi.MapPost(
+    "/",
+    async ([FromBody] CreateCategoryModel model, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        // Validation du nom unique
+        var nameExists = await categoryStore.CategoryNameExistsAsync(model.Name, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (nameExists)
+        {
+            return Results.Conflict($"Une catégorie avec le nom '{model.Name}' existe déjà");
+        }
+
+        // Validation de la catégorie parente
+        if (model.ParentId.HasValue)
+        {
+            var parentExists = await categoryStore.CategoryExistsAsync(model.ParentId.Value, cancellationToken).ConfigureAwait(false);
+            if (!parentExists)
+            {
+                return Results.BadRequest($"La catégorie parente avec l'ID {model.ParentId.Value} n'existe pas");
+            }
+        }
+
+        var category = new Category
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Color = model.Color,
+            Icon = model.Icon,
+            Keywords = model.Keywords,
+            ParentId = model.ParentId,
+            ConfidenceThreshold = model.ConfidenceThreshold
+        };
+
+        var createdCategory = await categoryStore.CreateCategoryAsync(category, cancellationToken).ConfigureAwait(false);
+
+        var viewModel = new CategoryViewModel
+        {
+            Id = createdCategory.Id,
+            Name = createdCategory.Name,
+            Description = createdCategory.Description,
+            Color = createdCategory.Color,
+            Icon = createdCategory.Icon,
+            Keywords = createdCategory.Keywords,
+            ParentId = createdCategory.ParentId,
+            CreatedAt = createdCategory.CreatedAt,
+            UpdatedAt = createdCategory.UpdatedAt,
+            IsActive = createdCategory.IsActive,
+            ConfidenceThreshold = createdCategory.ConfidenceThreshold
+        };
+
+        return Results.Created($"/api/categories/{createdCategory.Id}", viewModel);
+    })
+    .WithName("CreateCategory")
+    .WithSummary("Crée une nouvelle catégorie");
+
+categoriesApi.MapPut(
+    "/{id:int}",
+    async ([FromRoute] int id, [FromBody] UpdateCategoryModel model, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        var category = await categoryStore.GetCategoryByIdAsync(id, cancellationToken).ConfigureAwait(false);
+        if (category == null)
+        {
+            return Results.NotFound($"Catégorie avec l'ID {id} non trouvée");
+        }
+
+        // Validation du nom unique si modifié
+        if (!string.IsNullOrEmpty(model.Name) && model.Name != category.Name)
+        {
+            var nameExists = await categoryStore.CategoryNameExistsAsync(model.Name, id, cancellationToken).ConfigureAwait(false);
+            if (nameExists)
+            {
+                return Results.Conflict($"Une catégorie avec le nom '{model.Name}' existe déjà");
+            }
+            category.Name = model.Name;
+        }
+
+        // Validation de la catégorie parente si modifiée
+        if (model.ParentId != category.ParentId)
+        {
+            if (model.ParentId.HasValue)
+            {
+                var parentExists = await categoryStore.CategoryExistsAsync(model.ParentId.Value, cancellationToken).ConfigureAwait(false);
+                if (!parentExists)
+                {
+                    return Results.BadRequest($"La catégorie parente avec l'ID {model.ParentId.Value} n'existe pas");
+                }
+
+                // Vérifier qu'on ne crée pas une référence circulaire
+                if (model.ParentId.Value == id)
+                {
+                    return Results.BadRequest("Une catégorie ne peut pas être sa propre parente");
+                }
+            }
+            category.ParentId = model.ParentId;
+        }
+
+        // Mise à jour des autres propriétés
+        if (model.Description != null) category.Description = model.Description;
+        if (model.Color != null) category.Color = model.Color;
+        if (model.Icon != null) category.Icon = model.Icon;
+        if (model.Keywords != null) category.Keywords = model.Keywords;
+        if (model.IsActive.HasValue) category.IsActive = model.IsActive.Value;
+        if (model.ConfidenceThreshold.HasValue) category.ConfidenceThreshold = model.ConfidenceThreshold.Value;
+
+        var updatedCategory = await categoryStore.UpdateCategoryAsync(category, cancellationToken).ConfigureAwait(false);
+
+        var viewModel = new CategoryViewModel
+        {
+            Id = updatedCategory.Id,
+            Name = updatedCategory.Name,
+            Description = updatedCategory.Description,
+            Color = updatedCategory.Color,
+            Icon = updatedCategory.Icon,
+            Keywords = updatedCategory.Keywords,
+            ParentId = updatedCategory.ParentId,
+            CreatedAt = updatedCategory.CreatedAt,
+            UpdatedAt = updatedCategory.UpdatedAt,
+            IsActive = updatedCategory.IsActive,
+            ConfidenceThreshold = updatedCategory.ConfidenceThreshold
+        };
+
+        return Results.Ok(viewModel);
+    })
+    .WithName("UpdateCategory")
+    .WithSummary("Met à jour une catégorie");
+
+categoriesApi.MapDelete(
+    "/{id:int}",
+    async ([FromRoute] int id, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        try
+        {
+            var deleted = await categoryStore.DeleteCategoryAsync(id, cancellationToken).ConfigureAwait(false);
+            if (!deleted)
+            {
+                return Results.NotFound($"Catégorie avec l'ID {id} non trouvée");
+            }
+            return Results.NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+    })
+    .WithName("DeleteCategory")
+    .WithSummary("Supprime une catégorie");
+
+categoriesApi.MapGet(
+    "/roots",
+    async ([FromServices] ICategoryStore categoryStore, [FromQuery] bool includeInactive = false, CancellationToken cancellationToken = default) =>
+    {
+        var categories = await categoryStore.GetRootCategoriesAsync(includeInactive, cancellationToken).ConfigureAwait(false);
+        var viewModels = categories.Select(c => new CategoryViewModel
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Color = c.Color,
+            Icon = c.Icon,
+            Keywords = c.Keywords,
+            ParentId = c.ParentId,
+            Children = c.Children.Select(child => new CategoryViewModel
+            {
+                Id = child.Id,
+                Name = child.Name,
+                Description = child.Description,
+                Color = child.Color,
+                Icon = child.Icon,
+                Keywords = child.Keywords,
+                ParentId = child.ParentId,
+                CreatedAt = child.CreatedAt,
+                UpdatedAt = child.UpdatedAt,
+                IsActive = child.IsActive,
+                ConfidenceThreshold = child.ConfidenceThreshold
+            }).ToList(),
+            CreatedAt = c.CreatedAt,
+            UpdatedAt = c.UpdatedAt,
+            IsActive = c.IsActive,
+            ConfidenceThreshold = c.ConfidenceThreshold
+        });
+        return Results.Ok(viewModels);
+    })
+    .WithName("GetRootCategories")
+    .WithSummary("Récupère les catégories racines avec leurs enfants");
+
+categoriesApi.MapPost(
+    "/{categoryId:int}/articles/{articleId:int}",
+    async ([FromRoute] int categoryId, [FromRoute] int articleId, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        var success = await categoryStore.AssignCategoryToArticleAsync(articleId, categoryId, true, null, cancellationToken).ConfigureAwait(false);
+        if (!success)
+        {
+            return Results.BadRequest("Impossible d'assigner la catégorie à l'article");
+        }
+        return Results.Ok();
+    })
+    .WithName("AssignCategoryToArticle")
+    .WithSummary("Assigne une catégorie à un article");
+
+categoriesApi.MapDelete(
+    "/{categoryId:int}/articles/{articleId:int}",
+    async ([FromRoute] int categoryId, [FromRoute] int articleId, [FromServices] ICategoryStore categoryStore, CancellationToken cancellationToken) =>
+    {
+        var success = await categoryStore.RemoveCategoryFromArticleAsync(articleId, categoryId, cancellationToken).ConfigureAwait(false);
+        if (!success)
+        {
+            return Results.NotFound("Assignation non trouvée");
+        }
+        return Results.NoContent();
+    })
+    .WithName("RemoveCategoryFromArticle")
+    .WithSummary("Retire une catégorie d'un article");
+
 app.MapDefaultEndpoints();
 
 app.UseDefaultOpenApi();

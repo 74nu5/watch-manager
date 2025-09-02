@@ -16,6 +16,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
         <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" />
         <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />

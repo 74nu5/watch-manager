@@ -15,6 +15,7 @@ public static class DatabaseExtensions
     public static void AddDatabaseServices(this IHostApplicationBuilder builder)
     {
         builder.Services.TryAddTransient<IArticleAnalyseStore, ArticleAnalyseStore>();
+        builder.Services.TryAddTransient<ICategoryStore, CategoryStore>();
         builder.AddSqlServerDbContext<ArticlesContext>("articlesdb");
         _ = builder.Services.AddSqlServerVectorStore(
             connectionStringProvider: provider => provider.GetRequiredService<IConfiguration>().GetConnectionString("articlesdb") ?? throw new InvalidOperationException("Connection string 'articlesdb' is not configured."),

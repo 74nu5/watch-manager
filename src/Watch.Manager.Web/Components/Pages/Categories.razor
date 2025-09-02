@@ -1,0 +1,206 @@
+@page "/categories"
+@using Watch.Manager.Web.Services.Models
+@using Watch.Manager.Web.Services
+@using Watch.Manager.Common
+@using Microsoft.FluentUI.AspNetCore.Components
+
+<h3>📁 Gestion des Catégories</h3>
+
+<div class="categories-container">
+    <div class="categories-header">
+        <FluentButton Appearance="Appearance.Accent" @onclick="ShowCreateDialog">
+            ➕ Nouvelle Catégorie
+        </FluentButton>
+        <FluentSwitch @bind-Value="showInactive" @bind-Value:after="OnShowInactiveChanged" Label="Afficher les catégories inactives" />
+    </div>
+
+    @if (loading)
+    {
+        <div class="loading-container">
+            <FluentProgressRing />
+            <p>Chargement des catégories...</p>
+        </div>
+    }
+    else if (categories.Length == 0)
+    {
+        <FluentCard>
+            <div class="empty-state">
+                <p style="font-size: 3em;">📁</p>
+                <h4>Aucune catégorie</h4>
+                <p>Commencez par créer votre première catégorie pour organiser vos articles.</p>
+                <FluentButton Appearance="Appearance.Accent" @onclick="ShowCreateDialog">
+                    Créer une catégorie
+                </FluentButton>
+            </div>
+        </FluentCard>
+    }
+    else
+    {
+        <div class="categories-grid">
+            @foreach (var category in categories)
+            {
+                <CategoryCard Category="category"
+                             OnEdit="EditCategory"
+                             OnDelete="DeleteCategory"
+                             OnToggleActive="ToggleActiveCategory" />
+            }
+        </div>
+    }
+</div>
+
+<!-- Dialog pour créer/éditer une catégorie -->
+<FluentDialog @bind-Hidden="hideDialog" Modal="true" TrapFocus="true" CloseOnOverlayClick="false">
+    <FluentDialogHeader>
+        <FluentLabel Typo="Typography.H4">
+            @(editingCategory == null ? "Nouvelle Catégorie" : "Modifier la Catégorie")
+        </FluentLabel>
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <EditForm Model="categoryForm" OnValidSubmit="SaveCategory">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <FluentTextField @bind-Value="categoryForm.Name"
+                               Label="Nom *"
+                               Required="true"
+                               Placeholder="Nom de la catégorie" />
+                <ValidationMessage For="@(() => categoryForm.Name)" />
+            </div>
+
+            <div class="form-group">
+                <FluentTextArea @bind-Value="categoryForm.Description"
+                              Label="Description"
+                              Placeholder="Description de la catégorie"
+                              Rows="3" />
+            </div>
+
+            <div class="form-group">
+                <FluentTextField @bind-Value="categoryForm.Color"
+                               Label="Couleur (hex)"
+                               Placeholder="#3498db" />
+            </div>
+
+            <div class="form-group">
+                <FluentTextField @bind-Value="categoryForm.Icon"
+                               Label="Icône"
+                               Placeholder="folder" />
+            </div>
+
+            <div class="form-group">
+                <FluentTextField @bind-Value="keywordsText"
+                               Label="Mots-clés (séparés par des virgules)"
+                               Placeholder="react, javascript, frontend" />
+            </div>
+
+            <div class="form-group">
+                <FluentSelect @bind-SelectedOption="selectedParent"
+                            Label="Catégorie parente"
+                            Placeholder="Sélectionner une catégorie parente">
+                    <FluentOption Value="null">Aucune (catégorie racine)</FluentOption>
+                    @foreach (var cat in GetAvailableParentCategories())
+                    {
+                        <FluentOption Value="cat.Id">@cat.Name</FluentOption>
+                    }
+                </FluentSelect>
+            </div>
+
+            <div class="form-group">
+                <FluentNumberField @bind-Value="categoryForm.ConfidenceThreshold"
+                                 Label="Seuil de confiance (0.0 - 1.0)"
+                                 Min="0"
+                                 Max="1"
+                                 Step="0.1" />
+            </div>
+
+            <div class="dialog-actions">
+                <FluentButton @onclick="HideDialog" Appearance="Appearance.Neutral">
+                    Annuler
+                </FluentButton>
+                <FluentButton Type="ButtonType.Submit"
+                            Appearance="Appearance.Accent"
+                            Loading="saving">
+                    @(editingCategory == null ? "Créer" : "Modifier")
+                </FluentButton>
+            </div>
+        </EditForm>
+    </FluentDialogBody>
+</FluentDialog>
+
+<!-- Dialog de confirmation de suppression -->
+<FluentDialog @bind-Hidden="hideDeleteDialog" Modal="true" TrapFocus="true">
+    <FluentDialogHeader>
+        <FluentLabel Typo="Typography.H4">Confirmer la suppression</FluentLabel>
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <p>Êtes-vous sûr de vouloir supprimer la catégorie "<strong>@categoryToDelete?.Name</strong>" ?</p>
+        <p class="warning-text">Cette action est irréversible et supprimera également toutes les assignations d'articles à cette catégorie.</p>
+    </FluentDialogBody>
+
+    <FluentDialogFooter>
+        <FluentButton @onclick="HideDeleteDialog" Appearance="Appearance.Neutral">
+            Annuler
+        </FluentButton>
+        <FluentButton @onclick="ConfirmDelete"
+                    Appearance="Appearance.Accent"
+                    Loading="deleting">
+            Supprimer
+        </FluentButton>
+    </FluentDialogFooter>
+</FluentDialog>
+
+<style>
+    .categories-container {
+        padding: 20px;
+    }
+
+    .categories-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .empty-state svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .warning-text {
+        color: var(--error-color);
+        font-weight: 500;
+    }
+</style>

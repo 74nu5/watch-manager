@@ -1,0 +1,279 @@
+@using Watch.Manager.Web.Services.Models
+@using Microsoft.FluentUI.AspNetCore.Components
+@using static Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size20
+@using static Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16
+
+<FluentCard Class="category-card">
+    <div class="category-header">
+        <div class="category-title">
+            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
+            <h4>@Category.Name</h4>
+        </div>
+        <div class="category-actions">
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        Title="Modifier"
+                        @onclick="() => OnEdit.InvokeAsync(Category)">
+                ✏️
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        Title="@(Category.IsActive ? "Désactiver" : "Activer")"
+                        @onclick="() => OnToggleActive.InvokeAsync(Category)">
+                @(Category.IsActive ? "👁️" : "🚫")
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        Title="Supprimer"
+                        @onclick="() => OnDelete.InvokeAsync(Category)">
+                🗑️
+            </FluentButton>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Category.Description))
+    {
+        <p class="category-description">@Category.Description</p>
+    }
+
+    <div class="category-info">
+        <div class="info-item">
+            <FluentIcon Value="@(new Size16.Document())" />
+            <span>@Category.ArticleCount articles</span>
+        </div>
+
+        @if (Category.ParentName != null)
+        {
+            <div class="info-item">
+                <FluentIcon Value="@(new Size16.FolderOpen())" />
+                <span>Parent: @Category.ParentName</span>
+            </div>
+        }
+
+        @if (Category.Children.Any())
+        {
+            <div class="info-item">
+                <FluentIcon Value="@(new Size16.Folder())" />
+                <span>@Category.Children.Count sous-catégories</span>
+            </div>
+        }
+    </div>
+
+    @if (Category.Keywords.Any())
+    {
+        <div class="category-keywords">
+            @foreach (var keyword in Category.Keywords)
+            {
+                <FluentBadge Appearance="Appearance.Neutral" BackgroundColor="@GetColor()" Color="white">
+                    @keyword
+                </FluentBadge>
+            }
+        </div>
+    }
+
+    <div class="category-footer">
+        <div class="category-dates">
+            <small>Créée: @Category.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</small>
+            @if (Category.UpdatedAt != Category.CreatedAt)
+            {
+                <small>Modifiée: @Category.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy")</small>
+            }
+        </div>
+
+        @if (!Category.IsActive)
+        {
+            <FluentBadge Appearance="Appearance.Neutral">Inactive</FluentBadge>
+        }
+
+        @if (Category.ConfidenceThreshold.HasValue)
+        {
+            <FluentBadge Appearance="Appearance.Neutral" Title="Seuil de confiance pour la classification automatique">
+                Confiance: @Category.ConfidenceThreshold.Value.ToString("P0")
+            </FluentBadge>
+        }
+    </div>
+
+    @if (Category.Children.Any())
+    {
+        <details class="children-details">
+            <summary>Sous-catégories (@Category.Children.Count)</summary>
+            <div class="children-list">
+                @foreach (var child in Category.Children)
+                {
+                    <div class="child-category">
+                        @if (!string.IsNullOrEmpty(child.Icon))
+                        {
+                            <FluentIcon Value="@GetIcon(child.Icon)" />
+                        }
+                        <span class="@(child.IsActive ? "" : "inactive")">@child.Name</span>
+                        @if (!child.IsActive)
+                        {
+                            <FluentBadge Appearance="Appearance.Neutral" Size="BadgeSize.Small">Inactive</FluentBadge>
+                        }
+                    </div>
+                }
+            </div>
+        </details>
+    }
+</FluentCard>
+
+<style>
+    .category-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .category-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .category-title h4 {
+        margin: 0;
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .category-description {
+        color: var(--neutral-foreground-rest);
+        font-size: 0.9em;
+        margin-bottom: 16px;
+        line-height: 1.4;
+    }
+
+    .category-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .category-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .category-footer {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--neutral-stroke-divider-rest);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .category-dates {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .category-dates small {
+        color: var(--neutral-foreground-rest);
+        font-size: 0.75em;
+    }
+
+    .children-details {
+        margin-top: 16px;
+        border-top: 1px solid var(--neutral-stroke-divider-rest);
+        padding-top: 12px;
+    }
+
+    .children-details summary {
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9em;
+        margin-bottom: 8px;
+    }
+
+    .children-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-left: 16px;
+    }
+
+    .child-category {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+    }
+
+    .child-category.inactive {
+        opacity: 0.6;
+    }
+
+    .inactive {
+        text-decoration: line-through;
+        opacity: 0.6;
+    }
+</style>
+
+@code {
+    [Parameter] public CategoryModel Category { get; set; } = null!;
+    [Parameter] public EventCallback<CategoryModel> OnEdit { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnDelete { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnToggleActive { get; set; }
+
+    private Icon GetIcon(string iconName)
+    {
+        // Mapping simple des noms d'icônes vers les icônes Fluent UI
+        return iconName.ToLower() switch
+        {
+            "folder" => new Size20.Folder(),
+            "code" => new Size20.Code(),
+            "web" => new Size20.Globe(),
+            "mobile" => new Size20.Phone(),
+            "database" => new Size20.Database(),
+            "cloud" => new Size20.Cloud(),
+            "security" => new Size20.Shield(),
+            "ai" => new Size20.Brain(),
+            "tool" => new Size20.Wrench(),
+            "book" => new Size20.Book(),
+            "star" => new Size20.Star(),
+            "tag" => new Size20.Tag(),
+            _ => new Size20.Folder()
+        };
+    }
+
+    private string GetColor()
+    {
+        if (!string.IsNullOrEmpty(Category.Color))
+        {
+            return Category.Color;
+        }
+
+        // Couleur par défaut basée sur le hash du nom
+        var hash = Category.Name.GetHashCode();
+        var colors = new[] { "#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c", "#34495e", "#e67e22" };
+        return colors[Math.Abs(hash) % colors.Length];
+    }
+}
