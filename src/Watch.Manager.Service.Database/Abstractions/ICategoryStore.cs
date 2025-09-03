@@ -108,4 +108,12 @@ public interface ICategoryStore
     /// <param name="cancellationToken">Token d'annulation.</param>
     /// <returns>Nombre d'articles.</returns>
     Task<int> GetArticleCountInCategoryAsync(int categoryId, bool includeChildren = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Récupère les titres des articles liés à une catégorie.
+    /// </summary>
+    /// <param name="categoryId">Identifiant de la catégorie.</param>
+    /// <param name="cancellationToken">Token d'annulation.</param>
+    /// <returns>Liste des titres d'articles.</returns>
+    Task<string[]> GetLinkedArticleTitlesAsync(int categoryId, CancellationToken cancellationToken = default);
 }

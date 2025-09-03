@@ -23,6 +23,7 @@ public partial class Categories : ComponentBase, IDisposable
     // Dialog states
     private bool hideDialog = true;
     private bool hideDeleteDialog = true;
+    private bool hideBatchDialog = true;
     private bool saving = false;
     private bool deleting = false;
 
@@ -32,6 +33,12 @@ public partial class Categories : ComponentBase, IDisposable
     private CategoryFormModel categoryForm = new();
     private string keywordsText = string.Empty;
     private int? selectedParent = null;
+
+    // AI Classification
+    private bool suggestingCategories = false;
+    private NewCategorySuggestion[] newCategorySuggestions = [];
+    private bool batchClassifying = false;
+    private BatchClassificationResult[] batchResults = [];
 
     /// <summary>
     /// Constructeur.
@@ -261,6 +268,114 @@ public partial class Categories : ComponentBase, IDisposable
             current = categories.FirstOrDefault(c => c.Id == current.ParentId);
         }
         return false;
+    }
+
+    // AI Classification Methods
+    private async Task SuggestNewCategories()
+    {
+        suggestingCategories = true;
+        try
+        {
+            var result = await analyzeService.SuggestNewCategoriesAsync(cts.Token);
+
+            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
+            {
+                toastService.ShowError($"Erreur lors de la suggestion de catégories: {result.Error}");
+                return;
+            }
+
+            newCategorySuggestions = result.Result ?? [];
+            if (newCategorySuggestions.Length == 0)
+            {
+                toastService.ShowInfo("Aucune nouvelle catégorie suggérée. Vos catégories actuelles semblent couvrir tous les articles.");
+            }
+            else
+            {
+                toastService.ShowSuccess($"{newCategorySuggestions.Length} nouvelles catégories suggérées");
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Erreur: {ex.Message}");
+        }
+        finally
+        {
+            suggestingCategories = false;
+        }
+    }
+
+    private async Task ShowBatchClassificationDialog()
+    {
+        batchClassifying = true;
+        batchResults = [];
+        hideBatchDialog = false;
+
+        try
+        {
+            var result = await analyzeService.BatchClassifyAsync(cts.Token);
+
+            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
+            {
+                toastService.ShowError($"Erreur lors de la classification par lot: {result.Error}");
+                return;
+            }
+
+            batchResults = result.Result ?? [];
+            toastService.ShowSuccess($"{batchResults.Length} articles classifiés");
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Erreur: {ex.Message}");
+        }
+        finally
+        {
+            batchClassifying = false;
+        }
+    }
+
+    private async Task CreateCategoryFromSuggestion(NewCategorySuggestion suggestion)
+    {
+        try
+        {
+            var result = await analyzeService.CreateCategoryAsync(
+                suggestion.Name,
+                suggestion.Description,
+                suggestion.Color,
+                suggestion.Icon,
+                suggestion.Keywords,
+                null, // pas de parent pour les suggestions
+                suggestion.ConfidenceThreshold,
+                cts.Token);
+
+            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
+            {
+                toastService.ShowError($"Erreur lors de la création: {result.Error}");
+                return;
+            }
+
+            toastService.ShowSuccess($"Catégorie '{suggestion.Name}' créée avec succès");
+
+            // Retirer la suggestion de la liste
+            newCategorySuggestions = newCategorySuggestions.Where(s => s != suggestion).ToArray();
+
+            // Recharger les catégories
+            await LoadCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Erreur: {ex.Message}");
+        }
+    }
+
+    private void DismissSuggestion(NewCategorySuggestion suggestion)
+    {
+        newCategorySuggestions = newCategorySuggestions.Where(s => s != suggestion).ToArray();
+    }
+
+    private void HideBatchDialog()
+    {
+        hideBatchDialog = true;
+        batchResults = [];
     }
 
     /// <summary>

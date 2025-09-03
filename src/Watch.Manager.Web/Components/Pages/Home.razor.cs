@@ -112,6 +112,8 @@ public partial class Home
                 this.toastService.ShowError("Url non disponible");
                 return;
             case ApiResultErrorType.None:
+                // Article sauvé avec succès, afficher un message de succès avec info sur la classification
+                this.toastService.ShowSuccess("Article sauvegardé avec succès ! 🤖 Classification automatique appliquée.");
                 break;
             case ApiResultErrorType.BadRequest:
                 this.analyzeInProgress = false;
@@ -130,6 +132,8 @@ public partial class Home
                 this.toastService.ShowError("Erreur interne du serveur");
                 break;
             case null:
+                // Article sauvé avec succès, afficher un message de succès avec info sur la classification
+                this.toastService.ShowSuccess("Article sauvegardé avec succès ! 🤖 Classification automatique appliquée.");
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -138,6 +142,7 @@ public partial class Home
         await this.ReloadArticlesAsync().ConfigureAwait(true);
         this.addArticleViewModel.Url = string.Empty;
         this.analyzeInProgress = false;
+        this.popoverIsVisible = false; // Fermer le popover après l'ajout
     }
 
     private async Task DismissTagAsync()

@@ -1,0 +1,354 @@
+@using Watch.Manager.Web.Services.Models
+@using Watch.Manager.Web.Services
+@using Watch.Manager.Common
+@inject AnalyzeService AnalyzeService
+@inject IToastService ToastService
+
+<div class="article-classification">
+    <div class="classification-header">
+        <span class="classification-icon">🤖</span>
+        <span class="classification-title">Classification IA</span>
+        @if (IsClassifying)
+        {
+            <FluentProgressRing Size="16px" />
+        }
+        else
+        {
+            <FluentButton Appearance="Appearance.Stealth"
+                         @onclick="ClassifyArticleAsync"
+                         Title="Reclassifier l'article">
+                🔄
+            </FluentButton>
+        }
+    </div>
+
+    @if (Suggestions?.Any() == true)
+    {
+        <div class="suggestions-section">
+            <h4>Catégories suggérées:</h4>
+            @foreach (var suggestion in Suggestions.OrderByDescending(s => s.ConfidenceScore))
+            {
+                <div class="suggestion-item @(suggestion.IsAutoAssigned ? "auto-assigned" : "")">
+                    <FluentBadge Appearance="@GetBadgeAppearance(suggestion.ConfidenceScore)"
+                                Circular="false"
+                                Class="confidence-badge">
+                        @($"{suggestion.ConfidenceScore:P0}")
+                    </FluentBadge>
+
+                    <span class="category-name">@suggestion.CategoryName</span>
+
+                    @if (!suggestion.IsAutoAssigned)
+                    {
+                        <FluentButton Appearance="Appearance.Stealth"
+                                     @onclick="() => AssignCategoryAsync(suggestion.CategoryId)"
+                                     Title="Assigner cette catégorie">
+                            ➕
+                        </FluentButton>
+                    }
+                    else
+                    {
+                        <span class="success-icon" title="Assigné automatiquement">✅</span>
+                    }
+
+                    @if (!string.IsNullOrEmpty(suggestion.Reason))
+                    {
+                        <span class="info-icon" title="@suggestion.Reason">ℹ️</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (NewCategorySuggestions?.Any() == true)
+    {
+        <div class="new-category-suggestions">
+            <h4>Nouvelles catégories suggérées:</h4>
+            @foreach (var newCat in NewCategorySuggestions)
+            {
+                <div class="new-category-item">
+                    <FluentBadge Appearance="@GetBadgeAppearance(newCat.ConfidenceScore)"
+                                Circular="false"
+                                Class="confidence-badge">
+                        @($"{newCat.ConfidenceScore:P0}")
+                    </FluentBadge>
+
+                    <span class="new-category-name">@newCat.SuggestedName</span>
+
+                    <FluentButton Appearance="Appearance.Stealth"
+                                 @onclick="() => CreateAndAssignCategoryAsync(newCat)"
+                                 Title="Créer cette catégorie">
+                        ➕
+                    </FluentButton>
+
+                    @if (!string.IsNullOrEmpty(newCat.Reason))
+                    {
+                        <span class="info-icon" title="@newCat.Reason">ℹ️</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (HasClassified && !Suggestions?.Any() == true)
+    {
+        <div class="no-suggestions">
+            <span>❓ Aucune catégorie correspondante trouvée.</span>
+            <FluentButton Appearance="Appearance.Accent"
+                         @onclick="SuggestNewCategoriesAsync"
+                         Disabled="IsLoadingNewSuggestions">
+                @if (IsLoadingNewSuggestions)
+                {
+                    <FluentProgressRing Size="16px" />
+                }
+                else
+                {
+                    <span>Suggérer de nouvelles catégories</span>
+                }
+            </FluentButton>
+        </div>
+    }
+</div>
+
+<style>
+    .article-classification {
+        border: 1px solid var(--neutral-stroke-divider-rest);
+        border-radius: var(--control-corner-radius);
+        padding: 12px;
+        margin: 8px 0;
+        background: var(--neutral-layer-1);
+    }
+
+    .classification-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .classification-icon {
+        font-size: 18px;
+    }
+
+    .classification-title {
+        flex-grow: 1;
+    }
+
+    .suggestions-section, .new-category-suggestions {
+        margin-bottom: 12px;
+    }
+
+    .suggestion-item, .new-category-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    }
+
+    .suggestion-item:last-child, .new-category-item:last-child {
+        border-bottom: none;
+    }
+
+    .auto-assigned {
+        background-color: var(--accent-fill-rest);
+        border-radius: 4px;
+        padding: 4px 8px;
+        opacity: 0.8;
+    }
+
+    .confidence-badge {
+        min-width: 45px;
+        text-align: center;
+    }
+
+    .category-name, .new-category-name {
+        flex-grow: 1;
+        font-weight: 500;
+    }
+
+    .new-category-name {
+        font-style: italic;
+        color: var(--accent-foreground-rest);
+    }
+
+    .success-icon, .info-icon {
+        cursor: help;
+    }
+
+    .no-suggestions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        background: var(--neutral-layer-2);
+        border-radius: 4px;
+        font-style: italic;
+        color: var(--neutral-foreground-hint);
+    }
+</style>
+
+@code {
+    [Parameter] public int ArticleId { get; set; }
+    [Parameter] public EventCallback OnCategoryAssigned { get; set; }
+
+    private bool IsClassifying { get; set; }
+    private bool IsLoadingNewSuggestions { get; set; }
+    private bool HasClassified { get; set; }
+    private CategorySuggestionModel[]? Suggestions { get; set; }
+    private NewCategorySuggestionModel[]? NewCategorySuggestions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ClassifyArticleAsync();
+    }
+
+    private async Task ClassifyArticleAsync()
+    {
+        if (IsClassifying) return;
+
+        IsClassifying = true;
+        HasClassified = false;
+        StateHasChanged();
+
+        try
+        {
+            var result = await AnalyzeService.ClassifyArticleAsync(ArticleId);
+            if (result.ApiResultErrorType == ApiResultErrorType.None || result.ApiResultErrorType == null)
+            {
+                Suggestions = result.Result;
+                HasClassified = true;
+            }
+            else
+            {
+                ToastService.ShowError($"Erreur lors de la classification: {result.Error ?? result.ApiResultErrorType?.ToString()}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Erreur inattendue: {ex.Message}");
+        }
+        finally
+        {
+            IsClassifying = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task AssignCategoryAsync(int categoryId)
+    {
+        try
+        {
+            var result = await AnalyzeService.AssignCategoryToArticleAsync(categoryId, ArticleId);
+            if (result.ApiResultErrorType == ApiResultErrorType.None || result.ApiResultErrorType == null)
+            {
+                ToastService.ShowSuccess("Catégorie assignée avec succès");
+
+                // Marquer la suggestion comme assignée
+                if (Suggestions != null)
+                {
+                    var suggestion = Suggestions.FirstOrDefault(s => s.CategoryId == categoryId);
+                    if (suggestion != null)
+                    {
+                        suggestion.IsAutoAssigned = true;
+                    }
+                }
+
+                await OnCategoryAssigned.InvokeAsync();
+                StateHasChanged();
+            }
+            else
+            {
+                ToastService.ShowError($"Erreur lors de l'assignation: {result.Error ?? result.ApiResultErrorType?.ToString()}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Erreur inattendue: {ex.Message}");
+        }
+    }
+
+    private async Task SuggestNewCategoriesAsync()
+    {
+        if (IsLoadingNewSuggestions) return;
+
+        IsLoadingNewSuggestions = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await AnalyzeService.SuggestNewCategoriesAsync(ArticleId);
+            if (result.ApiResultErrorType == ApiResultErrorType.None || result.ApiResultErrorType == null)
+            {
+                NewCategorySuggestions = result.Result;
+            }
+            else
+            {
+                ToastService.ShowError($"Erreur lors de la suggestion: {result.Error ?? result.ApiResultErrorType?.ToString()}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Erreur inattendue: {ex.Message}");
+        }
+        finally
+        {
+            IsLoadingNewSuggestions = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateAndAssignCategoryAsync(NewCategorySuggestionModel suggestion)
+    {
+        try
+        {
+            // Créer la nouvelle catégorie
+            var createResult = await AnalyzeService.CreateCategoryAsync(
+                suggestion.SuggestedName,
+                suggestion.SuggestedDescription,
+                suggestion.SuggestedColor,
+                suggestion.SuggestedIcon,
+                suggestion.SuggestedKeywords,
+                suggestion.SuggestedParentId);
+
+            if (createResult.ApiResultErrorType == ApiResultErrorType.None || createResult.ApiResultErrorType == null)
+            {
+                ToastService.ShowSuccess($"Catégorie '{suggestion.SuggestedName}' créée avec succès");
+
+                // Assigner la nouvelle catégorie à l'article
+                var assignResult = await AnalyzeService.AssignCategoryToArticleAsync(createResult.Result!.Id, ArticleId);
+                if (assignResult.ApiResultErrorType == ApiResultErrorType.None || assignResult.ApiResultErrorType == null)
+                {
+                    ToastService.ShowSuccess("Catégorie assignée à l'article");
+                    await OnCategoryAssigned.InvokeAsync();
+
+                    // Retirer la suggestion de la liste
+                    NewCategorySuggestions = NewCategorySuggestions?.Where(s => s != suggestion).ToArray();
+                    StateHasChanged();
+                }
+                else
+                {
+                    ToastService.ShowWarning("Catégorie créée mais échec de l'assignation");
+                }
+            }
+            else
+            {
+                ToastService.ShowError($"Erreur lors de la création: {createResult.Error ?? createResult.ApiResultErrorType?.ToString()}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Erreur inattendue: {ex.Message}");
+        }
+    }
+
+    private static Appearance GetBadgeAppearance(double confidence)
+    {
+        return confidence switch
+        {
+            >= 0.8 => Appearance.Accent,
+            >= 0.6 => Appearance.Neutral,
+            _ => Appearance.Lightweight
+        };
+    }
+}

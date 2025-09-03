@@ -4,6 +4,98 @@
         <name>Watch.Manager.ApiService</name>
     </assembly>
     <members>
+        <member name="T:Watch.Manager.ApiService.Extensions.ClassificationEndpoints">
+            <summary>
+            Extensions pour ajouter les endpoints de classification des articles.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Extensions.ClassificationEndpoints.MapClassificationEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Ajoute les endpoints de classification des articles à l'application.
+            </summary>
+            <param name="app">L'application web.</param>
+            <returns>L'application web pour le chaînage.</returns>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Categories">
+            <summary>
+            Catégories assignées à cet article.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest">
+            <summary>
+            Modèle de requête pour la classification en lot d'articles
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest.ArticleIds">
+            <summary>
+            Identifiants des articles à classifier
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest.Options">
+            <summary>
+            Options de classification
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.BatchClassificationResult">
+            <summary>
+            Modèle pour représenter le résultat de la classification par lot d'un article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ArticleId">
+            <summary>
+            Identifiant de l'article classifié.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ArticleTitle">
+            <summary>
+            Titre de l'article classifié.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.AssignedCategories">
+            <summary>
+            Catégories assignées automatiquement.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.Success">
+            <summary>
+            Indique si la classification a réussi.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ErrorMessage">
+            <summary>
+            Message d'erreur en cas d'échec.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel">
+            <summary>
+            Modèle pour représenter l'assignation d'une catégorie à un article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.CategoryId">
+            <summary>
+            Identifiant de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.CategoryName">
+            <summary>
+            Nom de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.ConfidenceScore">
+            <summary>
+            Score de confiance de l'assignation.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.IsAutomatic">
+            <summary>
+            Indique si l'assignation a été faite automatiquement ou manuellement.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.AssignedAt">
+            <summary>
+            Date de l'assignation.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CategoryViewModel">
             <summary>
             ViewModel pour représenter une catégorie dans l'API.
@@ -59,6 +151,11 @@
             Nombre d'articles dans cette catégorie.
             </summary>
         </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.LinkedArticles">
+            <summary>
+            Noms des articles liés à cette catégorie.
+            </summary>
+        </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.CreatedAt">
             <summary>
             Date de création.
@@ -77,6 +174,26 @@
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.ConfidenceThreshold">
             <summary>
             Seuil de confiance pour la classification automatique.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest">
+            <summary>
+            Modèle de requête pour fournir un retour sur la classification
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.ArticleId">
+            <summary>
+            Identifiant de l'article classifié
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.CorrectCategories">
+            <summary>
+            Identifiants des catégories correctes
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.IncorrectCategories">
+            <summary>
+            Identifiants des catégories incorrectes suggérées par l'IA
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CreateCategoryModel">
@@ -117,6 +234,56 @@
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.ConfidenceThreshold">
             <summary>
             Seuil de confiance pour la classification automatique.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion">
+            <summary>
+            Modèle pour représenter une suggestion de nouvelle catégorie compatible avec l'API Web.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedName">
+            <summary>
+            Nom suggéré pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedDescription">
+            <summary>
+            Description suggérée pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedKeywords">
+            <summary>
+            Mots-clés suggérés pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.RelevanceScore">
+            <summary>
+            Score de pertinence de la suggestion entre 0 et 1.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.Justification">
+            <summary>
+            Justification de la suggestion de nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedColor">
+            <summary>
+            Couleur suggérée pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedIcon">
+            <summary>
+            Icône suggérée pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedParentId">
+            <summary>
+            Identifiant de la catégorie parente suggérée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedParentName">
+            <summary>
+            Nom de la catégorie parente suggérée.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel">

@@ -1,6 +1,8 @@
 namespace Watch.Manager.Service.Database.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Représente une catégorie pour organiser les articles.
@@ -84,4 +86,21 @@ public sealed class Category
     /// Score de confiance pour la classification automatique.
     /// </summary>
     public double? ConfidenceThreshold { get; set; } = 0.7;
+
+    /// <summary>
+    /// Embedding vectoriel de la catégorie pour la classification sémantique.
+    /// </summary>
+    [Column(TypeName = "vector(1536)")]
+    [JsonIgnore]
+    public float[]? Embedding { get; set; }
+
+    /// <summary>
+    /// Seuil automatique pour la classification.
+    /// </summary>
+    public double AutoThreshold { get; set; } = 0.8;
+
+    /// <summary>
+    /// Seuil manuel pour la classification.
+    /// </summary>
+    public double ManualThreshold { get; set; } = 0.6;
 }

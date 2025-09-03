@@ -56,6 +56,11 @@ public class CategoryModel
     public int ArticleCount { get; set; }
 
     /// <summary>
+    /// Liste des articles liés à cette catégorie.
+    /// </summary>
+    public List<string> LinkedArticles { get; set; } = new();
+
+    /// <summary>
     /// Date de création.
     /// </summary>
     public DateTime CreatedAt { get; set; }
@@ -78,5 +83,5 @@ public class CategoryModel
     /// <summary>
     /// Mots-clés concaténés pour l'affichage.
     /// </summary>
-    public string KeywordsJoin => string.Join(", ", Keywords);
+    public string KeywordsJoin => string.Join(", ", this.Keywords);
 }

@@ -1,7 +1,4 @@
 @using Watch.Manager.Web.Services.Models
-@using Microsoft.FluentUI.AspNetCore.Components
-@using static Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size20
-@using static Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16
 
 <FluentCard Class="category-card">
     <div class="category-header">
@@ -58,6 +55,23 @@
             </div>
         }
     </div>
+
+    @* Affichage des articles liés *@
+    @if (Category.LinkedArticles.Count > 0)
+    {
+        <details class="linked-articles-details">
+            <summary>Articles liés (@Category.LinkedArticles.Count)</summary>
+            <div class="linked-articles-list">
+                @foreach (var article in Category.LinkedArticles)
+                {
+                    <div class="linked-article">
+                        <FluentIcon Value="@(new Size16.Document())" />
+                        <span>@article</span>
+                    </div>
+                }
+            </div>
+        </details>
+    }
 
     @if (Category.Keywords.Any())
     {
@@ -234,6 +248,42 @@
     .inactive {
         text-decoration: line-through;
         opacity: 0.6;
+    }
+
+    .linked-articles-details {
+        margin-top: 12px;
+        border-top: 1px solid var(--neutral-stroke-divider-rest);
+        padding-top: 12px;
+    }
+
+    .linked-articles-details summary {
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9em;
+        margin-bottom: 8px;
+        color: var(--accent-foreground-rest);
+    }
+
+    .linked-articles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-left: 16px;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .linked-article {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    }
+
+    .linked-article:last-child {
+        border-bottom: none;
     }
 </style>
 

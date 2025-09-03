@@ -19,4 +19,9 @@ public sealed record ArticleResultDto
     public Uri Thumbnail { get; set; }
 
     public double? Score { get; set; }
+
+    /// <summary>
+    /// Catégories assignées à cet article.
+    /// </summary>
+    public string[] Categories { get; set; } = [];
 }

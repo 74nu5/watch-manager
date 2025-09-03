@@ -25,5 +25,11 @@ public record AnalyzeParameter
     public IArticleAnalyseStore ArticleAnalyseStore { get; set; }
 
     [FromServices]
+    public IArticleClassificationAI ClassificationService { get; set; }
+
+    [FromServices]
+    public ICategoryStore CategoryStore { get; set; }
+
+    [FromServices]
     public ILogger<AnalyzeParameter> Logger { get; set; }
 }

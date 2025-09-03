@@ -1,12 +1,84 @@
 @page "/categories"
-@using Watch.Manager.Web.Services.Models
-@using Watch.Manager.Web.Services
-@using Watch.Manager.Common
-@using Microsoft.FluentUI.AspNetCore.Components
 
 <h3>📁 Gestion des Catégories</h3>
 
 <div class="categories-container">
+    <!-- Section Classification Automatique -->
+    <FluentCard Class="classification-panel">
+        <div class="panel-header">
+            <h4>🤖 Classification Automatique par IA</h4>
+            <FluentBadge Appearance="Appearance.Accent">Nouveau</FluentBadge>
+        </div>
+
+        <div class="classification-actions">
+            <div class="action-group">
+                <FluentButton Appearance="Appearance.Accent"
+                            @onclick="SuggestNewCategories"
+                            Loading="suggestingCategories">
+                    ✨ Suggérer de nouvelles catégories
+                </FluentButton>
+                <p class="action-description">Analyse les articles non catégorisés pour suggérer de nouvelles catégories</p>
+            </div>
+
+            <div class="action-group">
+                <FluentButton Appearance="Appearance.Outline"
+                            @onclick="ShowBatchClassificationDialog"
+                            Loading="false">
+                    📊 Classification en lot
+                </FluentButton>
+                <p class="action-description">Classifie automatiquement plusieurs articles à la fois</p>
+            </div>
+        </div>
+
+        @if (newCategorySuggestions.Length > 0)
+        {
+            <div class="suggestions-section">
+                <h5>💡 Nouvelles catégories suggérées</h5>
+                <div class="suggestions-grid">
+                    @foreach (var suggestion in newCategorySuggestions)
+                    {
+                        <div class="suggestion-card">
+                            <div class="suggestion-header">
+                                <strong>@suggestion.Name</strong>
+                                <FluentBadge Appearance="Appearance.Neutral">
+                                    @($"{suggestion.ConfidenceScore:P0}")
+                                </FluentBadge>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(suggestion.Description))
+                            {
+                                <p class="suggestion-description">@suggestion.Description</p>
+                            }
+
+                            @if (suggestion.Keywords.Any())
+                            {
+                                <div class="suggestion-keywords">
+                                    @foreach (var keyword in suggestion.Keywords)
+                                    {
+                                        <FluentBadge Appearance="Appearance.Lightweight">@keyword</FluentBadge>
+                                    }
+                                </div>
+                            }
+
+                            <div class="suggestion-actions">
+                                <FluentButton Size="ButtonSize.Small"
+                                            Appearance="Appearance.Accent"
+                                            @onclick="() => CreateCategoryFromSuggestion(suggestion)">
+                                    ➕ Créer
+                                </FluentButton>
+                                <FluentButton Size="ButtonSize.Small"
+                                            Appearance="Appearance.Stealth"
+                                            @onclick="() => DismissSuggestion(suggestion)">
+                                    ❌ Ignorer
+                                </FluentButton>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </FluentCard>
+
     <div class="categories-header">
         <FluentButton Appearance="Appearance.Accent" @onclick="ShowCreateDialog">
             ➕ Nouvelle Catégorie
@@ -150,9 +222,144 @@
     </FluentDialogFooter>
 </FluentDialog>
 
+@* Dialogue de classification par lot *@
+<FluentDialog @bind-Hidden="hideBatchDialog" Modal="true" TrapFocus="true">
+    <FluentDialogHeader>
+        <h4>Résultats de la classification par lot</h4>
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        @if (batchClassifying)
+        {
+            <div class="loading-container">
+                <FluentProgressRing />
+                <p>Classification en cours...</p>
+            </div>
+        }
+        else if (batchResults.Any())
+        {
+            <div class="batch-classification-content">
+                <p>@batchResults.Length articles classifiés automatiquement :</p>
+
+                <div class="classification-results">
+                    @foreach (var result in batchResults)
+                    {
+                        <div class="result-item">
+                            <div class="result-article">@result.ArticleTitle</div>
+                            <div class="result-categories">
+                                @foreach (var category in result.AssignedCategories)
+                                {
+                                    <FluentBadge Appearance="Appearance.Accent">
+                                        @category.CategoryName (@($"{category.ConfidenceScore:P0}"))
+                                    </FluentBadge>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Aucun article à classifier trouvé.</p>
+        }
+    </FluentDialogBody>
+
+    <FluentDialogFooter>
+        <FluentButton @onclick="HideBatchDialog">Fermer</FluentButton>
+    </FluentDialogFooter>
+</FluentDialog>
+
 <style>
     .categories-container {
         padding: 20px;
+    }
+
+    .classification-panel {
+        margin-bottom: 30px;
+        padding: 20px;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .panel-header h4 {
+        margin: 0;
+        color: var(--accent-foreground-rest);
+    }
+
+    .classification-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .action-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .action-description {
+        font-size: 0.85em;
+        color: var(--neutral-foreground-rest);
+        margin: 0;
+    }
+
+    .suggestions-section {
+        border-top: 1px solid var(--neutral-stroke-divider-rest);
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+
+    .suggestions-section h5 {
+        margin: 0 0 16px 0;
+        color: var(--accent-foreground-rest);
+    }
+
+    .suggestions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .suggestion-card {
+        border: 1px solid var(--neutral-stroke-rest);
+        border-radius: 8px;
+        padding: 16px;
+        background: var(--neutral-layer-1);
+    }
+
+    .suggestion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .suggestion-description {
+        font-size: 0.9em;
+        color: var(--neutral-foreground-rest);
+        margin: 0 0 12px 0;
+        line-height: 1.4;
+    }
+
+    .suggestion-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .suggestion-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
     }
 
     .categories-header {
@@ -202,5 +409,41 @@
     .warning-text {
         color: var(--error-color);
         font-weight: 500;
+    }
+
+    .batch-classification-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .classification-results {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid var(--neutral-stroke-rest);
+        border-radius: 4px;
+        padding: 12px;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    }
+
+    .result-item:last-child {
+        border-bottom: none;
+    }
+
+    .result-article {
+        font-weight: 500;
+    }
+
+    .result-categories {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
     }
 </style>

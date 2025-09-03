@@ -11,6 +11,342 @@
             <summary>The name of the chat model to use.</summary>
             <remarks>When using Azure OpenAI, this should be the "Deployment name" of the chat model.</remarks>
         </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult">
+            <summary>
+            Résultat de la classification automatique d'un article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult.CategoryId">
+            <summary>
+            Identifiant de la catégorie suggérée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult.CategoryName">
+            <summary>
+            Nom de la catégorie suggérée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult.ConfidenceScore">
+            <summary>
+            Score de confiance de la classification (0.0 à 1.0).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult.Reason">
+            <summary>
+            Raison de la classification (mots-clés matchés, similarité sémantique, etc.).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryClassificationResult.IsRecommendedForAutoAssignment">
+            <summary>
+            Indique si cette catégorie est recommandée pour une assignation automatique.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.CategorySuggestion">
+            <summary>
+            Suggestion pour une nouvelle catégorie basée sur l'analyse des articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.SuggestedName">
+            <summary>
+            Nom suggéré pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.SuggestedDescription">
+            <summary>
+            Description suggérée pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.SuggestedKeywords">
+            <summary>
+            Mots-clés suggérés pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.RelevanceScore">
+            <summary>
+            Score de pertinence de la suggestion (0.0 à 1.0).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.PotentialArticleCount">
+            <summary>
+            Nombre d'articles qui seraient classés dans cette catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.ExampleArticleIds">
+            <summary>
+            Exemples d'articles qui seraient dans cette catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestion.Reason">
+            <summary>
+            Raison de la suggestion.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.CategoryForClassification">
+            <summary>
+            Représente une catégorie utilisée pour la classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Id">
+            <summary>
+            Identifiant unique de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Name">
+            <summary>
+            Nom de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Description">
+            <summary>
+            Description de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Keywords">
+            <summary>
+            Mots-clés associés à la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.AutoThreshold">
+            <summary>
+            Seuil de confiance pour la classification automatique.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.ManualThreshold">
+            <summary>
+            Seuil de confiance pour la classification manuelle.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Embedding">
+            <summary>
+            Embedding vectoriel de la catégorie pour la comparaison sémantique.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.IsActive">
+            <summary>
+            Indique si la catégorie est active.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult">
+            <summary>
+            Représente une suggestion de catégorie avec un score de confiance.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.CategoryId">
+            <summary>
+            Identifiant de la catégorie suggérée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.CategoryName">
+            <summary>
+            Nom de la catégorie suggérée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ConfidenceScore">
+            <summary>
+            Score de confiance entre 0 et 1.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.Reason">
+            <summary>
+            Raison de la suggestion (mots-clés correspondants, similarité sémantique, etc.).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ExceedsAutoThreshold">
+            <summary>
+            Indique si la suggestion dépasse le seuil automatique.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ExceedsManualThreshold">
+            <summary>
+            Indique si la suggestion dépasse le seuil manuel.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion">
+            <summary>
+            Représente une suggestion de nouvelle catégorie à créer.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedName">
+            <summary>
+            Nom suggéré pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedDescription">
+            <summary>
+            Description suggérée pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedKeywords">
+            <summary>
+            Mots-clés suggérés pour la nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.RelevanceScore">
+            <summary>
+            Score de pertinence de la suggestion entre 0 et 1.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.Justification">
+            <summary>
+            Justification de la suggestion de nouvelle catégorie.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult">
+            <summary>
+            Représente les résultats de la classification automatique d'un article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.ArticleId">
+            <summary>
+            Identifiant de l'article classifié.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.CategorySuggestions">
+            <summary>
+            Suggestions de catégories existantes.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.NewCategorySuggestions">
+            <summary>
+            Suggestions de nouvelles catégories à créer.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.OverallConfidence">
+            <summary>
+            Score de confiance global de la classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.ClassificationDate">
+            <summary>
+            Horodatage de la classification.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Models.ClassificationOptions">
+            <summary>
+            Options pour la classification automatique.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.MinAutoClassificationScore">
+            <summary>
+            Score minimum pour une classification automatique (par défaut 0.7).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.MinSuggestionScore">
+            <summary>
+            Score minimum pour une suggestion de classification (par défaut 0.5).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.MaxSuggestionsPerArticle">
+            <summary>
+            Nombre maximum de catégories à suggérer par article (par défaut 5).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.EnableAutoClassification">
+            <summary>
+            Indique si la classification automatique est activée (par défaut true).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.KeywordMatchWeight">
+            <summary>
+            Poids accordé à la correspondance des mots-clés (par défaut 0.3).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Models.ClassificationOptions.SemanticSimilarityWeight">
+            <summary>
+            Poids accordé à la similarité sémantique (par défaut 0.7).
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI">
+            <summary>
+            Service de classification automatique d'articles par IA.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI.IsEnabled">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI.ClassifyArticleAsync(System.String,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Analyse.Models.CategoryForClassification},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI.SuggestNewCategoriesAsync(System.String,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI.CalculateSemanticSimilarity(System.Single[],System.Single[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationAI.LearnFromFeedbackAsync(System.String,System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Services.ArticleClassificationService">
+            <summary>
+            Service de classification automatique des articles par IA utilisant les embeddings existants.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.ClassifyArticleAsync(System.Int32,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.ClassifyArticleAsync(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.ClassifyArticlesBatchAsync(System.Collections.Generic.IEnumerable{System.Int32},Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.AutoAssignCategoriesAsync(System.Int32,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.SuggestNewCategoriesAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.UpdateCategoryEmbeddingsAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.EvaluateClassificationQualityAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateClassificationScore(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Calcule le score de classification pour un article et une catégorie.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateKeywordMatchScore(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category)">
+            <summary>
+            Calcule le score de correspondance des mots-clés.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateSemanticSimilarityScore(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
+            <summary>
+            Calcule la similarité sémantique entre l'article et la catégorie.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateHistoricalScore(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
+            <summary>
+            Calcule un score basé sur l'historique de classification.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CombineEmbeddings(System.Single[],System.Single[])">
+            <summary>
+            Combine deux embeddings en calculant leur moyenne pondérée.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateCosineSimilarity(System.Single[],System.Single[])">
+            <summary>
+            Calcule la similarité cosinus entre deux vecteurs.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.BuildCategoryText(Watch.Manager.Service.Database.Entities.Category)">
+            <summary>
+            Construit le texte représentatif d'une catégorie pour générer son embedding.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.ExtractKeywords(System.String)">
+            <summary>
+            Extrait les mots-clés d'un texte.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CapitalizeTag(System.String)">
+            <summary>
+            Met en forme un tag pour qu'il ressemble à un nom de catégorie.
+            </summary>
+        </member>
         <member name="F:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.logger">
             <summary>Logger for use in AI operations.</summary>
         </member>
@@ -25,6 +361,155 @@
         </member>
         <member name="M:Watch.Manager.Service.Analyse.Services.ExtractEmbeddingAI.GetEmbeddingAsync(System.String,System.Threading.CancellationToken)">
             <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI">
+            <summary>
+            Interface pour la classification automatique d'articles par IA.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI.IsEnabled">
+            <summary>
+            Indique si le service de classification IA est activé.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI.ClassifyArticleAsync(System.String,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Analyse.Models.CategoryForClassification},System.Threading.CancellationToken)">
+            <summary>
+            Classifie automatiquement un article et suggère des catégories avec des scores de confiance.
+            </summary>
+            <param name="articleContent">Contenu de l'article à classifier.</param>
+            <param name="availableCategories">Catégories disponibles pour la classification.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des suggestions de catégories avec scores de confiance.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI.SuggestNewCategoriesAsync(System.String,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Suggère des nouvelles catégories basées sur le contenu d'un article.
+            </summary>
+            <param name="articleContent">Contenu de l'article.</param>
+            <param name="existingCategories">Catégories existantes pour éviter les doublons.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des suggestions de nouvelles catégories.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI.CalculateSemanticSimilarity(System.Single[],System.Single[])">
+            <summary>
+            Calcule la similarité sémantique entre un article et une catégorie en utilisant les embeddings.
+            </summary>
+            <param name="articleEmbedding">Embedding de l'article.</param>
+            <param name="categoryEmbedding">Embedding de la catégorie.</param>
+            <returns>Score de similarité entre 0 et 1.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationAI.LearnFromFeedbackAsync(System.String,System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Améliore les modèles de classification basés sur les corrections manuelles.
+            </summary>
+            <param name="articleContent">Contenu de l'article.</param>
+            <param name="correctCategories">Catégories correctes assignées manuellement.</param>
+            <param name="incorrectCategories">Catégories incorrectes suggérées par l'IA.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Task représentant l'opération d'apprentissage.</returns>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Services.IArticleClassificationService">
+            <summary>
+            Service de classification automatique des articles par IA.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.ClassifyArticleAsync(System.Int32,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Classifie automatiquement un article en suggérant des catégories appropriées.
+            </summary>
+            <param name="articleId">Identifiant de l'article à classifier.</param>
+            <param name="options">Options de classification.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des catégories suggérées avec leurs scores de confiance.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.ClassifyArticleAsync(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Classifie automatiquement un article en suggérant des catégories appropriées.
+            </summary>
+            <param name="article">Article à classifier.</param>
+            <param name="options">Options de classification.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des catégories suggérées avec leurs scores de confiance.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.ClassifyArticlesBatchAsync(System.Collections.Generic.IEnumerable{System.Int32},Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Classifie automatiquement plusieurs articles en lot.
+            </summary>
+            <param name="articleIds">Identifiants des articles à classifier.</param>
+            <param name="options">Options de classification.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Dictionnaire associant chaque article à ses catégories suggérées.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.AutoAssignCategoriesAsync(System.Int32,Watch.Manager.Service.Analyse.Models.ClassificationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Applique automatiquement les classifications recommandées pour un article.
+            </summary>
+            <param name="articleId">Identifiant de l'article.</param>
+            <param name="options">Options de classification.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Nombre de catégories assignées automatiquement.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.SuggestNewCategoriesAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Génère des suggestions de nouvelles catégories basées sur l'analyse des articles non classifiés.
+            </summary>
+            <param name="maxSuggestions">Nombre maximum de suggestions à retourner.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des suggestions de nouvelles catégories.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.UpdateCategoryEmbeddingsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Améliore les embeddings des catégories basés sur les articles assignés manuellement.
+            </summary>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Nombre de catégories dont les embeddings ont été mis à jour.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Analyse.Services.IArticleClassificationService.EvaluateClassificationQualityAsync(System.Threading.CancellationToken)">
+            <summary>
+            Évalue la qualité des classifications existantes et suggère des améliorations.
+            </summary>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Rapport d'évaluation des classifications.</returns>
+        </member>
+        <member name="T:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport">
+            <summary>
+            Rapport d'évaluation de la qualité des classifications.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.TotalArticles">
+            <summary>
+            Nombre total d'articles évalués.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.AutoClassifiedArticles">
+            <summary>
+            Nombre d'articles avec classifications automatiques.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.ManuallyClassifiedArticles">
+            <summary>
+            Nombre d'articles avec classifications manuelles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.AverageConfidenceScore">
+            <summary>
+            Score moyen de confiance des classifications automatiques.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.TopCategories">
+            <summary>
+            Catégories les plus utilisées.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.ArticlesSuggestedForReview">
+            <summary>
+            Articles suggérés pour révision manuelle.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Analyse.Services.ClassificationQualityReport.ImprovementSuggestions">
+            <summary>
+            Suggestions d'amélioration du système de classification.
+            </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Services.IExtractEmbeddingAI.IsEnabled">
             <summary>Gets whether the AI system is enabled.</summary>

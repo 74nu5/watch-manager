@@ -21,12 +21,42 @@
             <FluentButton Appearance="Appearance.Neutral" Size="ButtonSize.Small" @onclick="this.ToggleShowMore" IconStart="@(new Size20.ArrowExpandAll())">Voir plus</FluentButton>
         }
     </p>
+
+    @* Section Classification IA *@
+    @if (showClassification)
+    {
+        <ArticleClassification ArticleId="@ArticleModel.Id" OnCategoryAssigned="@OnCategoryAssignedAsync" />
+    }
+    else
+    {
+        <div style="margin: 8px 0;">
+            <FluentButton Appearance="Appearance.Stealth"
+                         @onclick="() => showClassification = true"
+                         IconStart="@(new Size20.Bot())"
+                         Title="Afficher la classification IA">
+                Classifier avec l'IA
+            </FluentButton>
+        </div>
+    }
+
     <p>
         @foreach (var tag in this.ArticleModel.Tags)
         {
             <a href="@($"/?tag={tag}")"><FluentBadge Appearance="Appearance.Accent">@tag</FluentBadge></a>
         }
     </p>
+
+    @* Affichage des catégories assignées *@
+    @if (this.ArticleModel.Categories.Count > 0)
+    {
+        <div style="margin: 8px 0;">
+            <span style="font-size: 0.9em; color: var(--neutral-foreground-rest); margin-right: 8px;">📁 Catégories:</span>
+            @foreach (var category in this.ArticleModel.Categories)
+            {
+                <FluentBadge Appearance="Appearance.Neutral" BackgroundColor="#3498db" Color="white" style="margin-right: 4px;">@category</FluentBadge>
+            }
+        </div>
+    }
     <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.SpaceBetween">
         @foreach (var author in this.ArticleModel.Authors)
         {

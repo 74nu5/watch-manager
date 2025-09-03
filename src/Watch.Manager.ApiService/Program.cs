@@ -3,9 +3,11 @@ using System.Net;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Watch.Manager.ApiService.Extensions;
 using Watch.Manager.ApiService.Parameters;
 using Watch.Manager.ApiService.ViewModels;
 using Watch.Manager.Service.Analyse.Extensions;
+using Watch.Manager.Service.Analyse.Models;
 using Watch.Manager.Service.Analyse.Services;
 using Watch.Manager.Service.Database.Abstractions;
 using Watch.Manager.Service.Database.Entities;
@@ -88,6 +90,62 @@ api.MapPost(
 
             await analyzeParameter.ArticleAnalyseStore.StoreArticleAnalyzeAsync(article, cancellationToken).ConfigureAwait(false);
 
+            // Classification automatique après l'ajout de l'article
+            if (analyzeParameter.ClassificationService.IsEnabled)
+            {
+                try
+                {
+                    // Récupérer les catégories disponibles pour la classification
+                    var categories = await analyzeParameter.CategoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
+                    var categoryForClassification = categories
+                        .Where(c => c.IsActive)
+                        .Select(c => new CategoryForClassification
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            Description = c.Description,
+                            Keywords = c.Keywords ?? [],
+                            AutoThreshold = 0.7, // Seuil par défaut pour l'auto-assignation
+                            ManualThreshold = 0.5, // Seuil par défaut pour les suggestions
+                            IsActive = c.IsActive
+                        });
+
+                    // Classification de l'article
+                    var articleContent = $"{article.Title}\n\n{article.Summary}";
+                    var suggestions = await analyzeParameter.ClassificationService.ClassifyArticleAsync(
+                        articleContent,
+                        categoryForClassification,
+                        cancellationToken).ConfigureAwait(false);
+
+                    // Auto-assigner les catégories qui dépassent le seuil automatique
+                    var autoAssignedCategories = suggestions
+                        .Where(s => s.ExceedsAutoThreshold)
+                        .ToList();
+
+                    foreach (var suggestion in autoAssignedCategories)
+                    {
+                        await analyzeParameter.CategoryStore.AssignCategoryToArticleAsync(
+                            article.Id,
+                            suggestion.CategoryId,
+                            false, // Pas manuel, c'est automatique
+                            suggestion.ConfidenceScore,
+                            cancellationToken).ConfigureAwait(false);
+                    }
+
+                    analyzeParameter.Logger.LogInformation(
+                        "Article {ArticleId} automatiquement classifié avec {Count} catégories",
+                        article.Id,
+                        autoAssignedCategories.Count);
+                }
+                catch (Exception classificationException)
+                {
+                    // Ne pas faire échouer l'ajout d'article si la classification échoue
+                    analyzeParameter.Logger.LogWarning(classificationException,
+                        "Échec de la classification automatique pour l'article {ArticleId}",
+                        article.Id);
+                }
+            }
+
             return Results.Ok(analyzeResult);
         }
         catch (HttpRequestException httpRequestException) when(httpRequestException.StatusCode == HttpStatusCode.NotFound)
@@ -126,6 +184,7 @@ async IAsyncEnumerable<ArticleViewModel> Handler([FromQuery] string? text, [From
             AnalyzeDate = article.AnalyzeDate,
             Thumbnail = article.Thumbnail,
             Score = article.Score,
+            Categories = article.Categories
         };
     }
 }
@@ -155,35 +214,46 @@ categoriesApi.MapGet(
     async ([FromServices] ICategoryStore categoryStore, [FromQuery] bool includeInactive = false, CancellationToken cancellationToken = default) =>
     {
         var categories = await categoryStore.GetAllCategoriesAsync(includeInactive, cancellationToken).ConfigureAwait(false);
-        var viewModels = categories.Select(c => new CategoryViewModel
+        var viewModels = new List<CategoryViewModel>();
+
+        foreach (var c in categories)
         {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            Color = c.Color,
-            Icon = c.Icon,
-            Keywords = c.Keywords,
-            ParentId = c.ParentId,
-            ParentName = c.Parent?.Name,
-            Children = c.Children.Select(child => new CategoryViewModel
+            var articleCount = await categoryStore.GetArticleCountInCategoryAsync(c.Id, false, cancellationToken).ConfigureAwait(false);
+            var linkedArticles = await categoryStore.GetLinkedArticleTitlesAsync(c.Id, cancellationToken).ConfigureAwait(false);
+
+            viewModels.Add(new CategoryViewModel
             {
-                Id = child.Id,
-                Name = child.Name,
-                Description = child.Description,
-                Color = child.Color,
-                Icon = child.Icon,
-                Keywords = child.Keywords,
-                ParentId = child.ParentId,
-                CreatedAt = child.CreatedAt,
-                UpdatedAt = child.UpdatedAt,
-                IsActive = child.IsActive,
-                ConfidenceThreshold = child.ConfidenceThreshold
-            }).ToList(),
-            CreatedAt = c.CreatedAt,
-            UpdatedAt = c.UpdatedAt,
-            IsActive = c.IsActive,
-            ConfidenceThreshold = c.ConfidenceThreshold
-        });
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Color = c.Color,
+                Icon = c.Icon,
+                Keywords = c.Keywords,
+                ParentId = c.ParentId,
+                ParentName = c.Parent?.Name,
+                Children = c.Children.Select(child => new CategoryViewModel
+                {
+                    Id = child.Id,
+                    Name = child.Name,
+                    Description = child.Description,
+                    Color = child.Color,
+                    Icon = child.Icon,
+                    Keywords = child.Keywords,
+                    ParentId = child.ParentId,
+                    CreatedAt = child.CreatedAt,
+                    UpdatedAt = child.UpdatedAt,
+                    IsActive = child.IsActive,
+                    ConfidenceThreshold = child.ConfidenceThreshold
+                }).ToList(),
+                ArticleCount = articleCount,
+                LinkedArticles = linkedArticles,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt,
+                IsActive = c.IsActive,
+                ConfidenceThreshold = c.ConfidenceThreshold
+            });
+        }
+
         return Results.Ok(viewModels);
     })
     .WithName("GetAllCategories")
@@ -200,6 +270,7 @@ categoriesApi.MapGet(
         }
 
         var articleCount = await categoryStore.GetArticleCountInCategoryAsync(id, true, cancellationToken).ConfigureAwait(false);
+        var linkedArticles = await categoryStore.GetLinkedArticleTitlesAsync(id, cancellationToken).ConfigureAwait(false);
 
         var viewModel = new CategoryViewModel
         {
@@ -226,6 +297,7 @@ categoriesApi.MapGet(
                 ConfidenceThreshold = child.ConfidenceThreshold
             }).ToList(),
             ArticleCount = articleCount,
+            LinkedArticles = linkedArticles,
             CreatedAt = category.CreatedAt,
             UpdatedAt = category.UpdatedAt,
             IsActive = category.IsActive,
@@ -387,34 +459,45 @@ categoriesApi.MapGet(
     async ([FromServices] ICategoryStore categoryStore, [FromQuery] bool includeInactive = false, CancellationToken cancellationToken = default) =>
     {
         var categories = await categoryStore.GetRootCategoriesAsync(includeInactive, cancellationToken).ConfigureAwait(false);
-        var viewModels = categories.Select(c => new CategoryViewModel
+        var viewModels = new List<CategoryViewModel>();
+
+        foreach (var c in categories)
         {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            Color = c.Color,
-            Icon = c.Icon,
-            Keywords = c.Keywords,
-            ParentId = c.ParentId,
-            Children = c.Children.Select(child => new CategoryViewModel
+            var articleCount = await categoryStore.GetArticleCountInCategoryAsync(c.Id, false, cancellationToken).ConfigureAwait(false);
+            var linkedArticles = await categoryStore.GetLinkedArticleTitlesAsync(c.Id, cancellationToken).ConfigureAwait(false);
+
+            viewModels.Add(new CategoryViewModel
             {
-                Id = child.Id,
-                Name = child.Name,
-                Description = child.Description,
-                Color = child.Color,
-                Icon = child.Icon,
-                Keywords = child.Keywords,
-                ParentId = child.ParentId,
-                CreatedAt = child.CreatedAt,
-                UpdatedAt = child.UpdatedAt,
-                IsActive = child.IsActive,
-                ConfidenceThreshold = child.ConfidenceThreshold
-            }).ToList(),
-            CreatedAt = c.CreatedAt,
-            UpdatedAt = c.UpdatedAt,
-            IsActive = c.IsActive,
-            ConfidenceThreshold = c.ConfidenceThreshold
-        });
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Color = c.Color,
+                Icon = c.Icon,
+                Keywords = c.Keywords,
+                ParentId = c.ParentId,
+                Children = c.Children.Select(child => new CategoryViewModel
+                {
+                    Id = child.Id,
+                    Name = child.Name,
+                    Description = child.Description,
+                    Color = child.Color,
+                    Icon = child.Icon,
+                    Keywords = child.Keywords,
+                    ParentId = child.ParentId,
+                    CreatedAt = child.CreatedAt,
+                    UpdatedAt = child.UpdatedAt,
+                    IsActive = child.IsActive,
+                    ConfidenceThreshold = child.ConfidenceThreshold
+                }).ToList(),
+                ArticleCount = articleCount,
+                LinkedArticles = linkedArticles,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt,
+                IsActive = c.IsActive,
+                ConfidenceThreshold = c.ConfidenceThreshold
+            });
+        }
+
         return Results.Ok(viewModels);
     })
     .WithName("GetRootCategories")
@@ -447,6 +530,9 @@ categoriesApi.MapDelete(
     })
     .WithName("RemoveCategoryFromArticle")
     .WithSummary("Retire une catégorie d'un article");
+
+// Ajouter les endpoints de classification
+app.MapClassificationEndpoints();
 
 app.MapDefaultEndpoints();
 

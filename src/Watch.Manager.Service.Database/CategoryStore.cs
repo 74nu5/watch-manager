@@ -267,6 +267,19 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
             .ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    public async Task<string[]> GetLinkedArticleTitlesAsync(int categoryId, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Récupération des titres d'articles liés à la catégorie: {CategoryId}", categoryId);
+
+        return await context.ArticleCategories
+            .Where(ac => ac.CategoryId == categoryId)
+            .Include(ac => ac.Article)
+            .Select(ac => ac.Article.Title)
+            .ToArrayAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     /// <summary>
     /// Récupère l'ID d'une catégorie et tous les IDs de ses sous-catégories de manière récursive.
     /// </summary>

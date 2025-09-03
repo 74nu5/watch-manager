@@ -20,4 +20,9 @@ public class ArticleViewModel
     public double? Score { get; set; }
 
     public Uri ThumbnailBase64 { get; set; }
+
+    /// <summary>
+    /// Catégories assignées à cet article.
+    /// </summary>
+    public string[] Categories { get; set; } = [];
 }

@@ -31,6 +31,8 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
         {
             // Filter by tag if provided
             await foreach (var article in articlesContext.Articles.AsNoTracking()
+                                                         .Include(a => a.ArticleCategories)
+                                                         .ThenInclude(ac => ac.Category)
                                                          .AsQueryable()
                                                          .Where(a => a.Tags.Contains(tag))
                                                          .OrderByDescending(a => a.AnalyzeDate)
@@ -49,6 +51,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
                     AnalyzeDate = article.AnalyzeDate,
                     Thumbnail = article.Thumbnail,
                     Score = 0, // Default score when no search terms are provided
+                    Categories = article.ArticleCategories.Where(ac => ac.Category != null).Select(ac => ac.Category!.Name).ToArray()
                 };
             }
 
@@ -64,6 +67,15 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
 
             await foreach (var result in searchable.SearchAsync(searchTerms, 10, vectorSearchOptions, cancellationToken).ConfigureAwait(false))
             {
+                // Récupérer les catégories pour cet article spécifique
+                var articleCategories = await articlesContext.ArticleCategories
+                    .AsNoTracking()
+                    .Where(ac => ac.ArticleId == result.Record.Id)
+                    .Include(ac => ac.Category)
+                    .Select(ac => ac.Category!.Name)
+                    .ToArrayAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
                 yield return new()
                 {
                     Id = result.Record.Id,
@@ -75,6 +87,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
                     AnalyzeDate = result.Record.AnalyzeDate,
                     Thumbnail = new(result.Record.Thumbnail),
                     Score = result.Score,
+                    Categories = articleCategories
                 };
             }
 
@@ -83,7 +96,13 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
 
         var test = articlesContext.Articles.ToList();
 
-        await foreach (var article in articlesContext.Articles.AsNoTracking().OrderByDescending(a => a.AnalyzeDate).AsAsyncEnumerable().WithCancellation(cancellationToken).ConfigureAwait(false))
+        await foreach (var article in articlesContext.Articles.AsNoTracking()
+                                                             .Include(a => a.ArticleCategories)
+                                                             .ThenInclude(ac => ac.Category)
+                                                             .OrderByDescending(a => a.AnalyzeDate)
+                                                             .AsAsyncEnumerable()
+                                                             .WithCancellation(cancellationToken)
+                                                             .ConfigureAwait(false))
         {
             yield return new()
             {
@@ -96,6 +115,7 @@ internal sealed class ArticleAnalyseStore(ILogger<ArticleAnalyseStore> logger, A
                 AnalyzeDate = article.AnalyzeDate,
                 Thumbnail = article.Thumbnail,
                 Score = 0, // Default score when no search terms are provided
+                Categories = article.ArticleCategories.Where(ac => ac.Category != null).Select(ac => ac.Category!.Name).ToArray()
             };
         }
     }

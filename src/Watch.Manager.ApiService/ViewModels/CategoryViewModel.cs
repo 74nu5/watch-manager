@@ -56,6 +56,11 @@ public class CategoryViewModel
     public int ArticleCount { get; set; }
 
     /// <summary>
+    /// Noms des articles liés à cette catégorie.
+    /// </summary>
+    public string[] LinkedArticles { get; set; } = [];
+
+    /// <summary>
     /// Date de création.
     /// </summary>
     public DateTime CreatedAt { get; set; }

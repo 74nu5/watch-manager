@@ -111,6 +111,14 @@
             <param name="cancellationToken">Token d'annulation.</param>
             <returns>Nombre d'articles.</returns>
         </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetLinkedArticleTitlesAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Récupère les titres des articles liés à une catégorie.
+            </summary>
+            <param name="categoryId">Identifiant de la catégorie.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des titres d'articles.</returns>
+        </member>
         <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GetThumbnailAsync(System.Int32,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -158,6 +166,9 @@
             <inheritdoc />
         </member>
         <member name="M:Watch.Manager.Service.Database.CategoryStore.GetArticleCountInCategoryAsync(System.Int32,System.Boolean,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetLinkedArticleTitlesAsync(System.Int32,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoryAndChildrenIdsAsync(System.Int32,System.Threading.CancellationToken)">
@@ -422,6 +433,21 @@
             Score de confiance pour la classification automatique.
             </summary>
         </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.Embedding">
+            <summary>
+            Embedding vectoriel de la catégorie pour la classification sémantique.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.AutoThreshold">
+            <summary>
+            Seuil automatique pour la classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.ManualThreshold">
+            <summary>
+            Seuil manuel pour la classification.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Migrations.InitDatabase">
             <inheritdoc />
         </member>
@@ -469,6 +495,23 @@
         </member>
         <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoriesSupport.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.AddAutoclassification">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Categories">
+            <summary>
+            Catégories assignées à cet article.
+            </summary>
         </member>
     </members>
 </doc>

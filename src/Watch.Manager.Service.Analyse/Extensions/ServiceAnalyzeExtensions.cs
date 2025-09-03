@@ -23,7 +23,7 @@ public static class ServiceAnalyzeExtensions
         builder.Services.TryAddTransient<SanitizeService>();
         builder.Services.TryAddTransient<SanitizeYoutubeService>();
         builder.Services.TryAddTransient<IWebSiteService, WebSiteService>();
-        
+
         if (builder.Configuration["OllamaEnabled"] is string ollamaEnabled && bool.Parse(ollamaEnabled))
         {
             _ = builder.AddOllamaApiClient("embedding")
@@ -64,5 +64,6 @@ public static class ServiceAnalyzeExtensions
 
         builder.Services.TryAddScoped<IExtractEmbeddingAI, ExtractEmbeddingAI>();
         builder.Services.TryAddScoped<IExtractDataAI, ExtractDataAI>();
+        builder.Services.TryAddScoped<IArticleClassificationAI, ArticleClassificationAI>();
     }
 }
