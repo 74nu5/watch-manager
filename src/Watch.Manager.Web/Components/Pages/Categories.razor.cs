@@ -19,6 +19,7 @@ public sealed partial class Categories : ComponentBase, IDisposable
     private readonly CancellationTokenSource cts = new();
 
     private CategoryModel[] categories = [];
+    private IEnumerable<CategoryModel> hierarchicalCategories = [];
     private bool loading = true;
     private bool showInactive;
 
@@ -35,6 +36,31 @@ public sealed partial class Categories : ComponentBase, IDisposable
     private CategoryFormModel categoryForm = new();
     private string keywordsText = string.Empty;
     private int? selectedParent;
+    private string selectedParentString = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the selected parent as string, synchronized with selectedParent.
+    /// </summary>
+    private string SelectedParentString
+    {
+        get => this.selectedParent?.ToString() ?? string.Empty;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                this.selectedParent = null;
+            }
+            else if (int.TryParse(value, out var parentId))
+            {
+                this.selectedParent = parentId;
+            }
+            else
+            {
+                this.selectedParent = null;
+            }
+            this.selectedParentString = value;
+        }
+    }
 
     // AI Classification
     private bool suggestingCategories;
@@ -74,6 +100,18 @@ public sealed partial class Categories : ComponentBase, IDisposable
         try
         {
             this.categories = await this.analyzeService.GetCategoriesAsync(this.showInactive, this.cts.Token).ConfigureAwait(true);
+
+            // Load hierarchical categories for tree view
+            var hierarchicalResult = await this.analyzeService.GetCategoriesAsTreeAsync(this.showInactive, this.cts.Token).ConfigureAwait(true);
+            if (hierarchicalResult.ApiResultErrorType == null && string.IsNullOrEmpty(hierarchicalResult.Error))
+            {
+                this.hierarchicalCategories = hierarchicalResult.Result ?? [];
+            }
+            else
+            {
+                // Fallback to flat list if hierarchical loading fails
+                this.hierarchicalCategories = this.categories;
+            }
         }
         catch (Exception ex)
         {
@@ -99,7 +137,7 @@ public sealed partial class Categories : ComponentBase, IDisposable
         this.editingCategory = null;
         this.categoryForm = new();
         this.keywordsText = string.Empty;
-        this.selectedParent = null;
+        this.SelectedParentString = string.Empty;
         this.hideDialog = false;
     }
 
@@ -120,7 +158,7 @@ public sealed partial class Categories : ComponentBase, IDisposable
         };
 
         this.keywordsText = string.Join(", ", category.Keywords);
-        this.selectedParent = category.ParentId;
+        this.SelectedParentString = category.ParentId?.ToString() ?? string.Empty;
         this.hideDialog = false;
     }
 

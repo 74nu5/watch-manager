@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Watch.Manager.Service.Database.Abstractions;
 using Watch.Manager.Service.Database.Context;
 using Watch.Manager.Service.Database.Entities;
+using Watch.Manager.Service.Database.Extensions;
 
 /// <summary>
 /// Implémentation du service de gestion des catégories.
@@ -51,6 +52,19 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         category.CreatedAt = DateTime.UtcNow;
         category.UpdatedAt = DateTime.UtcNow;
 
+        // Calculer le chemin hiérarchique et le niveau
+        if (category.ParentId.HasValue)
+        {
+            var allCategories = await context.Categories.ToListAsync(cancellationToken).ConfigureAwait(false);
+            category.HierarchyPath = category.CalculateHierarchyPath(allCategories);
+            category.HierarchyLevel = category.CalculateHierarchyLevel(allCategories);
+        }
+        else
+        {
+            category.HierarchyPath = category.Name;
+            category.HierarchyLevel = 0;
+        }
+
         _ = context.Categories.Add(category);
         _ = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -63,7 +77,24 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
     {
         logger.LogInformation("Mise à jour de la catégorie: {CategoryId}", category.Id);
 
+        var oldCategory = await context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == category.Id, cancellationToken).ConfigureAwait(false);
+        var hierarchyChanged = oldCategory != null && (oldCategory.ParentId != category.ParentId || oldCategory.Name != category.Name);
+
         category.UpdatedAt = DateTime.UtcNow;
+
+        // Recalculer la hiérarchie si nécessaire
+        if (hierarchyChanged)
+        {
+            var allCategories = await context.Categories.Where(c => c.Id != category.Id).ToListAsync(cancellationToken).ConfigureAwait(false);
+            allCategories.Add(category); // Ajouter la catégorie mise à jour
+
+            category.HierarchyPath = category.CalculateHierarchyPath(allCategories);
+            category.HierarchyLevel = category.CalculateHierarchyLevel(allCategories);
+
+            // Mettre à jour les descendants si le nom ou le parent a changé
+            category.UpdateDescendantsHierarchyPaths(allCategories);
+        }
+
         _ = context.Categories.Update(category);
         _ = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -295,5 +326,125 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         }
 
         return categoryIds;
+    }
+
+    /// <inheritdoc />
+    public async Task<int> UpdateAllHierarchyPathsAsync(CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Mise à jour de tous les chemins hiérarchiques");
+
+        var allCategories = await context.Categories.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var updateCount = 0;
+
+        foreach (var category in allCategories)
+        {
+            var newPath = category.CalculateHierarchyPath(allCategories);
+            var newLevel = category.CalculateHierarchyLevel(allCategories);
+
+            if (category.HierarchyPath != newPath || category.HierarchyLevel != newLevel)
+            {
+                category.HierarchyPath = newPath;
+                category.HierarchyLevel = newLevel;
+                category.UpdatedAt = DateTime.UtcNow;
+                updateCount++;
+            }
+        }
+
+        if (updateCount > 0)
+        {
+            _ = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Chemins hiérarchiques mis à jour pour {UpdateCount} catégories", updateCount);
+        }
+
+        return updateCount;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Category>> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Récupération des catégories en arbre hiérarchique. IncludeInactive: {IncludeInactive}", includeInactive);
+
+        var query = context.Categories.AsQueryable()
+            .Include(c => c.Children)
+            .Where(c => c.ParentId == null);
+
+        if (!includeInactive)
+            query = query.Where(c => c.IsActive);
+
+        var categories = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return categories;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Category>> GetCategoryDescendantsAsync(int categoryId, bool includeInactive = false, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Récupération des descendants de la catégorie: {CategoryId}", categoryId);
+
+        var allCategories = await this.GetAllCategoriesAsync(includeInactive, cancellationToken).ConfigureAwait(false);
+        var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
+
+        if (category == null)
+            return Enumerable.Empty<Category>();
+
+        return category.GetAllDescendants(allCategories);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Category>> GetCategoryAncestorsAsync(int categoryId, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Récupération des ancêtres de la catégorie: {CategoryId}", categoryId);
+
+        var allCategories = await this.GetAllCategoriesAsync(true, cancellationToken).ConfigureAwait(false);
+        var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
+
+        if (category == null)
+            return Enumerable.Empty<Category>();
+
+        return category.GetAncestors(allCategories);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> WouldCreateCircularReferenceAsync(int categoryId, int newParentId, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Vérification de référence circulaire: catégorie {CategoryId} vers parent {ParentId}", categoryId, newParentId);
+
+        if (categoryId == newParentId)
+            return true;
+
+        var allCategories = await this.GetAllCategoriesAsync(true, cancellationToken).ConfigureAwait(false);
+        var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
+        var newParent = allCategories.FirstOrDefault(c => c.Id == newParentId);
+
+        if (category == null || newParent == null)
+            return false;
+
+        // Vérifier si la nouvelle catégorie parent est un descendant de la catégorie actuelle
+        return category.IsAncestorOf(newParent, allCategories);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> ReorderCategoriesAsync(Dictionary<int, int> categoryOrders, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Réorganisation de {Count} catégories", categoryOrders.Count);
+
+        var updateCount = 0;
+        foreach (var (categoryId, order) in categoryOrders)
+        {
+            var category = await context.Categories.FindAsync([categoryId], cancellationToken).ConfigureAwait(false);
+            if (category != null && category.DisplayOrder != order)
+            {
+                category.DisplayOrder = order;
+                category.UpdatedAt = DateTime.UtcNow;
+                updateCount++;
+            }
+        }
+
+        if (updateCount > 0)
+        {
+            _ = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Ordre mis à jour pour {UpdateCount} catégories", updateCount);
+        }
+
+        return updateCount;
     }
 }

@@ -262,6 +262,31 @@
             Gets token to cancel the operation if needed.
             </summary>
         </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.GetCategoryDescendantsParameter">
+            <summary>
+            Paramètres pour récupérer les descendants d'une catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryDescendantsParameter.Id">
+            <summary>
+            Identifiant de la catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryDescendantsParameter.IncludeInactive">
+            <summary>
+            Inclut les catégories inactives.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryDescendantsParameter.CategoryStore">
+            <summary>
+            Service de gestion des catégories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryDescendantsParameter.CancellationToken">
+            <summary>
+            Token d'annulation.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.Parameters.Categories.GetCategoryParameter">
             <summary>
             Represents the parameters required to retrieve a specific category.
@@ -327,6 +352,26 @@
             Gets token to cancel the operation if needed.
             </summary>
         </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.ReorderCategoriesParameter">
+            <summary>
+            Paramètres pour réorganiser l'ordre d'affichage des catégories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.ReorderCategoriesParameter.CategoryOrders">
+            <summary>
+            Dictionnaire des ordres d'affichage par ID de catégorie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.ReorderCategoriesParameter.CategoryStore">
+            <summary>
+            Service de gestion des catégories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.ReorderCategoriesParameter.CancellationToken">
+            <summary>
+            Token d'annulation.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter">
             <summary>
             Represents the parameters required to update an existing category.
@@ -350,6 +395,21 @@
         <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter.CancellationToken">
             <summary>
             Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.UpdateHierarchyPathsParameter">
+            <summary>
+            Paramètres pour mettre à jour les chemins hiérarchiques.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateHierarchyPathsParameter.CategoryStore">
+            <summary>
+            Service de gestion des catégories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateHierarchyPathsParameter.CancellationToken">
+            <summary>
+            Token d'annulation.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter">
@@ -701,6 +761,26 @@
             Gets or sets the date of the assignment.
             </summary>
         </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.CategoryBreadcrumbViewModel">
+            <summary>
+            ViewModel for category breadcrumb navigation.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryBreadcrumbViewModel.Id">
+            <summary>
+            Gets or sets the category identifier.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryBreadcrumbViewModel.Name">
+            <summary>
+            Gets or sets the category name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryBreadcrumbViewModel.Level">
+            <summary>
+            Gets or sets the hierarchy level.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CategoryViewModel">
             <summary>
             ViewModel representing a category in the API.
@@ -781,6 +861,31 @@
             Gets or sets the confidence threshold for automatic classification.
             </summary>
         </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.InheritFromParent">
+            <summary>
+            Gets or sets a value indicating whether this category inherits properties from its parent.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.DisplayOrder">
+            <summary>
+            Gets or sets the display order in the hierarchy.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.HierarchyPath">
+            <summary>
+            Gets or sets the full hierarchy path (e.g., "Parent/Child/SubChild").
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.HierarchyLevel">
+            <summary>
+            Gets or sets the hierarchy level (0 = root).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Breadcrumbs">
+            <summary>
+            Gets or sets the breadcrumb navigation path.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest">
             <summary>
             Request model for providing feedback on classification.
@@ -839,6 +944,21 @@
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.ConfidenceThreshold">
             <summary>
             Gets or sets the confidence threshold for automatic classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.InheritFromParent">
+            <summary>
+            Gets or sets a value indicating whether this category inherits properties from its parent.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.DisplayOrder">
+            <summary>
+            Gets or sets the display order in the hierarchy.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.IsActive">
+            <summary>
+            Gets or sets a value indicating whether this category is active.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion">

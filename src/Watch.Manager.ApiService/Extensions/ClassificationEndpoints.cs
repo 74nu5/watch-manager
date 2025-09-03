@@ -38,7 +38,9 @@ public static class ClassificationEndpoints
     /// <param name="app">The <see cref="WebApplication" /> instance to which the classification endpoints will be added.</param>
     public static void MapClassificationEndpoints(this WebApplication app)
     {
-        var classificationGroup = app.MapGroup("/api/classification")
+        var vApi = app.NewVersionedApi("Classification");
+
+        var classificationGroup = vApi.MapGroup("/api/classification")
                                      .WithTags("Classification")
                                      .WithOpenApi();
 

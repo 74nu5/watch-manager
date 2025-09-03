@@ -1,0 +1,245 @@
+@using Watch.Manager.Web.Services.Models
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+
+<div class="tree-node" data-level="@Category.HierarchyLevel">
+    <div class="node-content @(IsSelected ? "selected" : "")">
+        @if (HasChildren)
+        {
+            <FluentButton
+                Appearance="Appearance.Stealth"
+                IconOnly="true"
+                @onclick="ToggleExpanded"
+                Class="expand-button"
+                Title="@(IsExpanded ? "Réduire" : "Développer")">
+                @if (IsExpanded)
+                {
+                    <FluentIcon Value="@(new Size16.ChevronDown())" />
+                }
+                else
+                {
+                    <FluentIcon Value="@(new Size16.ChevronRight())" />
+                }
+            </FluentButton>
+        }
+        else
+        {
+            <div class="spacer"></div>
+        }
+
+        <div class="category-info" @onclick="SelectCategory">
+            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
+            <span class="category-name">@Category.Name</span>
+
+            @if (Category.ArticleCount > 0)
+            {
+                <FluentBadge Appearance="Appearance.Neutral" Class="article-count">
+                    @Category.ArticleCount
+                </FluentBadge>
+            }
+
+            @if (!Category.IsActive)
+            {
+                <FluentBadge Appearance="Appearance.Neutral" Class="inactive-badge">
+                    Inactive
+                </FluentBadge>
+            }
+        </div>
+
+        @if (ShowActions)
+        {
+            <div class="node-actions">
+                <FluentButton
+                    Appearance="Appearance.Stealth"
+                    IconOnly="true"
+                    @onclick="() => OnCategoryEdit.InvokeAsync(Category)"
+                    Title="Modifier">
+                    <FluentIcon Value="@(new Size16.Edit())" />
+                </FluentButton>
+                <FluentButton
+                    Appearance="Appearance.Stealth"
+                    IconOnly="true"
+                    @onclick="() => OnCategoryDelete.InvokeAsync(Category)"
+                    Title="Supprimer">
+                    <FluentIcon Value="@(new Size16.Delete())" />
+                </FluentButton>
+            </div>
+        }
+    </div>
+
+    @if (HasChildren && IsExpanded)
+    {
+        <div class="children-container">
+            @foreach (var child in Category.Children.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
+            {
+                <CategoryTreeNode
+                    Category="child"
+                    SelectedCategoryId="SelectedCategoryId"
+                    OnCategorySelected="OnCategorySelected"
+                    OnCategoryEdit="OnCategoryEdit"
+                    OnCategoryDelete="OnCategoryDelete"
+                    ShowActions="ShowActions"
+                    ExpandedCategories="ExpandedCategories"
+                    OnToggleExpanded="OnToggleExpanded" />
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .tree-node {
+        width: 100%;
+    }
+
+    .node-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin: 2px 0;
+        transition: background-color 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .node-content:hover {
+        background-color: var(--neutral-layer-2);
+    }
+
+    .node-content.selected {
+        background-color: var(--accent-fill-rest);
+        color: var(--accent-foreground-rest);
+        border-color: var(--accent-stroke-control-default);
+    }
+
+    .expand-button {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        padding: 0;
+    }
+
+    .spacer {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+    }
+
+    .category-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        cursor: pointer;
+        padding: 4px 0;
+    }
+
+    .category-icon {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .category-name {
+        font-weight: 500;
+        flex: 1;
+    }
+
+    .article-count {
+        font-size: 0.75em;
+    }
+
+    .inactive-badge {
+        font-size: 0.7em;
+        opacity: 0.7;
+    }
+
+    .node-actions {
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .node-content:hover .node-actions {
+        opacity: 1;
+    }
+
+    .children-container {
+        margin-left: 24px;
+        padding-left: 12px;
+        border-left: 2px solid var(--neutral-stroke-divider-rest);
+    }
+
+    .tree-node[data-level="0"] {
+        font-weight: 600;
+    }
+
+    .tree-node[data-level="1"] .category-name {
+        font-size: 0.95em;
+    }
+
+    .tree-node[data-level="2"] .category-name {
+        font-size: 0.9em;
+    }
+
+    .tree-node[data-level="3"] .category-name {
+        font-size: 0.85em;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// La catégorie à afficher.
+    /// </summary>
+    [Parameter] public required CategoryModel Category { get; set; }
+
+    /// <summary>
+    /// ID de la catégorie actuellement sélectionnée.
+    /// </summary>
+    [Parameter] public int? SelectedCategoryId { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de la sélection d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategorySelected { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de l'édition d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de la suppression d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+
+    /// <summary>
+    /// Affiche les actions (éditer, supprimer).
+    /// </summary>
+    [Parameter] public bool ShowActions { get; set; } = true;
+
+    /// <summary>
+    /// Set des IDs de catégories actuellement développées.
+    /// </summary>
+    [Parameter] public required HashSet<int> ExpandedCategories { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors du basculement de l'état développé/réduit.
+    /// </summary>
+    [Parameter] public EventCallback<int> OnToggleExpanded { get; set; }
+
+    private bool HasChildren => Category.Children?.Any() == true;
+    private bool IsExpanded => ExpandedCategories.Contains(Category.Id);
+    private bool IsSelected => SelectedCategoryId == Category.Id;
+
+    private async Task ToggleExpanded()
+    {
+        await OnToggleExpanded.InvokeAsync(Category.Id);
+    }
+
+    private async Task SelectCategory()
+    {
+        await OnCategorySelected.InvokeAsync(Category);
+    }
+}

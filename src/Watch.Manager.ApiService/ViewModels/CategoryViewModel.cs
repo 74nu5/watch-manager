@@ -79,4 +79,29 @@ public sealed class CategoryViewModel
     /// Gets or sets the confidence threshold for automatic classification.
     /// </summary>
     public double? ConfidenceThreshold { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this category inherits properties from its parent.
+    /// </summary>
+    public bool InheritFromParent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the display order in the hierarchy.
+    /// </summary>
+    public int DisplayOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full hierarchy path (e.g., "Parent/Child/SubChild").
+    /// </summary>
+    public string HierarchyPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the hierarchy level (0 = root).
+    /// </summary>
+    public int HierarchyLevel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the breadcrumb navigation path.
+    /// </summary>
+    public List<CategoryBreadcrumbViewModel> Breadcrumbs { get; set; } = new();
 }

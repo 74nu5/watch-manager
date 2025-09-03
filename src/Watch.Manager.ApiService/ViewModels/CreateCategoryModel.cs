@@ -39,4 +39,19 @@ public sealed class CreateCategoryModel
     /// Gets or sets the confidence threshold for automatic classification.
     /// </summary>
     public double? ConfidenceThreshold { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this category inherits properties from its parent.
+    /// </summary>
+    public bool InheritFromParent { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the display order in the hierarchy.
+    /// </summary>
+    public int DisplayOrder { get; set; } = 0;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this category is active.
+    /// </summary>
+    public bool? IsActive { get; set; }
 }

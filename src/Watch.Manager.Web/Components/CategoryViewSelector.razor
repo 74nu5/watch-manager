@@ -1,0 +1,255 @@
+@using Watch.Manager.Web.Services.Models
+@using Watch.Manager.Web.Components
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using Microsoft.FluentUI.AspNetCore.Components.Icons
+
+<div class="category-view-selector">
+    <div class="view-header">
+        <div class="view-controls">
+            <h3>Organisation des catégories</h3>
+
+            <div class="view-actions">
+                <div class="view-selector">
+                    <FluentButton Appearance="@(CurrentView == CategoryViewType.Grid ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => SetCurrentView(CategoryViewType.Grid)"
+                                Title="Vue en grille">
+                        <FluentIcon Value="@(new Size16.GridKanban())" />
+                        Grille
+                    </FluentButton>
+
+                    <FluentButton Appearance="@(CurrentView == CategoryViewType.List ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => SetCurrentView(CategoryViewType.List)"
+                                Title="Vue en liste">
+                        <FluentIcon Value="@(new Size16.List())" />
+                        Liste
+                    </FluentButton>
+
+                    <FluentButton Appearance="@(CurrentView == CategoryViewType.Tree ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => SetCurrentView(CategoryViewType.Tree)"
+                                Title="Vue arborescente">
+                        <FluentIcon Value="@(new Size16.Flow())" />
+                        Arbre
+                    </FluentButton>
+                </div>
+
+                <FluentButton Appearance="Appearance.Accent"
+                            @onclick="OnAddCategory">
+                    <FluentIcon Value="@(new Size16.Add())" Slot="start" />
+                    Nouvelle catégorie
+                </FluentButton>
+            </div>
+        </div>
+
+        @if (CurrentView == CategoryViewType.Tree || CurrentView == CategoryViewType.List)
+        {
+            <div class="hierarchy-controls">
+                <FluentButton Appearance="Appearance.Stealth"
+                            @onclick="ExpandAll"
+                            Title="Tout développer">
+                    <FluentIcon Value="@(new Size16.ChevronDoubleDown())" />
+                    Tout développer
+                </FluentButton>
+
+                <FluentButton Appearance="Appearance.Stealth"
+                            @onclick="CollapseAll"
+                            Title="Tout réduire">
+                    <FluentIcon Value="@(new Size16.ChevronDoubleUp())" />
+                    Tout réduire
+                </FluentButton>
+            </div>
+        }
+    </div>
+
+    <div class="view-content">
+        @switch (CurrentView)
+        {
+            case CategoryViewType.Grid:
+                <div class="grid-view">
+                    @if (Categories?.Any() == true)
+                    {
+                        <div class="category-grid">
+                            @foreach (var category in Categories)
+                            {
+                                <CategoryCard Category="category"
+                                            OnEdit="OnCategoryEdit"
+                                            OnDelete="OnCategoryDelete" />
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <p>Aucune catégorie trouvée</p>
+                        </div>
+                    }
+                </div>
+                break;
+
+            case CategoryViewType.List:
+                <CategoryListView Categories="@Categories"
+                                OnCategoryEdit="OnCategoryEdit"
+                                OnCategoryDelete="OnCategoryDelete"
+                                ExpandedCategories="ExpandedCategories"
+                                OnToggleExpanded="OnToggleExpanded" />
+                break;
+
+            case CategoryViewType.Tree:
+                <CategoryTreeView Categories="@Categories"
+                                OnCategoryEdit="OnCategoryEdit"
+                                OnCategoryDelete="OnCategoryDelete"
+                                ExpandedCategories="ExpandedCategories"
+                                OnToggleExpanded="OnToggleExpanded" />
+                break;
+        }
+    </div>
+</div>
+
+<style>
+    .category-view-selector {
+        width: 100%;
+        background-color: var(--neutral-layer-1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .view-header {
+        padding: 16px 20px;
+        background-color: var(--neutral-layer-2);
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    }
+
+    .view-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .view-controls h3 {
+        margin: 0;
+        color: var(--neutral-foreground-rest);
+        font-weight: 600;
+    }
+
+    .view-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .view-selector {
+        display: flex;
+        gap: 4px;
+        border: 1px solid var(--neutral-stroke-divider-rest);
+        border-radius: 6px;
+        padding: 2px;
+        background-color: var(--neutral-layer-1);
+    }
+
+    .hierarchy-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .view-content {
+        padding: 20px;
+    }
+
+    .grid-view {
+        width: 100%;
+    }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        width: 100%;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--neutral-foreground-rest);
+    }
+</style>
+
+@code {
+    [Parameter] public IEnumerable<CategoryModel>? Categories { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+    [Parameter] public EventCallback OnAddCategory { get; set; }
+    [Parameter] public CategoryViewType InitialView { get; set; } = CategoryViewType.Grid;
+
+    private CategoryViewType currentView;
+    private HashSet<int> expandedCategories = new();
+
+    public CategoryViewType CurrentView
+    {
+        get => currentView;
+        set
+        {
+            if (currentView != value)
+            {
+                currentView = value;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public HashSet<int> ExpandedCategories => expandedCategories;
+
+    protected override void OnInitialized()
+    {
+        currentView = InitialView;
+    }
+
+    private void SetCurrentView(CategoryViewType viewType)
+    {
+        CurrentView = viewType;
+    }
+
+    private async Task OnToggleExpanded(int categoryId)
+    {
+        if (expandedCategories.Contains(categoryId))
+        {
+            expandedCategories.Remove(categoryId);
+        }
+        else
+        {
+            expandedCategories.Add(categoryId);
+        }
+
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    private void ExpandAll()
+    {
+        if (Categories?.Any() == true)
+        {
+            expandedCategories.Clear();
+            AddAllCategoryIds(Categories);
+            StateHasChanged();
+        }
+    }
+
+    private void CollapseAll()
+    {
+        expandedCategories.Clear();
+        StateHasChanged();
+    }
+
+    private void AddAllCategoryIds(IEnumerable<CategoryModel> categories)
+    {
+        foreach (var category in categories)
+        {
+            expandedCategories.Add(category.Id);
+            if (category.Children?.Any() == true)
+            {
+                AddAllCategoryIds(category.Children);
+            }
+        }
+    }
+}

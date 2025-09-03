@@ -1,4 +1,5 @@
 @page "/categories"
+@using Watch.Manager.Web.Components
 
 <h3>📁 Gestion des Catégories</h3>
 
@@ -108,15 +109,11 @@
     }
     else
     {
-        <div class="categories-grid">
-            @foreach (var category in this.categories)
-            {
-                <CategoryCard Category="category"
-                             OnEdit="this.EditCategory"
-                             OnDelete="this.DeleteCategory"
-                             OnToggleActive="this.ToggleActiveCategoryAsync" />
-            }
-        </div>
+        <CategoryViewSelector Categories="@this.hierarchicalCategories"
+                            OnCategoryEdit="@this.EditCategory"
+                            OnCategoryDelete="@this.DeleteCategory"
+                            OnAddCategory="@this.ShowCreateDialog"
+                            InitialView="@CategoryViewType.Grid" />
     }
 </div>
 
@@ -166,13 +163,13 @@
             </div>
 
             <div class="form-group">
-                <FluentSelect @bind-SelectedOption="this.selectedParent"
+                <FluentSelect TOption="string" @bind-Value="this.SelectedParentString"
                             Label="Catégorie parente"
                             Placeholder="Sélectionner une catégorie parente">
-                    <FluentOption Value="null">Aucune (catégorie racine)</FluentOption>
+                    <FluentOption TOption="string" Value="">Aucune (catégorie racine)</FluentOption>
                     @foreach (var cat in this.GetAvailableParentCategories())
                     {
-                        <FluentOption Value="cat.Id">@cat.Name</FluentOption>
+                        <FluentOption TOption="string" Value="@cat.Id.ToString()">@cat.Name</FluentOption>
                     }
                 </FluentSelect>
             </div>

@@ -84,4 +84,24 @@ public sealed class CategoryModel
     /// Mots-clés concaténés pour l'affichage.
     /// </summary>
     public string KeywordsJoin => string.Join(", ", this.Keywords);
+
+    /// <summary>
+    /// Indique si cette catégorie hérite des propriétés de son parent.
+    /// </summary>
+    public bool InheritFromParent { get; set; } = true;
+
+    /// <summary>
+    /// Ordre d'affichage dans la hiérarchie.
+    /// </summary>
+    public int DisplayOrder { get; set; } = 0;
+
+    /// <summary>
+    /// Chemin complet dans la hiérarchie (ex: "Parent/Enfant/Sous-enfant").
+    /// </summary>
+    public string HierarchyPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Niveau de profondeur dans la hiérarchie (0 = racine).
+    /// </summary>
+    public int HierarchyLevel { get; set; } = 0;
 }

@@ -56,6 +56,26 @@ public static class CategoryEndpoints
         _ = categoriesApi.MapDelete("/{categoryId:int}/articles/{articleId:int}", RemoveCategoryFromArticleAsync)
                          .WithName("RemoveCategoryFromArticle")
                          .WithSummary("Retire une catégorie d'un article");
+
+        _ = categoriesApi.MapGet("/tree", GetCategoriesTreeAsync)
+                         .WithName("GetCategoriesTree")
+                         .WithSummary("Récupère les catégories organisées en arbre hiérarchique");
+
+        _ = categoriesApi.MapGet("/{id:int}/ancestors", GetCategoryAncestorsAsync)
+                         .WithName("GetCategoryAncestors")
+                         .WithSummary("Récupère les ancêtres d'une catégorie (breadcrumb)");
+
+        _ = categoriesApi.MapGet("/{id:int}/descendants", GetCategoryDescendantsAsync)
+                         .WithName("GetCategoryDescendants")
+                         .WithSummary("Récupère tous les descendants d'une catégorie");
+
+        _ = categoriesApi.MapPost("/reorder", ReorderCategoriesAsync)
+                         .WithName("ReorderCategories")
+                         .WithSummary("Réorganise l'ordre d'affichage des catégories");
+
+        _ = categoriesApi.MapPost("/update-hierarchy", UpdateHierarchyPathsAsync)
+                         .WithName("UpdateHierarchyPaths")
+                         .WithSummary("Met à jour les chemins hiérarchiques de toutes les catégories");
     }
 
     private static async Task<IResult> GetCategoriesAsync([AsParameters] GetCategoriesParameter p)
@@ -128,6 +148,9 @@ public static class CategoryEndpoints
             Keywords = p.Model.Keywords,
             ParentId = p.Model.ParentId,
             ConfidenceThreshold = p.Model.ConfidenceThreshold,
+            InheritFromParent = p.Model.InheritFromParent,
+            DisplayOrder = p.Model.DisplayOrder,
+            IsActive = p.Model.IsActive ?? true,
         };
 
         var createdCategory = await p.CategoryStore.CreateCategoryAsync(category, p.CancellationToken).ConfigureAwait(false);
@@ -144,6 +167,10 @@ public static class CategoryEndpoints
             UpdatedAt = createdCategory.UpdatedAt,
             IsActive = createdCategory.IsActive,
             ConfidenceThreshold = createdCategory.ConfidenceThreshold,
+            InheritFromParent = createdCategory.InheritFromParent,
+            DisplayOrder = createdCategory.DisplayOrder,
+            HierarchyPath = createdCategory.HierarchyPath,
+            HierarchyLevel = createdCategory.HierarchyLevel,
         };
 
         return Results.Created($"/api/categories/{createdCategory.Id}", viewModel);
@@ -341,5 +368,115 @@ public static class CategoryEndpoints
             return Results.NotFound("Assignation non trouvée");
 
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetCategoriesTreeAsync([AsParameters] GetRootsCategoryParameter p)
+    {
+        var categoriesTree = await p.CategoryStore.GetCategoriesAsTreeAsync(p.IncludeInactive, p.CancellationToken).ConfigureAwait(false);
+        var viewModels = new List<CategoryViewModel>();
+
+        foreach (var c in categoriesTree)
+        {
+            var articleCount = await p.CategoryStore.GetArticleCountInCategoryAsync(c.Id, false, p.CancellationToken).ConfigureAwait(false);
+            var linkedArticles = await p.CategoryStore.GetLinkedArticleTitlesAsync(c.Id, p.CancellationToken).ConfigureAwait(false);
+            viewModels.Add(new()
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Color = c.Color,
+                Icon = c.Icon,
+                Keywords = c.Keywords,
+                ParentId = c.ParentId,
+                ParentName = c.Parent?.Name,
+                Children = MapCategoryChildren(c.Children),
+                ArticleCount = articleCount,
+                LinkedArticles = linkedArticles,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt,
+                IsActive = c.IsActive,
+                ConfidenceThreshold = c.ConfidenceThreshold,
+                InheritFromParent = c.InheritFromParent,
+                DisplayOrder = c.DisplayOrder,
+                HierarchyPath = c.HierarchyPath,
+                HierarchyLevel = c.HierarchyLevel,
+            });
+        }
+
+        return Results.Ok(viewModels);
+    }
+
+    private static async Task<IResult> GetCategoryAncestorsAsync([AsParameters] GetCategoryParameter p)
+    {
+        var ancestors = await p.CategoryStore.GetCategoryAncestorsAsync(p.Id, p.CancellationToken).ConfigureAwait(false);
+        var breadcrumbs = ancestors.Select(a => new CategoryBreadcrumbViewModel
+        {
+            Id = a.Id,
+            Name = a.Name,
+            Level = a.HierarchyLevel,
+        }).ToList();
+
+        return Results.Ok(breadcrumbs);
+    }
+
+    private static async Task<IResult> GetCategoryDescendantsAsync([AsParameters] GetCategoryDescendantsParameter p)
+    {
+        var descendants = await p.CategoryStore.GetCategoryDescendantsAsync(p.Id, p.IncludeInactive, p.CancellationToken).ConfigureAwait(false);
+        var viewModels = descendants.Select(c => new CategoryViewModel
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Color = c.Color,
+            Icon = c.Icon,
+            Keywords = c.Keywords,
+            ParentId = c.ParentId,
+            ParentName = c.Parent?.Name,
+            CreatedAt = c.CreatedAt,
+            UpdatedAt = c.UpdatedAt,
+            IsActive = c.IsActive,
+            ConfidenceThreshold = c.ConfidenceThreshold,
+            InheritFromParent = c.InheritFromParent,
+            DisplayOrder = c.DisplayOrder,
+            HierarchyPath = c.HierarchyPath,
+            HierarchyLevel = c.HierarchyLevel,
+        }).ToList();
+
+        return Results.Ok(viewModels);
+    }
+
+    private static async Task<IResult> ReorderCategoriesAsync([AsParameters] ReorderCategoriesParameter p)
+    {
+        var updatedCount = await p.CategoryStore.ReorderCategoriesAsync(p.CategoryOrders, p.CancellationToken).ConfigureAwait(false);
+        return Results.Ok(new { UpdatedCount = updatedCount });
+    }
+
+    private static async Task<IResult> UpdateHierarchyPathsAsync([AsParameters] UpdateHierarchyPathsParameter p)
+    {
+        var updatedCount = await p.CategoryStore.UpdateAllHierarchyPathsAsync(p.CancellationToken).ConfigureAwait(false);
+        return Results.Ok(new { UpdatedCount = updatedCount });
+    }
+
+    private static List<CategoryViewModel> MapCategoryChildren(ICollection<Category> children)
+    {
+        return children.Select(child => new CategoryViewModel
+        {
+            Id = child.Id,
+            Name = child.Name,
+            Description = child.Description,
+            Color = child.Color,
+            Icon = child.Icon,
+            Keywords = child.Keywords,
+            ParentId = child.ParentId,
+            Children = MapCategoryChildren(child.Children),
+            CreatedAt = child.CreatedAt,
+            UpdatedAt = child.UpdatedAt,
+            IsActive = child.IsActive,
+            ConfidenceThreshold = child.ConfidenceThreshold,
+            InheritFromParent = child.InheritFromParent,
+            DisplayOrder = child.DisplayOrder,
+            HierarchyPath = child.HierarchyPath,
+            HierarchyLevel = child.HierarchyLevel,
+        }).ToList();
     }
 }

@@ -1,0 +1,82 @@
+@using Watch.Manager.Web.Services.Models
+
+<div class="category-tree">
+    @if (Categories?.Any() == true)
+    {
+        @foreach (var category in Categories.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
+        {
+            <CategoryTreeNode
+                Category="category"
+                SelectedCategoryId="SelectedCategoryId"
+                OnCategorySelected="OnCategorySelected"
+                OnCategoryEdit="OnCategoryEdit"
+                OnCategoryDelete="OnCategoryDelete"
+                ShowActions="ShowActions"
+                ExpandedCategories="ExpandedCategories"
+                OnToggleExpanded="OnToggleExpanded" />
+        }
+    }
+    else
+    {
+        <div class="empty-tree">
+            <p style="text-align: center; color: var(--neutral-foreground-rest); padding: 20px;">
+                Aucune catégorie disponible
+            </p>
+        </div>
+    }
+</div>
+
+<style>
+    .category-tree {
+        width: 100%;
+    }
+
+    .empty-tree {
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// Les catégories à afficher en arbre.
+    /// </summary>
+    [Parameter] public IEnumerable<CategoryModel>? Categories { get; set; }
+
+    /// <summary>
+    /// ID de la catégorie actuellement sélectionnée.
+    /// </summary>
+    [Parameter] public int? SelectedCategoryId { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de la sélection d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategorySelected { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de l'édition d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+
+    /// <summary>
+    /// Callback déclenché lors de la suppression d'une catégorie.
+    /// </summary>
+    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+
+    /// <summary>
+    /// Affiche les actions (éditer, supprimer).
+    /// </summary>
+    [Parameter] public bool ShowActions { get; set; } = true;
+
+    /// <summary>
+    /// Set des IDs de catégories actuellement développées.
+    /// </summary>
+    [Parameter] public HashSet<int> ExpandedCategories { get; set; } = new();
+
+    /// <summary>
+    /// Callback déclenché lors du basculement de l'état développé/réduit.
+    /// </summary>
+    [Parameter] public EventCallback<int> OnToggleExpanded { get; set; }
+}

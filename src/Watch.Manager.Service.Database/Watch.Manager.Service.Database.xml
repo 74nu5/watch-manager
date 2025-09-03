@@ -166,6 +166,55 @@
             <param name="cancellationToken">Token d'annulation.</param>
             <returns>Liste des titres d'articles.</returns>
         </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.UpdateAllHierarchyPathsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Met à jour les chemins hiérarchiques de toutes les catégories.
+            </summary>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Nombre de catégories mises à jour.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoriesAsTreeAsync(System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Récupère les catégories organisées en arbre hiérarchique.
+            </summary>
+            <param name="includeInactive">Inclut les catégories inactives.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Catégories organisées en arbre.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoryDescendantsAsync(System.Int32,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Récupère tous les descendants d'une catégorie.
+            </summary>
+            <param name="categoryId">Identifiant de la catégorie parent.</param>
+            <param name="includeInactive">Inclut les catégories inactives.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des descendants.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoryAncestorsAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Récupère les ancêtres d'une catégorie (breadcrumb).
+            </summary>
+            <param name="categoryId">Identifiant de la catégorie.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Liste des ancêtres (du plus proche au plus éloigné).</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.WouldCreateCircularReferenceAsync(System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Vérifie s'il y aurait des références circulaires lors du changement de parent.
+            </summary>
+            <param name="categoryId">Identifiant de la catégorie.</param>
+            <param name="newParentId">Identifiant du nouveau parent.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>True s'il y aurait une référence circulaire.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.ReorderCategoriesAsync(System.Collections.Generic.Dictionary{System.Int32,System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Réorganise l'ordre d'affichage des catégories.
+            </summary>
+            <param name="categoryOrders">Dictionnaire des ordres d'affichage par ID de catégorie.</param>
+            <param name="cancellationToken">Token d'annulation.</param>
+            <returns>Nombre de catégories mises à jour.</returns>
+        </member>
         <member name="T:Watch.Manager.Service.Database.ArticleAnalyseStore">
             <summary>
                 Provides storage and retrieval operations for analyzed articles, including search and thumbnail access.
@@ -278,6 +327,24 @@
             <param name="categoryId">ID de la catégorie parent.</param>
             <param name="cancellationToken">Token d'annulation.</param>
             <returns>Liste des IDs de catégories.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.UpdateAllHierarchyPathsAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoriesAsTreeAsync(System.Boolean,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoryDescendantsAsync(System.Int32,System.Boolean,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoryAncestorsAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.WouldCreateCircularReferenceAsync(System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.ReorderCategoriesAsync(System.Collections.Generic.Dictionary{System.Int32,System.Int32},System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Watch.Manager.Service.Database.Context.ArticlesContext">
             <summary>
@@ -578,6 +645,102 @@
             Seuil manuel pour la classification.
             </summary>
         </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.InheritFromParent">
+            <summary>
+            Indique si cette catégorie hérite des propriétés de son parent.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.DisplayOrder">
+            <summary>
+            Ordre d'affichage dans la hiérarchie.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.HierarchyPath">
+            <summary>
+            Chemin complet dans la hiérarchie (ex: "Parent/Enfant/Sous-enfant").
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.Category.HierarchyLevel">
+            <summary>
+            Niveau de profondeur dans la hiérarchie (0 = racine).
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions">
+            <summary>
+            Extensions pour la gestion de la hiérarchie des catégories.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.CalculateHierarchyPath(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Calcule le chemin hiérarchique complet d'une catégorie.
+            </summary>
+            <param name="category">La catégorie.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Le chemin hiérarchique (ex: "Parent/Enfant/Sous-enfant").</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.CalculateHierarchyLevel(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Calcule le niveau de profondeur dans la hiérarchie.
+            </summary>
+            <param name="category">La catégorie.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Le niveau de profondeur (0 = racine).</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetAncestors(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Obtient tous les ancêtres d'une catégorie.
+            </summary>
+            <param name="category">La catégorie.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Liste des catégories ancêtres (du plus proche au plus éloigné).</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetAllDescendants(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Obtient tous les descendants d'une catégorie de manière récursive.
+            </summary>
+            <param name="category">La catégorie parent.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Liste de tous les descendants.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.IsAncestorOf(Watch.Manager.Service.Database.Entities.Category,Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Vérifie si une catégorie est un ancêtre d'une autre catégorie.
+            </summary>
+            <param name="potentialAncestor">La catégorie potentiellement ancêtre.</param>
+            <param name="category">La catégorie à vérifier.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>True si potentialAncestor est un ancêtre de category.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetEffectiveKeywords(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Obtient les mots-clés effectifs d'une catégorie (incluant l'héritage).
+            </summary>
+            <param name="category">La catégorie.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Liste des mots-clés effectifs.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetEffectiveConfidenceThreshold(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Obtient le seuil de confiance effectif d'une catégorie (incluant l'héritage).
+            </summary>
+            <param name="category">La catégorie.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <returns>Le seuil de confiance effectif.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.UpdateDescendantsHierarchyPaths(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Met à jour les chemins hiérarchiques de tous les descendants d'une catégorie.
+            </summary>
+            <param name="category">La catégorie parent.</param>
+            <param name="allCategories">Toutes les catégories disponibles.</param>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.ToHierarchicalTree(System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
+            <summary>
+            Obtient une représentation en arbre hiérarchique des catégories.
+            </summary>
+            <param name="categories">Les catégories à organiser.</param>
+            <returns>Les catégories racines avec leurs enfants organisés en arbre.</returns>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Extensions.DatabaseExtensions">
             <summary>
                 Provides extension methods for registering database-related services in the application.
@@ -662,6 +825,18 @@
             <inheritdoc />
         </member>
         <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:Watch.Manager.Service.Database.Models.ArticleResultDto">

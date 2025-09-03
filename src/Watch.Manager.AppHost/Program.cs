@@ -11,7 +11,7 @@ var scalar = builder.AddScalarApiReference(options => _ = options.WithTheme(Scal
                     .WithLifetime(ContainerLifetime.Persistent);
 
 var sqlServer = builder.AddSqlServer("sql-server", password, 1434)
-                       .WithHostPort(1434)
+                       .WithHostPort(52750)
                        .WithEnvironment("MSSQL_SA_PASSWORD", "Password1234")
                        .WithEnvironment("ACCEPT_EULA", "Y")
                        .WithImageTag("2025-latest")

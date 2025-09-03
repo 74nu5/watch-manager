@@ -1,0 +1,231 @@
+@using Watch.Manager.Web.Services.Models
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using Microsoft.FluentUI.AspNetCore.Components.Icons
+@inject IJSRuntime JSRuntime
+
+<tr class="category-row @(IsChild ? "child-row" : "parent-row") @(IsExpanded ? "expanded" : "")">
+    <td style="width: 40px;">
+        @if (Category.Children?.Any() == true)
+        {
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        @onclick="OnToggleExpanded"
+                        Title="@(IsExpanded ? "Réduire" : "Développer")"
+                        Style="@($"margin-left: {(IsChild ? 16 : 0)}px")">>
+                @if (IsExpanded)
+                {
+                    <FluentIcon Value="@(new Size16.ChevronDown())" />
+                }
+                else
+                {
+                    <FluentIcon Value="@(new Size16.ChevronRight())" />
+                }
+            </FluentButton>
+        }
+        else if (GetIndentationLevel() > 0)
+        {
+            <div style="@($"margin-left: {(GetIndentationLevel() * 16)}px"); width: 20px;"></div>
+        }
+    </td>
+
+    <td>
+        <div class="category-name-cell" style="@($"margin-left: {(GetIndentationLevel() * 16)}px")">
+            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
+            <div class="category-info">
+                <div class="name-with-path">
+                    @if (!string.IsNullOrEmpty(Category.HierarchyPath) && Category.HierarchyPath != Category.Name)
+                    {
+                        <span class="hierarchy-path">@Category.HierarchyPath.Replace(Category.Name, "").TrimEnd('/')/</span>
+                    }
+                    <strong>@Category.Name</strong>
+                </div>
+                @if (!string.IsNullOrEmpty(Category.Description))
+                {
+                    <div class="category-description">@Category.Description</div>
+                }
+            </div>
+        </div>
+    </td>
+
+    <td>
+        @if (!string.IsNullOrEmpty(Category.ParentName))
+        {
+            <span class="parent-name">@Category.ParentName</span>
+        }
+        else
+        {
+            <span class="no-parent">—</span>
+        }
+    </td>
+
+    <td style="text-align: center;">
+        <FluentBadge Appearance="Appearance.Neutral">
+            @Category.ArticleCount
+        </FluentBadge>
+    </td>
+
+    <td>
+        <div class="keywords-cell">
+            @if (Category.Keywords?.Any() == true)
+            {
+                @foreach (var keyword in Category.Keywords.Take(3))
+                {
+                    <FluentBadge Appearance="Appearance.Lightweight" Size="BadgeSize.Small">
+                        @keyword
+                    </FluentBadge>
+                }
+                @if (Category.Keywords.Length > 3)
+                {
+                    <FluentBadge Appearance="Appearance.Lightweight" Size="BadgeSize.Small">
+                        +@(Category.Keywords.Length - 3)
+                    </FluentBadge>
+                }
+            }
+            else
+            {
+                <span class="no-keywords">—</span>
+            }
+        </div>
+    </td>
+
+    <td style="text-align: center;">
+        @if (Category.IsActive)
+        {
+            <FluentBadge Appearance="Appearance.Accent" BackgroundColor="green">
+                Actif
+            </FluentBadge>
+        }
+        else
+        {
+            <FluentBadge Appearance="Appearance.Neutral">
+                Inactif
+            </FluentBadge>
+        }
+    </td>
+
+    <td style="text-align: center;">
+        <span class="date-cell">@Category.CreatedAt.ToString("dd/MM/yyyy")</span>
+    </td>
+
+    <td>
+        <div class="action-buttons">
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        @onclick="() => OnCategoryEdit.InvokeAsync(Category)"
+                        Title="Modifier">
+                <FluentIcon Value="@(new Size16.Edit())" />
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Stealth"
+                        IconOnly="true"
+                        @onclick="() => OnCategoryDelete.InvokeAsync(Category)"
+                        Title="Supprimer">
+                <FluentIcon Value="@(new Size16.Delete())" />
+            </FluentButton>
+        </div>
+    </td>
+</tr>
+
+<style>
+    .category-row {
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+        transition: background-color 0.2s ease;
+    }
+
+    .category-row:hover {
+        background-color: var(--neutral-layer-2);
+    }
+
+    .category-row td {
+        padding: 8px 12px;
+        vertical-align: top;
+    }
+
+    .child-row {
+        background-color: var(--neutral-layer-card-rest);
+    }
+
+    .child-row td:first-child {
+        border-left: 3px solid var(--accent-fill-rest);
+    }
+
+    .category-name-cell {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .category-icon {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+        margin-top: 2px;
+    }
+
+    .category-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .name-with-path {
+        margin-bottom: 4px;
+    }
+
+    .hierarchy-path {
+        color: var(--neutral-foreground-rest);
+        font-size: 0.85em;
+        opacity: 0.8;
+    }
+
+    .category-description {
+        font-size: 0.85em;
+        color: var(--neutral-foreground-rest);
+        line-height: 1.3;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .parent-name {
+        color: var(--neutral-foreground-rest);
+        font-style: italic;
+    }
+
+    .no-parent, .no-keywords {
+        color: var(--neutral-foreground-disabled);
+        font-style: italic;
+    }
+
+    .keywords-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 200px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+    }
+
+    .date-cell {
+        font-size: 0.9em;
+        color: var(--neutral-foreground-rest);
+    }
+</style>
+
+@code {
+    [Parameter] public CategoryModel Category { get; set; } = default!;
+    [Parameter] public bool IsChild { get; set; }
+    [Parameter] public bool IsExpanded { get; set; }
+    [Parameter] public EventCallback OnToggleExpanded { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+
+    private int GetIndentationLevel()
+    {
+        return Category.HierarchyLevel;
+    }
+}

@@ -1,0 +1,176 @@
+@using Watch.Manager.Web.Services.Models
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+
+<div class="category-list">
+    <div class="list-header">
+        <div class="filter-section">
+            <FluentSearch @bind-Value="nameFilter"
+                         @oninput="OnFilterChanged"
+                         Placeholder="Filtrer par nom..."
+                         Style="width: 250px;" />
+        </div>
+    </div>
+
+    <div class="list-container">
+        <table class="category-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;"></th>
+                    <th>Nom</th>
+                    <th>Parent</th>
+                    <th style="width: 80px;">Articles</th>
+                    <th>Mots-clés</th>
+                    <th style="width: 80px;">Statut</th>
+                    <th style="width: 100px;">Créée le</th>
+                    <th style="width: 100px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Categories?.Any() == true)
+                {
+                    @foreach (var row in GetAllRowsToDisplay())
+                    {
+                        <CategoryListRow Category="row.Category"
+                                       IsChild="row.IsChild"
+                                       IsExpanded="IsExpanded(row.Category.Id)"
+                                       OnToggleExpanded="() => ToggleExpanded(row.Category.Id)"
+                                       OnCategoryEdit="OnCategoryEdit"
+                                       OnCategoryDelete="OnCategoryDelete" />
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="empty-row">
+                            <div class="empty-state">
+                                <p>Aucune catégorie trouvée</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .category-list {
+        width: 100%;
+    }
+
+    .list-header {
+        margin-bottom: 16px;
+        padding: 12px;
+        background-color: var(--neutral-layer-2);
+        border-radius: 8px;
+    }
+
+    .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .list-container {
+        border: 1px solid var(--neutral-stroke-divider-rest);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .category-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: var(--neutral-layer-1);
+    }
+
+    .category-table th {
+        background-color: var(--neutral-layer-3);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid var(--neutral-stroke-divider-rest);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .empty-state {
+        color: var(--neutral-foreground-rest);
+    }
+</style>
+
+@code {
+    [Parameter] public IEnumerable<CategoryModel>? Categories { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+    [Parameter] public HashSet<int> ExpandedCategories { get; set; } = new();
+    [Parameter] public EventCallback<int> OnToggleExpanded { get; set; }
+
+    private string nameFilter = string.Empty;
+
+    private bool IsExpanded(int categoryId) => ExpandedCategories.Contains(categoryId);
+
+    private async Task ToggleExpanded(int categoryId)
+    {
+        await OnToggleExpanded.InvokeAsync(categoryId);
+    }
+
+    private IEnumerable<CategoryModel> GetFilteredCategories()
+    {
+        if (Categories == null) return Enumerable.Empty<CategoryModel>();
+
+        var filtered = Categories.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(nameFilter))
+        {
+            filtered = filtered.Where(c => c.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return filtered.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name);
+    }
+
+    private IEnumerable<CategoryRowDisplay> GetAllRowsToDisplay()
+    {
+        var rows = new List<CategoryRowDisplay>();
+        var rootCategories = GetFilteredCategories();
+
+        foreach (var category in rootCategories)
+        {
+            AddCategoryAndChildren(category, rows, isChild: false);
+        }
+
+        return rows;
+    }
+
+    private void AddCategoryAndChildren(CategoryModel category, List<CategoryRowDisplay> rows, bool isChild)
+    {
+        // Ajouter la catégorie courante
+        rows.Add(new CategoryRowDisplay { Category = category, IsChild = isChild });
+
+        // Ajouter récursivement les enfants si la catégorie est développée
+        if (IsExpanded(category.Id) && category.Children?.Any() == true)
+        {
+            foreach (var child in category.Children.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
+            {
+                AddCategoryAndChildren(child, rows, isChild: true);
+            }
+        }
+    }
+
+    private async Task OnFilterChanged()
+    {
+        await Task.CompletedTask; // Refresh automatique grâce au binding
+    }
+
+    private sealed class CategoryRowDisplay
+    {
+        public required CategoryModel Category { get; set; }
+        public bool IsChild { get; set; }
+    }
+}

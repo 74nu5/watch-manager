@@ -90,6 +90,37 @@ public sealed class AnalyzeService
     }
 
     /// <summary>
+    ///     Gets categories organized as a hierarchical tree.
+    /// </summary>
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>API result containing the hierarchical tree of categories.</returns>
+    public async Task<ApiResult<CategoryModel[]>> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await this.client.GetAsync($"/api/categories/tree?includeInactive={includeInactive}", cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return response.StatusCode switch
+                {
+                    HttpStatusCode.NotFound => ApiResult<CategoryModel[]>.Failure(ApiResultErrorType.NotFound),
+                    HttpStatusCode.BadRequest => ApiResult<CategoryModel[]>.Failure(ApiResultErrorType.BadRequest),
+                    _ => ApiResult<CategoryModel[]>.Failure("Failed to load categories tree"),
+                };
+            }
+
+            var categories = await response.Content.ReadFromJsonAsync<CategoryModel[]>(cancellationToken).ConfigureAwait(false);
+            return ApiResult<CategoryModel[]>.Success(categories ?? []);
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<CategoryModel[]>.Failure($"Error loading categories tree: {ex.Message}");
+        }
+    }
+
+    /// <summary>
     ///     Gets a category by its identifier.
     /// </summary>
     /// <param name="id">Category identifier.</param>
