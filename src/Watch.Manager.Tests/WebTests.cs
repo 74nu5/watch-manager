@@ -4,7 +4,7 @@ using System.Net;
 
 using Projects;
 
-public class WebTests
+public sealed class WebTests
 {
     [Fact]
     public async Task GetWebResourceRootReturnsOkStatusCode()

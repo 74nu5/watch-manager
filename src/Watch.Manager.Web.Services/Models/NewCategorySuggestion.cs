@@ -3,7 +3,7 @@ namespace Watch.Manager.Web.Services.Models;
 /// <summary>
 /// Modèle pour représenter une suggestion de nouvelle catégorie.
 /// </summary>
-public class NewCategorySuggestion
+public sealed class NewCategorySuggestion
 {
     /// <summary>
     /// Nom suggéré pour la nouvelle catégorie.

@@ -1,4 +1,4 @@
-﻿namespace eShop.ServiceDefaults;
+﻿namespace Watch.Manager.ServiceDefaults;
 
 using System.Text;
 
@@ -13,17 +13,24 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-using Watch.Manager.ServiceDefaults;
-
+/// <summary>
+///     Provides extension methods for configuring OpenAPI options.
+/// </summary>
 internal static class OpenApiOptionsExtensions
 {
+    /// <summary>
+    ///     Applies API version information to the OpenAPI document.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <param name="title">The API title.</param>
+    /// <param name="description">The API description.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplyApiVersionInfo(this OpenApiOptions options, string title, string description)
     {
-        _ = options.AddDocumentTransformer((document, context, cancellationToken) =>
+        _ = options.AddDocumentTransformer((document, context, _) =>
         {
             var versionedDescriptionProvider = context.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
-            var apiDescription = versionedDescriptionProvider?.ApiVersionDescriptions
-                                                              .SingleOrDefault(description => description.GroupName == context.DocumentName);
+            var apiDescription = versionedDescriptionProvider?.ApiVersionDescriptions.SingleOrDefault(desc => desc.GroupName == context.DocumentName);
 
             if (apiDescription is null)
                 return Task.CompletedTask;
@@ -37,12 +44,23 @@ internal static class OpenApiOptionsExtensions
         return options;
     }
 
+    /// <summary>
+    ///     Adds security scheme definitions to the OpenAPI document.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplySecuritySchemeDefinitions(this OpenApiOptions options)
     {
         _ = options.AddDocumentTransformer<SecuritySchemeDefinitionsTransformer>();
         return options;
     }
 
+    /// <summary>
+    ///     Adds authorization checks and security requirements to OpenAPI operations.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <param name="scopes">The required OAuth2 scopes.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplyAuthorizationChecks(this OpenApiOptions options, string[] scopes)
     {
         _ = options.AddOperationTransformer((operation, context, cancellationToken) =>
@@ -60,13 +78,13 @@ internal static class OpenApiOptionsExtensions
                 Reference = new() { Type = ReferenceType.SecurityScheme, Id = "oauth2" },
             };
 
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
+            operation.Security =
+            [
                 new()
                 {
                     [oAuthScheme] = scopes,
                 },
-            };
+            ];
 
             return Task.CompletedTask;
         });
@@ -74,9 +92,14 @@ internal static class OpenApiOptionsExtensions
         return options;
     }
 
+    /// <summary>
+    ///     Marks OpenAPI operations as deprecated if the corresponding API description is deprecated.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplyOperationDeprecatedStatus(this OpenApiOptions options)
     {
-        _ = options.AddOperationTransformer((operation, context, cancellationToken) =>
+        _ = options.AddOperationTransformer((operation, context, _) =>
         {
             var apiDescription = context.Description;
             operation.Deprecated |= apiDescription.IsDeprecated();
@@ -86,27 +109,28 @@ internal static class OpenApiOptionsExtensions
         return options;
     }
 
+    /// <summary>
+    ///     Adds a description and example to the "api-version" parameter in OpenAPI operations.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplyApiVersionDescription(this OpenApiOptions options)
     {
-        _ = options.AddOperationTransformer((operation, context, cancellationToken) =>
+        _ = options.AddOperationTransformer((operation, context, _) =>
         {
             // Find parameter named "api-version" and add a description to it
             var apiVersionParameter = operation.Parameters.FirstOrDefault(p => p.Name == "api-version");
 
-            if (apiVersionParameter is not null)
-            {
-                apiVersionParameter.Description = "The API version, in the format 'major.minor'.";
+            if (apiVersionParameter is null)
+                return Task.CompletedTask;
 
-                switch (context.DocumentName)
-                {
-                    case "v1":
-                        apiVersionParameter.Schema.Example = new OpenApiString("1.0");
-                        break;
-                    case "v2":
-                        apiVersionParameter.Schema.Example = new OpenApiString("2.0");
-                        break;
-                }
-            }
+            apiVersionParameter.Description = "The API version, in the format 'major.minor'.";
+            apiVersionParameter.Schema.Example = context.DocumentName switch
+            {
+                "v1" => new OpenApiString("1.0"),
+                "v2" => new OpenApiString("2.0"),
+                _ => apiVersionParameter.Schema.Example,
+            };
 
             return Task.CompletedTask;
         });
@@ -114,18 +138,22 @@ internal static class OpenApiOptionsExtensions
         return options;
     }
 
-    // This extension method adds a schema transformer that sets "nullable" to false for all optional properties.
+    /// <summary>
+    ///     Sets the "nullable" property to false for all optional properties in OpenAPI schemas.
+    /// </summary>
+    /// <param name="options">The OpenAPI options.</param>
+    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplySchemaNullableFalse(this OpenApiOptions options)
     {
-        _ = options.AddSchemaTransformer((schema, context, cancellationToken) =>
+        _ = options.AddSchemaTransformer((schema, _, _) =>
         {
-            if (schema.Properties is not null)
+            if (schema.Properties is null)
+                return Task.CompletedTask;
+
+            foreach (var property in schema.Properties)
             {
-                foreach (var property in schema.Properties)
-                {
-                    if (schema.Required?.Contains(property.Key) != true)
-                        property.Value.Nullable = false;
-                }
+                if (schema.Required?.Contains(property.Key) != true)
+                    property.Value.Nullable = false;
             }
 
             return Task.CompletedTask;
@@ -134,6 +162,12 @@ internal static class OpenApiOptionsExtensions
         return options;
     }
 
+    /// <summary>
+    ///     Builds the API description, including deprecation and sunset policy information if applicable.
+    /// </summary>
+    /// <param name="api">The API version description.</param>
+    /// <param name="description">The base description.</param>
+    /// <returns>The composed description string.</returns>
     private static string BuildDescription(ApiVersionDescription api, string description)
     {
         var text = new StringBuilder(description);
@@ -151,53 +185,57 @@ internal static class OpenApiOptionsExtensions
             _ = text.Append("This API version has been deprecated.");
         }
 
-        if (api.SunsetPolicy is { } policy)
-        {
-            if (policy.Date is { } when)
-            {
-                if (text.Length > 0)
-                    _ = text.Append(' ');
+        if (api.SunsetPolicy is not { } policy)
+            return text.ToString();
 
-                _ = text.Append("The API will be sunset on ")
+        if (policy.Date is { } when)
+        {
+            if (text.Length > 0)
+                _ = text.Append(' ');
+
+            _ = text.Append("The API will be sunset on ")
                     .Append(when.Date.ToShortDateString())
                     .Append('.');
-            }
-
-            if (policy.HasLinks)
-            {
-                _ = text.AppendLine();
-
-                var rendered = false;
-
-                foreach (var link in policy.Links.Where(l => l.Type == "text/html"))
-                {
-                    if (!rendered)
-                    {
-                        _ = text.Append("<h4>Links</h4><ul>");
-                        rendered = true;
-                    }
-
-                    _ = text.Append("<li><a href=\"");
-                    _ = text.Append(link.LinkTarget.OriginalString);
-                    _ = text.Append("\">");
-                    _ = text.Append(
-                        StringSegment.IsNullOrEmpty(link.Title)
-                                ? link.LinkTarget.OriginalString
-                                : link.Title.ToString());
-
-                    _ = text.Append("</a></li>");
-                }
-
-                if (rendered)
-                    _ = text.Append("</ul>");
-            }
         }
+
+        if (!policy.HasLinks)
+            return text.ToString();
+
+        _ = text.AppendLine();
+
+        var rendered = false;
+
+        foreach (var link in policy.Links.Where(l => l.Type == "text/html"))
+        {
+            if (!rendered)
+            {
+                _ = text.Append("<h4>Links</h4><ul>");
+                rendered = true;
+            }
+
+            _ = text.Append("<li><a href=\"");
+            _ = text.Append(link.LinkTarget.OriginalString);
+            _ = text.Append("\">");
+            _ = text.Append(
+                StringSegment.IsNullOrEmpty(link.Title)
+                        ? link.LinkTarget.OriginalString
+                        : link.Title.ToString());
+
+            _ = text.Append("</a></li>");
+        }
+
+        if (rendered)
+            _ = text.Append("</ul>");
 
         return text.ToString();
     }
 
-    private class SecuritySchemeDefinitionsTransformer(IConfiguration configuration) : IOpenApiDocumentTransformer
+    /// <summary>
+    ///     Transformer for adding OAuth2 security scheme definitions to the OpenAPI document.
+    /// </summary>
+    private sealed class SecuritySchemeDefinitionsTransformer(IConfiguration configuration) : IOpenApiDocumentTransformer
     {
+        /// <inheritdoc />
         public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
         {
             var identitySection = configuration.GetSection("Identity");

@@ -3,7 +3,7 @@ namespace Watch.Manager.Service.Analyse.Models;
 /// <summary>
 /// Options pour la classification automatique.
 /// </summary>
-public class ClassificationOptions
+public sealed class ClassificationOptions
 {
     /// <summary>
     /// Score minimum pour une classification automatique (par défaut 0.7).

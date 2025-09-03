@@ -36,37 +36,37 @@ public class ArticlesContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // Configuration de la relation Category hiérarchique
-        modelBuilder.Entity<Category>()
+        _ = modelBuilder.Entity<Category>()
             .HasOne(c => c.Parent)
             .WithMany(c => c.Children)
             .HasForeignKey(c => c.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Configuration de la relation many-to-many Article-Category
-        modelBuilder.Entity<ArticleCategory>()
+        _ = modelBuilder.Entity<ArticleCategory>()
             .HasKey(ac => new { ac.ArticleId, ac.CategoryId });
 
-        modelBuilder.Entity<ArticleCategory>()
+        _ = modelBuilder.Entity<ArticleCategory>()
             .HasOne(ac => ac.Article)
             .WithMany(a => a.ArticleCategories)
             .HasForeignKey(ac => ac.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<ArticleCategory>()
+        _ = modelBuilder.Entity<ArticleCategory>()
             .HasOne(ac => ac.Category)
             .WithMany(c => c.ArticleCategories)
             .HasForeignKey(ac => ac.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Index pour améliorer les performances
-        modelBuilder.Entity<Category>()
+        _ = modelBuilder.Entity<Category>()
             .HasIndex(c => c.Name)
             .IsUnique();
 
-        modelBuilder.Entity<Category>()
+        _ = modelBuilder.Entity<Category>()
             .HasIndex(c => c.ParentId);
 
-        modelBuilder.Entity<ArticleCategory>()
+        _ = modelBuilder.Entity<ArticleCategory>()
             .HasIndex(ac => ac.ConfidenceScore);
     }
 }

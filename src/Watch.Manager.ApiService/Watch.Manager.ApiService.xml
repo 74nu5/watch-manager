@@ -4,331 +4,936 @@
         <name>Watch.Manager.ApiService</name>
     </assembly>
     <members>
+        <member name="T:Watch.Manager.ApiService.Extensions.ArticleEndpoints">
+            <summary>
+            Provides extension methods for mapping article-related endpoints to a <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Extensions.ArticleEndpoints.MapArticleEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Configures the application's endpoints for managing articles, including operations for saving, searching, retrieving thumbnails, and getting all tags.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance to which the article endpoints will be added.</param>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Extensions.CategoryEndpoints">
+            <summary>
+            Provides extension methods for mapping category-related endpoints to a <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />.
+            </summary>
+            <remarks>
+            This class defines a set of endpoints for managing categories, including operations such as
+            retrieving, creating, updating, and deleting categories, as well as assigning and removing categories from articles.
+            The endpoints are grouped under the "api/categories" route and support additional operations like fetching root
+            categories and their children.
+            </remarks>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Extensions.CategoryEndpoints.MapCategoryEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Configures the application's endpoints for managing categories, including operations for retrieving, creating,
+            updating, and deleting categories, as well as assigning and removing categories from articles.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance to which the category endpoints will be added.</param>
+        </member>
         <member name="T:Watch.Manager.ApiService.Extensions.ClassificationEndpoints">
             <summary>
-            Extensions pour ajouter les endpoints de classification des articles.
+                Provides extension methods for configuring endpoints related to article classification.
             </summary>
+            <remarks>
+                This class defines a set of endpoints for managing article classification operations, including:
+                <list type="bullet">
+                    <item>Classifying individual articles.</item>
+                    <item>
+                        Automatically assigning categories to
+                        articles based on classification results.
+                    </item>
+                    <item>Batch classification of multiple articles.</item>
+                    <item>Providing suggestions for new categories based on uncategorized articles.</item>
+                    <item>
+                        Submitting feedback to
+                        improve classification accuracy.
+                    </item>
+                </list>
+                These endpoints are added to the application's routing pipeline and
+                are grouped under the "/api/classification" base path.
+            </remarks>
         </member>
         <member name="M:Watch.Manager.ApiService.Extensions.ClassificationEndpoints.MapClassificationEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
             <summary>
-            Ajoute les endpoints de classification des articles à l'application.
+                Configures the application's endpoints for managing article classification, including operations for classifying articles, auto-assigning categories, batch classification, suggestions, and feedback.
             </summary>
-            <param name="app">L'application web.</param>
-            <returns>L'application web pour le chaînage.</returns>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance to which the classification endpoints will be added.</param>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter">
+            <summary>
+            Represents the parameters required to analyze an article using AI and database services.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.AnalyzeModel">
+            <summary>
+            Gets or sets the model containing data to be analyzed.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.WebSiteService">
+            <summary>
+            Gets or sets service for website operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.ExtractEmbeddingAi">
+            <summary>
+            Gets or sets service for extracting AI embeddings from articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.ExtractDataAi">
+            <summary>
+            Gets or sets service for extracting data using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.ArticleAnalyseStore">
+            <summary>
+            Gets or sets store for article analysis data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.ClassificationService">
+            <summary>
+            Gets or sets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.CategoryStore">
+            <summary>
+            Gets or sets store for category data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter.Logger">
+            <summary>
+            Gets or sets logger for logging analysis operations.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Articles.GetAllTagsParameter">
+            <summary>
+            Represents the parameters required to retrieve all tags for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetAllTagsParameter.ArticleAnalyseStore">
+            <summary>
+            Gets store for article analysis data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetAllTagsParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Articles.GetArticleThumbnailParameter">
+            <summary>
+            Represents the parameters required to retrieve the thumbnail for a specific article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetArticleThumbnailParameter.Id">
+            <summary>
+            Gets the ID of the article whose thumbnail is requested.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetArticleThumbnailParameter.AnalyseStore">
+            <summary>
+            Gets store for article analysis data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetArticleThumbnailParameter.HttpContext">
+            <summary>
+            Gets the HTTP context for the request.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.GetArticleThumbnailParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter">
+            <summary>
+            Represents the parameters required to search for articles by text or tag.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter.Text">
+            <summary>
+            Gets the text to search for in articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter.Tag">
+            <summary>
+            Gets the tag to filter articles by.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter.ExtractEmbedding">
+            <summary>
+            Gets service for extracting AI embeddings from articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter.AnalyseStore">
+            <summary>
+            Gets store for article analysis data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.SearchArticleParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.AssignCategoryToArticleParameter">
+            <summary>
+            Represents the parameters required to assign a category to an article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.AssignCategoryToArticleParameter.CategoryId">
+            <summary>
+            Gets the ID of the category to assign.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.AssignCategoryToArticleParameter.ArticleId">
+            <summary>
+            Gets the ID of the article to assign the category to.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.AssignCategoryToArticleParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.AssignCategoryToArticleParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.CreateCategoryParameter">
+            <summary>
+            Represents the parameters required to create a new category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.CreateCategoryParameter.Model">
+            <summary>
+            Gets the model containing data for the new category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.CreateCategoryParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.CreateCategoryParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.DeleteCategoryParameter">
+            <summary>
+            Represents the parameters required to delete a category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.DeleteCategoryParameter.Id">
+            <summary>
+            Gets the ID of the category to delete.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.DeleteCategoryParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.DeleteCategoryParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.GetCategoriesParameter">
+            <summary>
+            Represents the parameters required to retrieve categories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoriesParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoriesParameter.IncludeInactive">
+            <summary>
+            Gets a value indicating whether indicates whether to include inactive categories in the result.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoriesParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.GetCategoryParameter">
+            <summary>
+            Represents the parameters required to retrieve a specific category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryParameter.Id">
+            <summary>
+            Gets the ID of the category to retrieve.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetCategoryParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.GetRootsCategoryParameter">
+            <summary>
+            Represents the parameters required to retrieve root categories.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetRootsCategoryParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetRootsCategoryParameter.IncludeInactive">
+            <summary>
+            Gets a value indicating whether indicates whether to include inactive categories in the result.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.GetRootsCategoryParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.RemoveCategoryFromArticleParameter">
+            <summary>
+            Represents the parameters required to remove a category from an article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.RemoveCategoryFromArticleParameter.CategoryId">
+            <summary>
+            Gets the ID of the category to remove.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.RemoveCategoryFromArticleParameter.ArticleId">
+            <summary>
+            Gets the ID of the article from which the category will be removed.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.RemoveCategoryFromArticleParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.RemoveCategoryFromArticleParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter">
+            <summary>
+            Represents the parameters required to update an existing category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter.Id">
+            <summary>
+            Gets the ID of the category to update.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter.Model">
+            <summary>
+            Gets the model containing updated data for the category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter.CategoryStore">
+            <summary>
+            Gets service for category data operations.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Categories.UpdateCategoryParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter">
+            <summary>
+            Represents the parameters required to automatically assign an article to categories using AI classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.Id">
+            <summary>
+            Gets the ID of the article to classify.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.Options">
+            <summary>
+            Gets optional classification options for the operation.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.CategoryStore">
+            <summary>
+            Gets store for category data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.AutoAssignArticleParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter">
+            <summary>
+            Represents the parameters required to classify multiple articles in a batch operation.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter.Request">
+            <summary>
+            Gets the batch classification request model containing articles and options.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter.CategoryStore">
+            <summary>
+            Gets store for category data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyArticlesParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyParameter">
+            <summary>
+            Represents the parameters required for a batch classification operation on articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyParameter.CategoryStore">
+            <summary>
+            Gets store for category data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.BatchClassifyParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter">
+            <summary>
+            Represents the parameters required to classify a single article using AI classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.Id">
+            <summary>
+            Gets the ID of the article to classify.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.Options">
+            <summary>
+            Gets optional classification options for the operation.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.CategoryStore">
+            <summary>
+            Gets store for category data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ClassifyArticleParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.GetNewCategorySuggestionsParameter">
+            <summary>
+            Represents the parameters required to get new category suggestions for articles using AI classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetNewCategorySuggestionsParameter.Limit">
+            <summary>
+            Gets optional limit for the number of suggestions to return.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetNewCategorySuggestionsParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetNewCategorySuggestionsParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetNewCategorySuggestionsParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.GetSuggestionsParameter">
+            <summary>
+            Represents the parameters required to get article suggestions using AI classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetSuggestionsParameter.Limit">
+            <summary>
+            Gets optional limit for the number of suggestions to return.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetSuggestionsParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetSuggestionsParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.GetSuggestionsParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Classification.ProvideClassificationFeedbackParameter">
+            <summary>
+            Represents the parameters required to provide feedback for article classification.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ProvideClassificationFeedbackParameter.Request">
+            <summary>
+            Gets the feedback request model containing feedback data.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ProvideClassificationFeedbackParameter.ClassificationService">
+            <summary>
+            Gets service for article classification using AI.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ProvideClassificationFeedbackParameter.Context">
+            <summary>
+            Gets database context for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Classification.ProvideClassificationFeedbackParameter.CancellationToken">
+            <summary>
+            Gets token to cancel the operation if needed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.AnalyzeModel">
+            <summary>
+                Represents a model containing the URI of a resource to be analyzed.
+            </summary>
+            <remarks>
+                This record is immutable and is intended to encapsulate the URI of a resource that will be processed
+                or analyzed by a consuming service or method.
+            </remarks>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.AnalyzeModel.UriToAnalyze">
+            <summary>
+                Gets the URI of the resource to be analyzed.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.ArticleViewModel">
+            <summary>
+                Represents an article with metadata, authors, tags, and analysis information.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Id">
+            <summary>
+                Gets or sets the unique identifier of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Title">
+            <summary>
+                Gets or sets the title of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Tags">
+            <summary>
+                Gets or sets the tags associated with the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Authors">
+            <summary>
+                Gets or sets the authors of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Summary">
+            <summary>
+                Gets or sets the summary of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Url">
+            <summary>
+                Gets or sets the URL of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.AnalyzeDate">
+            <summary>
+                Gets or sets the date when the article was analyzed.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Thumbnail">
+            <summary>
+                Gets or sets the thumbnail image URL for the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Score">
+            <summary>
+                Gets or sets the score assigned to the article, if any.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.ThumbnailBase64">
+            <summary>
+                Gets or sets the base64-encoded thumbnail image URI, if available.
+            </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.ArticleViewModel.Categories">
             <summary>
-            Catégories assignées à cet article.
+                Gets or sets the categories assigned to this article.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest">
             <summary>
-            Modèle de requête pour la classification en lot d'articles
+                Request model for batch classification of articles.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest.ArticleIds">
             <summary>
-            Identifiants des articles à classifier
+                Gets the identifiers of the articles to classify.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationRequest.Options">
             <summary>
-            Options de classification
+                Gets the classification options.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.BatchClassificationResult">
             <summary>
-            Modèle pour représenter le résultat de la classification par lot d'un article.
+            Model representing the result of batch classification for an article.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ArticleId">
             <summary>
-            Identifiant de l'article classifié.
+            Gets or sets the identifier of the classified article.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ArticleTitle">
             <summary>
-            Titre de l'article classifié.
+            Gets or sets the title of the classified article.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.AssignedCategories">
             <summary>
-            Catégories assignées automatiquement.
+            Gets or sets the categories automatically assigned.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.Success">
             <summary>
-            Indique si la classification a réussi.
+            Gets or sets a value indicating whether the classification succeeded.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.BatchClassificationResult.ErrorMessage">
             <summary>
-            Message d'erreur en cas d'échec.
+            Gets or sets the error message if the classification failed.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel">
             <summary>
-            Modèle pour représenter l'assignation d'une catégorie à un article.
+            Model representing the assignment of a category to an article.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.CategoryId">
             <summary>
-            Identifiant de la catégorie.
+            Gets or sets the identifier of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.CategoryName">
             <summary>
-            Nom de la catégorie.
+            Gets or sets the name of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.ConfidenceScore">
             <summary>
-            Score de confiance de l'assignation.
+            Gets or sets the confidence score of the assignment.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.IsAutomatic">
             <summary>
-            Indique si l'assignation a été faite automatiquement ou manuellement.
+            Gets or sets a value indicating whether the assignment was automatic or manual.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryAssignmentModel.AssignedAt">
             <summary>
-            Date de l'assignation.
+            Gets or sets the date of the assignment.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CategoryViewModel">
             <summary>
-            ViewModel pour représenter une catégorie dans l'API.
+            ViewModel representing a category in the API.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Id">
             <summary>
-            Identifiant unique de la catégorie.
+            Gets or sets the unique identifier of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Name">
             <summary>
-            Nom de la catégorie.
+            Gets or sets the name of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Description">
             <summary>
-            Description de la catégorie.
+            Gets or sets the description of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Color">
             <summary>
-            Couleur associée à la catégorie.
+            Gets or sets the color associated with the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Icon">
             <summary>
-            Icône associée à la catégorie.
+            Gets or sets the icon associated with the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Keywords">
             <summary>
-            Mots-clés pour la classification automatique.
+            Gets or sets the keywords for automatic classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.ParentId">
             <summary>
-            Identifiant de la catégorie parente.
+            Gets or sets the parent category identifier.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.ParentName">
             <summary>
-            Nom de la catégorie parente.
+            Gets or sets the name of the parent category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.Children">
             <summary>
-            Sous-catégories.
+            Gets or sets the child categories.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.ArticleCount">
             <summary>
-            Nombre d'articles dans cette catégorie.
+            Gets or sets the number of articles in this category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.LinkedArticles">
             <summary>
-            Noms des articles liés à cette catégorie.
+            Gets or sets the names of articles linked to this category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.CreatedAt">
             <summary>
-            Date de création.
+            Gets or sets the creation date.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.UpdatedAt">
             <summary>
-            Date de dernière modification.
+            Gets or sets the last modification date.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.IsActive">
             <summary>
-            Indique si la catégorie est active.
+            Gets or sets a value indicating whether the category is active.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CategoryViewModel.ConfidenceThreshold">
             <summary>
-            Seuil de confiance pour la classification automatique.
+            Gets or sets the confidence threshold for automatic classification.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest">
             <summary>
-            Modèle de requête pour fournir un retour sur la classification
+            Request model for providing feedback on classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.ArticleId">
             <summary>
-            Identifiant de l'article classifié
+            Gets the identifier of the classified article.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.CorrectCategories">
             <summary>
-            Identifiants des catégories correctes
+            Gets the identifiers of the correct categories.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.ClassificationFeedbackRequest.IncorrectCategories">
             <summary>
-            Identifiants des catégories incorrectes suggérées par l'IA
+            Gets the identifiers of the incorrect categories suggested by AI.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.CreateCategoryModel">
             <summary>
-            ViewModel pour créer ou mettre à jour une catégorie.
+            ViewModel for creating or updating a category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.Name">
             <summary>
-            Nom de la catégorie.
+            Gets or sets the name of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.Description">
             <summary>
-            Description de la catégorie.
+            Gets or sets the description of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.Color">
             <summary>
-            Couleur associée à la catégorie (format hex).
+            Gets or sets the color associated with the category (hex format).
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.Icon">
             <summary>
-            Icône associée à la catégorie.
+            Gets or sets the icon associated with the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.Keywords">
             <summary>
-            Mots-clés pour la classification automatique.
+            Gets or sets the keywords for automatic classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.ParentId">
             <summary>
-            Identifiant de la catégorie parente.
+            Gets or sets the parent category identifier.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.CreateCategoryModel.ConfidenceThreshold">
             <summary>
-            Seuil de confiance pour la classification automatique.
+            Gets or sets the confidence threshold for automatic classification.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion">
             <summary>
-            Modèle pour représenter une suggestion de nouvelle catégorie compatible avec l'API Web.
+            Model representing a suggestion for a new category compatible with the Web API.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedName">
             <summary>
-            Nom suggéré pour la nouvelle catégorie.
+            Gets or sets the suggested name for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedDescription">
             <summary>
-            Description suggérée pour la nouvelle catégorie.
+            Gets or sets the suggested description for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedKeywords">
             <summary>
-            Mots-clés suggérés pour la nouvelle catégorie.
+            Gets or sets the suggested keywords for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.RelevanceScore">
             <summary>
-            Score de pertinence de la suggestion entre 0 et 1.
+            Gets or sets the relevance score of the suggestion (between 0 and 1).
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.Justification">
             <summary>
-            Justification de la suggestion de nouvelle catégorie.
+            Gets or sets the justification for the new category suggestion.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedColor">
             <summary>
-            Couleur suggérée pour la nouvelle catégorie.
+            Gets or sets the suggested color for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedIcon">
             <summary>
-            Icône suggérée pour la nouvelle catégorie.
+            Gets or sets the suggested icon for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedParentId">
             <summary>
-            Identifiant de la catégorie parente suggérée.
+            Gets or sets the suggested parent category identifier.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.NewCategorySuggestion.SuggestedParentName">
             <summary>
-            Nom de la catégorie parente suggérée.
+            Gets or sets the suggested parent category name.
             </summary>
         </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel">
             <summary>
-            ViewModel pour mettre à jour une catégorie.
+            ViewModel for updating a category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.Name">
             <summary>
-            Nom de la catégorie.
+            Gets or sets the name of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.Description">
             <summary>
-            Description de la catégorie.
+            Gets or sets the description of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.Color">
             <summary>
-            Couleur associée à la catégorie (format hex).
+            Gets or sets the color associated with the category (hex format).
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.Icon">
             <summary>
-            Icône associée à la catégorie.
+            Gets or sets the icon associated with the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.Keywords">
             <summary>
-            Mots-clés pour la classification automatique.
+            Gets or sets the keywords for automatic classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.ParentId">
             <summary>
-            Identifiant de la catégorie parente.
+            Gets or sets the parent category identifier.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.IsActive">
             <summary>
-            Indique si la catégorie est active.
+            Gets or sets a value indicating whether the category is active.
             </summary>
         </member>
         <member name="P:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel.ConfidenceThreshold">
             <summary>
-            Seuil de confiance pour la classification automatique.
+            Gets or sets the confidence threshold for automatic classification.
             </summary>
         </member>
     </members>

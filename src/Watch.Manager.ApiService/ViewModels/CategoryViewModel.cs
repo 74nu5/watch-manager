@@ -1,82 +1,82 @@
-namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.ApiService.ViewModels;
 
 /// <summary>
-/// ViewModel pour représenter une catégorie dans l'API.
+/// ViewModel representing a category in the API.
 /// </summary>
-public class CategoryViewModel
+public sealed class CategoryViewModel
 {
     /// <summary>
-    /// Identifiant unique de la catégorie.
+    /// Gets or sets the unique identifier of the category.
     /// </summary>
     public int Id { get; set; }
 
     /// <summary>
-    /// Nom de la catégorie.
+    /// Gets or sets the name of the category.
     /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
-    /// Description de la catégorie.
+    /// Gets or sets the description of the category.
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// Couleur associée à la catégorie.
+    /// Gets or sets the color associated with the category.
     /// </summary>
     public string? Color { get; set; }
 
     /// <summary>
-    /// Icône associée à la catégorie.
+    /// Gets or sets the icon associated with the category.
     /// </summary>
     public string? Icon { get; set; }
 
     /// <summary>
-    /// Mots-clés pour la classification automatique.
+    /// Gets or sets the keywords for automatic classification.
     /// </summary>
     public string[] Keywords { get; set; } = [];
 
     /// <summary>
-    /// Identifiant de la catégorie parente.
+    /// Gets or sets the parent category identifier.
     /// </summary>
     public int? ParentId { get; set; }
 
     /// <summary>
-    /// Nom de la catégorie parente.
+    /// Gets or sets the name of the parent category.
     /// </summary>
     public string? ParentName { get; set; }
 
     /// <summary>
-    /// Sous-catégories.
+    /// Gets or sets the child categories.
     /// </summary>
     public List<CategoryViewModel> Children { get; set; } = new();
 
     /// <summary>
-    /// Nombre d'articles dans cette catégorie.
+    /// Gets or sets the number of articles in this category.
     /// </summary>
     public int ArticleCount { get; set; }
 
     /// <summary>
-    /// Noms des articles liés à cette catégorie.
+    /// Gets or sets the names of articles linked to this category.
     /// </summary>
     public string[] LinkedArticles { get; set; } = [];
 
     /// <summary>
-    /// Date de création.
+    /// Gets or sets the creation date.
     /// </summary>
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
-    /// Date de dernière modification.
+    /// Gets or sets the last modification date.
     /// </summary>
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>
-    /// Indique si la catégorie est active.
+    /// Gets or sets a value indicating whether the category is active.
     /// </summary>
     public bool IsActive { get; set; }
 
     /// <summary>
-    /// Seuil de confiance pour la classification automatique.
+    /// Gets or sets the confidence threshold for automatic classification.
     /// </summary>
     public double? ConfidenceThreshold { get; set; }
 }

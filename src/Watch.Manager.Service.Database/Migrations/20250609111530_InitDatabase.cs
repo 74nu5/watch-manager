@@ -11,7 +11,7 @@ namespace Watch.Manager.Service.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Articles",
                 columns: table => new
                 {
@@ -28,14 +28,14 @@ namespace Watch.Manager.Service.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Articles", x => x.Id);
+                    _ = table.PrimaryKey("PK_Articles", x => x.Id);
                 });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Articles");
         }
     }

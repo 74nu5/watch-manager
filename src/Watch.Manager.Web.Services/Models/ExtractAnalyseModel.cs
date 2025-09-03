@@ -1,6 +1,6 @@
 ﻿namespace Watch.Manager.Web.Services.Models;
 
-public record ExtractAnalyseModel
+public sealed record ExtractAnalyseModel
 {
     public required string Title { get; set; }
 

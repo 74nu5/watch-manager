@@ -10,7 +10,7 @@ namespace Watch.Manager.Service.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "ThumbnailBase64",
                 table: "Articles",
                 type: "nvarchar(max)",
@@ -21,7 +21,7 @@ namespace Watch.Manager.Service.Database.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ThumbnailBase64",
                 table: "Articles");
         }

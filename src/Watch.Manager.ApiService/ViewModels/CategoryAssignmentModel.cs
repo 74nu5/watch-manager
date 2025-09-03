@@ -1,32 +1,32 @@
-namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.ApiService.ViewModels;
 
 /// <summary>
-/// Modèle pour représenter l'assignation d'une catégorie à un article.
+/// Model representing the assignment of a category to an article.
 /// </summary>
-public class CategoryAssignmentModel
+public sealed class CategoryAssignmentModel
 {
     /// <summary>
-    /// Identifiant de la catégorie.
+    /// Gets or sets the identifier of the category.
     /// </summary>
     public required int CategoryId { get; set; }
 
     /// <summary>
-    /// Nom de la catégorie.
+    /// Gets or sets the name of the category.
     /// </summary>
     public required string CategoryName { get; set; }
 
     /// <summary>
-    /// Score de confiance de l'assignation.
+    /// Gets or sets the confidence score of the assignment.
     /// </summary>
     public double ConfidenceScore { get; set; }
 
     /// <summary>
-    /// Indique si l'assignation a été faite automatiquement ou manuellement.
+    /// Gets or sets a value indicating whether the assignment was automatic or manual.
     /// </summary>
     public bool IsAutomatic { get; set; }
 
     /// <summary>
-    /// Date de l'assignation.
+    /// Gets or sets the date of the assignment.
     /// </summary>
     public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
 }

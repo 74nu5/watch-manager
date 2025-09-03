@@ -3,7 +3,7 @@ namespace Watch.Manager.Service.Analyse.Models;
 /// <summary>
 /// Résultat de la classification automatique d'un article.
 /// </summary>
-public class CategoryClassificationResult
+public sealed class CategoryClassificationResult
 {
     /// <summary>
     /// Identifiant de la catégorie suggérée.

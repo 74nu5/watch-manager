@@ -84,7 +84,7 @@ public interface IArticleClassificationService
 /// <summary>
 /// Rapport d'évaluation de la qualité des classifications.
 /// </summary>
-public class ClassificationQualityReport
+public sealed class ClassificationQualityReport
 {
     /// <summary>
     /// Nombre total d'articles évalués.

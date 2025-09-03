@@ -1,9 +1,5 @@
 ﻿namespace Watch.Manager.Web.Components.Pages;
 
-using Markdig;
-
-using Markdown.ColorCode;
-
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 
@@ -14,16 +10,10 @@ using Watch.Manager.Web.Services.Models;
 /// <summary>
 ///     Home page.
 /// </summary>
-public partial class Home
+public sealed partial class Home
 {
-    private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
-                                                               .UseAdvancedExtensions()
-                                                               .UseColorCode()
-                                                               .Build();
-
     private readonly IToastService toastService;
     private readonly AnalyzeService analyzeService;
-    private readonly IConfiguration configuration;
     private readonly SearchArticleViewModel searchArticleViewModel = new();
     private readonly AddArticleViewModel addArticleViewModel = new();
     private ArticleModel[] articles = [];
@@ -37,12 +27,10 @@ public partial class Home
     /// </summary>
     /// <param name="toastService">The toast service.</param>
     /// <param name="analyzeService">The analyze service.</param>
-    /// <param name="configuration">The configuration service, used to retrieve application settings such as the OpenAI API key.</param>
-    public Home(IToastService toastService, AnalyzeService analyzeService, IConfiguration configuration)
+    public Home(IToastService toastService, AnalyzeService analyzeService)
     {
         this.toastService = toastService;
         this.analyzeService = analyzeService;
-        this.configuration = configuration;
     }
 
     /// <summary>

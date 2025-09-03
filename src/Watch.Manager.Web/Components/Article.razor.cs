@@ -11,7 +11,7 @@ using Watch.Manager.Web.Services.Models;
 /// <summary>
 /// Composant pour afficher un article avec fonctionnalités de classification IA.
 /// </summary>
-public partial class Article : ComponentBase
+public sealed partial class Article : ComponentBase
 {
     private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
                                                                .UseAdvancedExtensions()

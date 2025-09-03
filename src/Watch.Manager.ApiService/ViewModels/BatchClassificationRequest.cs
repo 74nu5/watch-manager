@@ -1,19 +1,19 @@
+﻿namespace Watch.Manager.ApiService.ViewModels;
+
 using Watch.Manager.Service.Analyse.Models;
 
-namespace Watch.Manager.ApiService.ViewModels;
-
 /// <summary>
-/// Modèle de requête pour la classification en lot d'articles
+///     Request model for batch classification of articles.
 /// </summary>
 public sealed class BatchClassificationRequest
 {
     /// <summary>
-    /// Identifiants des articles à classifier
+    ///     Gets the identifiers of the articles to classify.
     /// </summary>
     public required int[] ArticleIds { get; init; }
 
     /// <summary>
-    /// Options de classification
+    ///     Gets the classification options.
     /// </summary>
     public ClassificationOptions? Options { get; init; }
 }

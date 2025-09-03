@@ -1,32 +1,32 @@
-namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.ApiService.ViewModels;
 
 /// <summary>
-/// Modèle pour représenter le résultat de la classification par lot d'un article.
+/// Model representing the result of batch classification for an article.
 /// </summary>
-public class BatchClassificationResult
+public sealed class BatchClassificationResult
 {
     /// <summary>
-    /// Identifiant de l'article classifié.
+    /// Gets or sets the identifier of the classified article.
     /// </summary>
     public required int ArticleId { get; set; }
 
     /// <summary>
-    /// Titre de l'article classifié.
+    /// Gets or sets the title of the classified article.
     /// </summary>
     public required string ArticleTitle { get; set; }
 
     /// <summary>
-    /// Catégories assignées automatiquement.
+    /// Gets or sets the categories automatically assigned.
     /// </summary>
     public CategoryAssignmentModel[] AssignedCategories { get; set; } = [];
 
     /// <summary>
-    /// Indique si la classification a réussi.
+    /// Gets or sets a value indicating whether the classification succeeded.
     /// </summary>
     public bool Success { get; set; }
 
     /// <summary>
-    /// Message d'erreur en cas d'échec.
+    /// Gets or sets the error message if the classification failed.
     /// </summary>
     public string? ErrorMessage { get; set; }
 }

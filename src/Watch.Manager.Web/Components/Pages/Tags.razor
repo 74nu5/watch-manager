@@ -3,7 +3,7 @@
 <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalAlignment="HorizontalAlignment.Center">
     @if (this.tags.Length == 0)
     {
-        @foreach(var i in Enumerable.Range(1, 30))
+        @foreach(var unused in Enumerable.Range(1, 30))
         {
             <FluentSkeleton Height="20px;" Width="75px" />
         }

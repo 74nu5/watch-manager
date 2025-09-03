@@ -47,6 +47,7 @@ namespace Watch.Manager.Service.Database.Migrations
 
                     b.Property<string>("Summary")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
                     b.PrimitiveCollection<string>("Tags")

@@ -1,416 +1,349 @@
 ﻿namespace Watch.Manager.ApiService.Extensions;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using Watch.Manager.ApiService.Parameters.Classification;
 using Watch.Manager.ApiService.ViewModels;
 using Watch.Manager.Service.Analyse.Models;
-using Watch.Manager.Service.Analyse.Services;
-using Watch.Manager.Service.Database.Abstractions;
-using Watch.Manager.Service.Database.Context;
+using Watch.Manager.Service.Database.Entities;
+
+using NewCategorySuggestion = Watch.Manager.Service.Analyse.Models.NewCategorySuggestion;
 
 /// <summary>
-/// Extensions pour ajouter les endpoints de classification des articles.
+///     Provides extension methods for configuring endpoints related to article classification.
 /// </summary>
+/// <remarks>
+///     This class defines a set of endpoints for managing article classification operations, including:
+///     <list type="bullet">
+///         <item>Classifying individual articles.</item>
+///         <item>
+///             Automatically assigning categories to
+///             articles based on classification results.
+///         </item>
+///         <item>Batch classification of multiple articles.</item>
+///         <item>Providing suggestions for new categories based on uncategorized articles.</item>
+///         <item>
+///             Submitting feedback to
+///             improve classification accuracy.
+///         </item>
+///     </list>
+///     These endpoints are added to the application's routing pipeline and
+///     are grouped under the "/api/classification" base path.
+/// </remarks>
 public static class ClassificationEndpoints
 {
     /// <summary>
-    /// Ajoute les endpoints de classification des articles à l'application.
+    ///     Configures the application's endpoints for managing article classification, including operations for classifying articles, auto-assigning categories, batch classification, suggestions, and feedback.
     /// </summary>
-    /// <param name="app">L'application web.</param>
-    /// <returns>L'application web pour le chaînage.</returns>
-    public static WebApplication MapClassificationEndpoints(this WebApplication app)
+    /// <param name="app">The <see cref="WebApplication" /> instance to which the classification endpoints will be added.</param>
+    public static void MapClassificationEndpoints(this WebApplication app)
     {
         var classificationGroup = app.MapGroup("/api/classification")
-            .WithTags("Classification")
-            .WithOpenApi();
+                                     .WithTags("Classification")
+                                     .WithOpenApi();
 
-        // Classification automatique d'un article spécifique
-        _ = classificationGroup.MapPost("/articles/{id:int}/classify", async (
-            [FromRoute] int id,
-            [FromBody] ClassificationOptions? options,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ICategoryStore categoryStore,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
+        _ = classificationGroup.MapPost("/articles/{id:int}/classify", ClassifyArticleAsync)
+                               .WithName("ClassifyArticle")
+                               .WithSummary("Classifie automatiquement un article")
+                               .WithDescription("Analyse un article et suggère des catégories appropriées en utilisant l'IA");
+
+        _ = classificationGroup.MapPost("/articles/{id:int}/auto-assign", AutoAssignArticleAsync)
+                               .WithName("AutoAssignArticle")
+                               .WithSummary("Auto-assigne un article aux catégories appropriées")
+                               .WithDescription("Classifie un article et l'assigne automatiquement aux catégories qui dépassent le seuil de confiance");
+
+        _ = classificationGroup.MapPost("/articles/batch-classify", BatchClassifyArticlesAsync)
+                               .WithName("BatchClassifyArticles")
+                               .WithSummary("Classifie plusieurs articles en lot")
+                               .WithDescription("Analyse plusieurs articles et suggère des catégories appropriées pour chacun");
+
+        _ = classificationGroup.MapGet("/suggestions/new-categories", GetNewCategorySuggestionsAsync)
+                               .WithName("GetNewCategorySuggestions")
+                               .WithSummary("Obtient des suggestions de nouvelles catégories")
+                               .WithDescription("Analyse les articles non catégorisés et suggère de nouvelles catégories à créer");
+
+        _ = classificationGroup.MapPost("/feedback", ProvideClassificationFeedbackAsync)
+                               .WithName("ProvideClassificationFeedback")
+                               .WithSummary("Fournit un retour sur la classification")
+                               .WithDescription("Permet d'améliorer l'IA en fournissant des retours sur la précision des classifications");
+
+        _ = classificationGroup.MapGet("/suggestions", GetSuggestionsAsync)
+                               .WithName("GetSuggestions")
+                               .WithSummary("Obtient des suggestions de nouvelles catégories (endpoint simplifié)")
+                               .WithDescription("Endpoint simplifié pour obtenir des suggestions de nouvelles catégories");
+
+        _ = classificationGroup.MapPost("/batch", BatchClassifyAsync)
+                               .WithName("BatchClassify")
+                               .WithSummary("Classifie automatiquement tous les articles non catégorisés par lot")
+                               .WithDescription("Endpoint simplifié pour classifier automatiquement tous les articles non catégorisés");
+    }
+
+    private static async Task<IResult> ClassifyArticleAsync([AsParameters] ClassifyArticleParameter p)
+    {
+        var article = await p.Context.Articles.FirstOrDefaultAsync(a => a.Id == p.Id, p.CancellationToken).ConfigureAwait(false);
+        if (article == null)
+            return Results.NotFound($"Article {p.Id} not found");
+
+        var categories = await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false);
+        var categoryForClassification = categories.Where(c => c.IsActive)
+                                                  .Select(c => new CategoryForClassification
+                                                   {
+                                                       Id = c.Id,
+                                                       Name = c.Name,
+                                                       Description = c.Description,
+                                                       Keywords = c.Keywords,
+                                                       AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
+                                                       ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
+                                                       IsActive = c.IsActive,
+                                                   });
+
+        var articleContent = $"{article.Title}\n\n{article.Summary}";
+        var suggestions = await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false);
+        return Results.Ok(suggestions);
+    }
+
+    private static async Task<IResult> AutoAssignArticleAsync([AsParameters] AutoAssignArticleParameter p)
+    {
+        var article = await p.Context.Articles.FirstOrDefaultAsync(a => a.Id == p.Id, p.CancellationToken).ConfigureAwait(false);
+        if (article == null)
+            return Results.NotFound($"Article {p.Id} not found");
+
+        var categories = await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false);
+        var categoryForClassification = categories.Where(c => c.IsActive)
+                                                  .Select(c => new CategoryForClassification
+                                                   {
+                                                       Id = c.Id,
+                                                       Name = c.Name,
+                                                       Description = c.Description,
+                                                       Keywords = c.Keywords,
+                                                       AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
+                                                       ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
+                                                       IsActive = c.IsActive,
+                                                   });
+
+        var articleContent = $"{article.Title}\n\n{article.Summary}";
+        CategorySuggestionResult[] suggestions = [.. await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false)];
+        var autoAssignedCategories = suggestions.Where(s => s.ExceedsAutoThreshold).ToList();
+        foreach (var suggestion in autoAssignedCategories)
+            _ = await p.CategoryStore.AssignCategoryToArticleAsync(p.Id, suggestion.CategoryId, false, suggestion.ConfidenceScore, p.CancellationToken).ConfigureAwait(false);
+
+        return Results.Ok(new { AutoAssignedCategories = autoAssignedCategories.Count, Suggestions = suggestions });
+    }
+
+    private static async Task<IResult> BatchClassifyArticlesAsync([AsParameters] BatchClassifyArticlesParameter p)
+    {
+        var categories = await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false);
+        CategoryForClassification[] categoryForClassification =
+        [
+            .. categories.Where(c => c.IsActive)
+                         .Select(c => new CategoryForClassification
+                          {
+                              Id = c.Id,
+                              Name = c.Name,
+                              Description = c.Description,
+                              Keywords = c.Keywords,
+                              AutoThreshold = p.Request.Options?.MinAutoClassificationScore ?? 0.7,
+                              ManualThreshold = p.Request.Options?.MinSuggestionScore ?? 0.5,
+                              IsActive = c.IsActive,
+                          }),
+        ];
+
+        var results = new List<ArticleClassificationResult>();
+
+        foreach (var articleId in p.Request.ArticleIds)
         {
-            // Récupérer l'article
-            var article = await context.Articles
-                .FirstOrDefaultAsync(a => a.Id == id, cancellationToken)
-                .ConfigureAwait(false);
+            var article = await p.Context.Articles.FirstOrDefaultAsync(a => a.Id == articleId, p.CancellationToken).ConfigureAwait(false);
 
             if (article == null)
-            {
-                return Results.NotFound($"Article {id} not found");
-            }
+                continue;
 
-            // Récupérer les catégories disponibles
-            var categories = await categoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
-            var categoryForClassification = categories
-                .Where(c => c.IsActive)
-                .Select(c => new CategoryForClassification
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Keywords = c.Keywords ?? [],
-                    AutoThreshold = options?.MinAutoClassificationScore ?? 0.7,
-                    ManualThreshold = options?.MinSuggestionScore ?? 0.5,
-                    IsActive = c.IsActive
-                });
-
-            // Classification de l'article
             var articleContent = $"{article.Title}\n\n{article.Summary}";
-            var suggestions = await classificationService.ClassifyArticleAsync(articleContent, categoryForClassification, cancellationToken).ConfigureAwait(false);
-
-            return Results.Ok(suggestions);
-        })
-        .WithName("ClassifyArticle")
-        .WithSummary("Classifie automatiquement un article")
-        .WithDescription("Analyse un article et suggère des catégories appropriées en utilisant l'IA");
-
-        // Auto-assignation d'un article à une catégorie
-        _ = classificationGroup.MapPost("/articles/{id:int}/auto-assign", async (
-            [FromRoute] int id,
-            [FromBody] ClassificationOptions? options,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ICategoryStore categoryStore,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
-        {
-            // Récupérer l'article
-            var article = await context.Articles
-                .FirstOrDefaultAsync(a => a.Id == id, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (article == null)
+            CategorySuggestionResult[] suggestions = [.. await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false)];
+            results.Add(new()
             {
-                return Results.NotFound($"Article {id} not found");
-            }
+                ArticleId = articleId,
+                CategorySuggestions = suggestions,
+                NewCategorySuggestions = [],
+                OverallConfidence = suggestions.MaxBy(s => s.ConfidenceScore)?.ConfidenceScore ?? 0,
+            });
+        }
 
-            // Récupérer les catégories disponibles
-            var categories = await categoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
-            var categoryForClassification = categories
-                .Where(c => c.IsActive)
-                .Select(c => new CategoryForClassification
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Keywords = c.Keywords ?? [],
-                    AutoThreshold = options?.MinAutoClassificationScore ?? 0.7,
-                    ManualThreshold = options?.MinSuggestionScore ?? 0.5,
-                    IsActive = c.IsActive
-                });
+        return Results.Ok(results);
+    }
 
-            // Classification de l'article
-            var articleContent = $"{article.Title}\n\n{article.Summary}";
-            var suggestions = await classificationService.ClassifyArticleAsync(articleContent, categoryForClassification, cancellationToken).ConfigureAwait(false);
+    private static async Task<IResult> GetNewCategorySuggestionsAsync([AsParameters] GetNewCategorySuggestionsParameter p)
+    {
+        var uncategorizedArticles = await p.Context.Articles.Where(a => !a.ArticleCategories.Any())
+                                           .OrderByDescending(a => a.AnalyzeDate)
+                                           .Take(p.Limit ?? 50)
+                                           .ToListAsync(p.CancellationToken)
+                                           .ConfigureAwait(false);
 
-            // Auto-assigner les catégories qui dépassent le seuil automatique
-            var autoAssignedCategories = suggestions
-                .Where(s => s.ExceedsAutoThreshold)
-                .ToList();
+        var existingCategoryNames = await p.Context.Categories.Where(c => c.IsActive)
+                                           .Select(c => c.Name)
+                                           .ToListAsync(p.CancellationToken)
+                                           .ConfigureAwait(false);
 
-            foreach (var suggestion in autoAssignedCategories)
-            {
-                _ = await categoryStore.AssignCategoryToArticleAsync(id, suggestion.CategoryId, false, suggestion.ConfidenceScore, cancellationToken).ConfigureAwait(false);
-            }
+        var allSuggestions = new List<NewCategorySuggestion>();
 
-            return Results.Ok(new { AutoAssignedCategories = autoAssignedCategories.Count, Suggestions = suggestions });
-        })
-        .WithName("AutoAssignArticle")
-        .WithSummary("Auto-assigne un article aux catégories appropriées")
-        .WithDescription("Classifie un article et l'assigne automatiquement aux catégories qui dépassent le seuil de confiance");
-
-        // Classification en lot d'articles
-        _ = classificationGroup.MapPost("/articles/batch-classify", async (
-            [FromBody] BatchClassificationRequest request,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ICategoryStore categoryStore,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
+        foreach (var articleContent in uncategorizedArticles.Select(article => $"{article.Title}\n\n{article.Summary}"))
         {
-            // Récupérer les catégories disponibles
-            var categories = await categoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
-            var categoryForClassification = categories
-                .Where(c => c.IsActive)
-                .Select(c => new CategoryForClassification
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Keywords = c.Keywords ?? [],
-                    AutoThreshold = request.Options?.MinAutoClassificationScore ?? 0.7,
-                    ManualThreshold = request.Options?.MinSuggestionScore ?? 0.5,
-                    IsActive = c.IsActive
-                });
+            var suggestions = await p.ClassificationService.SuggestNewCategoriesAsync(articleContent, existingCategoryNames, p.CancellationToken).ConfigureAwait(false);
+            allSuggestions.AddRange(suggestions);
+        }
 
-            var results = new List<ArticleClassificationResult>();
+        var consolidatedSuggestions = allSuggestions.GroupBy(s => s.SuggestedName.ToLowerInvariant())
+                                                    .Select(g => new ViewModels.NewCategorySuggestion
+                                                     {
+                                                         SuggestedName = g.First().SuggestedName,
+                                                         SuggestedDescription = g.First().SuggestedDescription,
+                                                         SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
+                                                         RelevanceScore = g.Average(s => s.RelevanceScore),
+                                                         Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
+                                                     })
+                                                    .OrderByDescending(s => s.RelevanceScore)
+                                                    .Take(20)
+                                                    .ToList();
 
-            foreach (var articleId in request.ArticleIds)
-            {
-                var article = await context.Articles
-                    .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken)
-                    .ConfigureAwait(false);
+        return Results.Ok(consolidatedSuggestions);
+    }
 
-                if (article != null)
-                {
-                    var articleContent = $"{article.Title}\n\n{article.Summary}";
-                    var suggestions = await classificationService.ClassifyArticleAsync(articleContent, categoryForClassification, cancellationToken).ConfigureAwait(false);
+    private static async Task<IResult> ProvideClassificationFeedbackAsync([AsParameters] ProvideClassificationFeedbackParameter p)
+    {
+        var article = await p.Context.Articles.FirstOrDefaultAsync(a => a.Id == p.Request.ArticleId, p.CancellationToken).ConfigureAwait(false);
+        if (article == null)
+            return Results.NotFound($"Article {p.Request.ArticleId} not found");
 
-                    results.Add(new ArticleClassificationResult
-                    {
-                        ArticleId = articleId,
-                        CategorySuggestions = suggestions,
-                        NewCategorySuggestions = [],
-                        OverallConfidence = suggestions.MaxBy(s => s.ConfidenceScore)?.ConfidenceScore ?? 0
-                    });
-                }
-            }
+        var articleContent = $"{article.Title}\n\n{article.Summary}";
+        await p.ClassificationService.LearnFromFeedbackAsync(articleContent,
+                    p.Request.CorrectCategories,
+                    p.Request.IncorrectCategories,
+                    p.CancellationToken)
+               .ConfigureAwait(false);
 
-            return Results.Ok(results);
-        })
-        .WithName("BatchClassifyArticles")
-        .WithSummary("Classifie plusieurs articles en lot")
-        .WithDescription("Analyse plusieurs articles et suggère des catégories appropriées pour chacun");
+        return Results.Ok(new { Message = "Feedback enregistré avec succès" });
+    }
 
-        // Suggestions de nouvelles catégories
-        _ = classificationGroup.MapGet("/suggestions/new-categories", async (
-            [FromQuery] int? limit,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
+    private static async Task<IResult> GetSuggestionsAsync([AsParameters] GetSuggestionsParameter p)
+    {
+        var uncategorizedArticles = await p.Context.Articles.Where(a => !a.ArticleCategories.Any())
+                                           .OrderByDescending(a => a.AnalyzeDate)
+                                           .Take(p.Limit ?? 50)
+                                           .ToListAsync(p.CancellationToken)
+                                           .ConfigureAwait(false);
+
+        var existingCategoryNames = await p.Context.Categories.Where(c => c.IsActive)
+                                           .Select(c => c.Name)
+                                           .ToListAsync(p.CancellationToken)
+                                           .ConfigureAwait(false);
+
+        var allSuggestions = new List<ViewModels.NewCategorySuggestion>();
+
+        foreach (var articleContent in uncategorizedArticles.Select(article => $"{article.Title}\n\n{article.Summary}"))
         {
-            // Récupérer les articles récents non catégorisés
-            var uncategorizedArticles = await context.Articles
-                .Where(a => !a.ArticleCategories.Any())
-                .OrderByDescending(a => a.AnalyzeDate)
-                .Take(limit ?? 50)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+            var suggestions = await p.ClassificationService.SuggestNewCategoriesAsync(articleContent, existingCategoryNames, p.CancellationToken).ConfigureAwait(false);
 
-            // Récupérer les noms de catégories existantes
-            var existingCategoryNames = await context.Categories
-                .Where(c => c.IsActive)
-                .Select(c => c.Name)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
+            allSuggestions.AddRange(suggestions.Select(suggestion => new ViewModels.NewCategorySuggestion()
+            {
+                SuggestedName = suggestion.SuggestedName,
+                SuggestedDescription = suggestion.SuggestedDescription,
+                SuggestedKeywords = suggestion.SuggestedKeywords,
+                RelevanceScore = suggestion.RelevanceScore,
+                Justification = suggestion.Justification,
+                SuggestedColor = null,
+                SuggestedIcon = null,
+                SuggestedParentId = null,
+                SuggestedParentName = null,
+            }));
+        }
 
-            var allSuggestions = new List<Service.Analyse.Models.NewCategorySuggestion>();
+        var consolidatedSuggestions = allSuggestions.GroupBy(s => s.SuggestedName.ToLowerInvariant())
+                                                    .Select(g => new ViewModels.NewCategorySuggestion
+                                                     {
+                                                         SuggestedName = g.First().SuggestedName,
+                                                         SuggestedDescription = g.First().SuggestedDescription,
+                                                         SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
+                                                         RelevanceScore = g.Average(s => s.RelevanceScore),
+                                                         Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
+                                                         SuggestedColor = null,
+                                                         SuggestedIcon = null,
+                                                         SuggestedParentId = null,
+                                                         SuggestedParentName = null,
+                                                     })
+                                                    .OrderByDescending(s => s.RelevanceScore)
+                                                    .Take(20)
+                                                    .ToArray();
 
-            // Traiter chaque article
-            foreach (var article in uncategorizedArticles)
+        return Results.Ok(consolidatedSuggestions);
+    }
+
+    private static async Task<IResult> BatchClassifyAsync([AsParameters] BatchClassifyParameter p)
+    {
+        var uncategorizedArticles = await p.Context.Articles.Where(a => !a.ArticleCategories.Any())
+                                           .OrderByDescending(a => a.AnalyzeDate)
+                                           .Take(100)
+                                           .ToListAsync(p.CancellationToken)
+                                           .ConfigureAwait(false);
+
+        Category[] categories = [.. await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false)];
+        CategoryForClassification[] categoryForClassification =
+        [
+            .. categories.Where(c => c.IsActive)
+                         .Select(c => new CategoryForClassification
+                          {
+                              Id = c.Id,
+                              Name = c.Name,
+                              Description = c.Description,
+                              Keywords = c.Keywords,
+                              AutoThreshold = 0.7,
+                              ManualThreshold = 0.5,
+                              IsActive = c.IsActive,
+                          }),
+        ];
+
+        var results = new List<BatchClassificationResult>();
+
+        foreach (var article in uncategorizedArticles)
+        {
+            try
             {
                 var articleContent = $"{article.Title}\n\n{article.Summary}";
-                var suggestions = await classificationService.SuggestNewCategoriesAsync(articleContent, existingCategoryNames, cancellationToken).ConfigureAwait(false);
-                allSuggestions.AddRange(suggestions);
-            }
+                CategorySuggestionResult[] suggestions = [.. await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false)];
+                var autoAssigned = new List<CategoryAssignmentModel>();
 
-            // Grouper et consolider les suggestions
-            var consolidatedSuggestions = allSuggestions
-                .GroupBy(s => s.SuggestedName.ToLowerInvariant())
-                .Select(g => new ViewModels.NewCategorySuggestion
+                foreach (var suggestion in suggestions.Where(s => s.ExceedsAutoThreshold))
                 {
-                    SuggestedName = g.First().SuggestedName,
-                    SuggestedDescription = g.First().SuggestedDescription,
-                    SuggestedKeywords = g.SelectMany(s => s.SuggestedKeywords).Distinct().ToArray(),
-                    RelevanceScore = g.Average(s => s.RelevanceScore),
-                    Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j)))
-                })
-                .OrderByDescending(s => s.RelevanceScore)
-                .Take(20)
-                .ToList();
-
-            return Results.Ok(consolidatedSuggestions);
-        })
-        .WithName("GetNewCategorySuggestions")
-        .WithSummary("Obtient des suggestions de nouvelles catégories")
-        .WithDescription("Analyse les articles non catégorisés et suggère de nouvelles catégories à créer");
-
-        // Feedback sur la classification
-        _ = classificationGroup.MapPost("/feedback", async (
-            [FromBody] ClassificationFeedbackRequest request,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
-        {
-            // Récupérer le contenu de l'article
-            var article = await context.Articles
-                .FirstOrDefaultAsync(a => a.Id == request.ArticleId, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (article == null)
-            {
-                return Results.NotFound($"Article {request.ArticleId} not found");
-            }
-
-            var articleContent = $"{article.Title}\n\n{article.Summary}";
-
-            await classificationService.LearnFromFeedbackAsync(
-                articleContent,
-                request.CorrectCategories,
-                request.IncorrectCategories,
-                cancellationToken).ConfigureAwait(false);
-
-            return Results.Ok(new { Message = "Feedback enregistré avec succès" });
-        })
-        .WithName("ProvideClassificationFeedback")
-        .WithSummary("Fournit un retour sur la classification")
-        .WithDescription("Permet d'améliorer l'IA en fournissant des retours sur la précision des classifications");
-
-        // Endpoint simplifié pour les suggestions de nouvelles catégories (pour compatibilité avec AnalyzeService)
-        _ = classificationGroup.MapGet("/suggestions", async (
-            [FromQuery] int? limit,
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
-        {
-            // Récupérer les articles récents non catégorisés
-            var uncategorizedArticles = await context.Articles
-                .Where(a => !a.ArticleCategories.Any())
-                .OrderByDescending(a => a.AnalyzeDate)
-                .Take(limit ?? 50)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            // Récupérer les noms de catégories existantes
-            var existingCategoryNames = await context.Categories
-                .Where(c => c.IsActive)
-                .Select(c => c.Name)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            var allSuggestions = new List<ViewModels.NewCategorySuggestion>();
-
-            // Traiter chaque article
-            foreach (var article in uncategorizedArticles)
-            {
-                var articleContent = $"{article.Title}\n\n{article.Summary}";
-                var suggestions = await classificationService.SuggestNewCategoriesAsync(articleContent, existingCategoryNames, cancellationToken).ConfigureAwait(false);
-
-                // Convertir les suggestions du service vers le modèle attendu par l'API
-                foreach (var suggestion in suggestions)
-                {
-                    allSuggestions.Add(new ViewModels.NewCategorySuggestion
+                    _ = await p.CategoryStore.AssignCategoryToArticleAsync(article.Id, suggestion.CategoryId, false, suggestion.ConfidenceScore, p.CancellationToken).ConfigureAwait(false);
+                    autoAssigned.Add(new()
                     {
-                        SuggestedName = suggestion.SuggestedName,
-                        SuggestedDescription = suggestion.SuggestedDescription,
-                        SuggestedKeywords = suggestion.SuggestedKeywords,
-                        RelevanceScore = suggestion.RelevanceScore,
-                        Justification = suggestion.Justification,
-                        SuggestedColor = null, // Pas disponible dans le modèle du service
-                        SuggestedIcon = null, // Pas disponible dans le modèle du service
-                        SuggestedParentId = null, // Pas disponible dans le modèle du service
-                        SuggestedParentName = null // Pas disponible dans le modèle du service
+                        CategoryId = suggestion.CategoryId,
+                        CategoryName = categories.First(c => c.Id == suggestion.CategoryId).Name,
+                        ConfidenceScore = suggestion.ConfidenceScore,
+                        IsAutomatic = true,
                     });
                 }
-            }
 
-            // Grouper et consolider les suggestions
-            var consolidatedSuggestions = allSuggestions
-                .GroupBy(s => s.SuggestedName.ToLowerInvariant())
-                .Select(g => new ViewModels.NewCategorySuggestion
+                results.Add(new()
                 {
-                    SuggestedName = g.First().SuggestedName,
-                    SuggestedDescription = g.First().SuggestedDescription,
-                    SuggestedKeywords = g.SelectMany(s => s.SuggestedKeywords).Distinct().ToArray(),
-                    RelevanceScore = g.Average(s => s.RelevanceScore),
-                    Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
-                    SuggestedColor = null,
-                    SuggestedIcon = null,
-                    SuggestedParentId = null,
-                    SuggestedParentName = null
-                })
-                .OrderByDescending(s => s.RelevanceScore)
-                .Take(20)
-                .ToArray();
-
-            return Results.Ok(consolidatedSuggestions);
-        })
-        .WithName("GetSuggestions")
-        .WithSummary("Obtient des suggestions de nouvelles catégories (endpoint simplifié)")
-        .WithDescription("Endpoint simplifié pour obtenir des suggestions de nouvelles catégories");
-
-        // Endpoint simplifié pour la classification par lot (pour compatibilité avec AnalyzeService)
-        _ = classificationGroup.MapPost("/batch", async (
-            [FromServices] IArticleClassificationAI classificationService,
-            [FromServices] ICategoryStore categoryStore,
-            [FromServices] ArticlesContext context,
-            CancellationToken cancellationToken) =>
-        {
-            // Récupérer tous les articles non catégorisés
-            var uncategorizedArticles = await context.Articles
-                .Where(a => !a.ArticleCategories.Any())
-                .OrderByDescending(a => a.AnalyzeDate)
-                .Take(100) // Limiter à 100 articles pour éviter des temps de traitement trop longs
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            // Récupérer les catégories disponibles
-            var categories = await categoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
-            var categoryForClassification = categories
-                .Where(c => c.IsActive)
-                .Select(c => new CategoryForClassification
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Keywords = c.Keywords ?? [],
-                    AutoThreshold = 0.7,
-                    ManualThreshold = 0.5,
-                    IsActive = c.IsActive
+                    ArticleId = article.Id,
+                    ArticleTitle = article.Title,
+                    AssignedCategories = [.. autoAssigned],
+                    Success = true,
                 });
-
-            var results = new List<ViewModels.BatchClassificationResult>();
-
-            foreach (var article in uncategorizedArticles)
-            {
-                try
-                {
-                    var articleContent = $"{article.Title}\n\n{article.Summary}";
-                    var suggestions = await classificationService.ClassifyArticleAsync(articleContent, categoryForClassification, cancellationToken).ConfigureAwait(false);
-
-                    // Auto-assigner les catégories qui dépassent le seuil automatique
-                    var autoAssigned = new List<ViewModels.CategoryAssignmentModel>();
-                    foreach (var suggestion in suggestions.Where(s => s.ExceedsAutoThreshold))
-                    {
-                        _ = await categoryStore.AssignCategoryToArticleAsync(article.Id, suggestion.CategoryId, false, suggestion.ConfidenceScore, cancellationToken).ConfigureAwait(false);
-                        autoAssigned.Add(new ViewModels.CategoryAssignmentModel
-                        {
-                            CategoryId = suggestion.CategoryId,
-                            CategoryName = categories.First(c => c.Id == suggestion.CategoryId).Name,
-                            ConfidenceScore = suggestion.ConfidenceScore,
-                            IsAutomatic = true
-                        });
-                    }
-
-                    results.Add(new ViewModels.BatchClassificationResult
-                    {
-                        ArticleId = article.Id,
-                        ArticleTitle = article.Title,
-                        AssignedCategories = autoAssigned.ToArray(),
-                        Success = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    results.Add(new ViewModels.BatchClassificationResult
-                    {
-                        ArticleId = article.Id,
-                        ArticleTitle = article.Title,
-                        AssignedCategories = [],
-                        Success = false,
-                        ErrorMessage = ex.Message
-                    });
-                }
             }
+            catch (Exception ex)
+            {
+                results.Add(new()
+                {
+                    ArticleId = article.Id,
+                    ArticleTitle = article.Title,
+                    AssignedCategories = [],
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                });
+            }
+        }
 
-            return Results.Ok(results.ToArray());
-        })
-        .WithName("BatchClassify")
-        .WithSummary("Classifie automatiquement tous les articles non catégorisés par lot")
-        .WithDescription("Endpoint simplifié pour classifier automatiquement tous les articles non catégorisés");
-
-        return app;
+        return Results.Ok(results.ToArray());
     }
 }

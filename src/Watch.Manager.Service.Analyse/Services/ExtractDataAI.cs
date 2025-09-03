@@ -1,27 +1,28 @@
 namespace Watch.Manager.Service.Analyse.Services;
 
-using System.ComponentModel;
 using System.Text.Json;
 
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 
 using Watch.Manager.Service.Analyse.Models;
-using Watch.Manager.Service.Database.Abstractions;
 
-internal class ExtractDataAI : IExtractDataAI
+/// <summary>
+///     Service for extracting and analyzing article data using an AI chat client.
+/// </summary>
+internal sealed class ExtractDataAI : IExtractDataAI
 {
     private readonly IChatClient chatClient;
-
     private readonly ChatOptions chatOptions;
-
     private readonly IList<ChatMessage> messages;
-    private readonly IArticleAnalyseStore articleStore;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ExtractDataAI" /> class.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
     public ExtractDataAI(IServiceProvider serviceProvider)
     {
         this.chatClient = serviceProvider.GetRequiredService<IChatClient>();
-        this.articleStore = serviceProvider.GetRequiredService<IArticleAnalyseStore>();
         this.chatOptions = new()
         {
             Tools =
@@ -58,22 +59,20 @@ internal class ExtractDataAI : IExtractDataAI
         ];
     }
 
+    /// <summary>
+    ///     Extracts and analyzes data from the provided article content using the AI chat client.
+    /// </summary>
+    /// <param name="content">The article content to analyze.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    ///     An <see cref="ExtractAnalyseModel" /> containing the extracted analysis data, or <see langword="null" /> if extraction fails.
+    /// </returns>
     public async Task<ExtractAnalyseModel?> ExtractDatasAsync(string content, CancellationToken cancellationToken = default)
     {
         this.messages.Add(new(ChatRole.User, content));
         var response = await this.chatClient.GetResponseAsync(this.messages, this.chatOptions, cancellationToken).ConfigureAwait(false);
 
         var messageText = response.Messages.FirstOrDefault()?.Text;
-        if (messageText is not null)
-            return JsonSerializer.Deserialize<ExtractAnalyseModel>(messageText);
-
-        return null;
-    }
-
-    [Description("Get all existing tags.")]
-    private async Task<string> GetTags()
-    {
-        var tags = await this.articleStore.GetAllTagsAsync(CancellationToken.None).ConfigureAwait(false);
-        return JsonSerializer.Serialize(tags);
+        return messageText is not null ? JsonSerializer.Deserialize<ExtractAnalyseModel>(messageText) : null;
     }
 }

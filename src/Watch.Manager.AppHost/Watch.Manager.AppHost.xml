@@ -4,20 +4,41 @@
         <name>Watch.Manager.AppHost</name>
     </assembly>
     <members>
+        <member name="T:Watch.Manager.AppHost.Extensions">
+            <summary>
+                Provides extension methods for configuring distributed applications with additional services and features.
+            </summary>
+            <remarks>
+                This static class includes methods to configure distributed applications with features such as
+                forwarded headers, OpenAI integration, and Ollama integration. These methods extend the functionality of the
+                <see
+                    cref="T:Aspire.Hosting.IDistributedApplicationBuilder" />
+                interface, enabling developers to easily add and configure services  for
+                their distributed application projects.
+            </remarks>
+        </member>
         <member name="M:Watch.Manager.AppHost.Extensions.AddForwardedHeaders(Aspire.Hosting.IDistributedApplicationBuilder)">
             <summary>
                 Adds a hook to set the ASPNETCORE_FORWARDEDHEADERS_ENABLED environment variable to true for all projects in the application.
             </summary>
+            <param name="builder">The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> used to configure the application and its services.</param>
+            <returns>The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> with Ollama services added.</returns>
         </member>
         <member name="M:Watch.Manager.AppHost.Extensions.AddOpenAI(Aspire.Hosting.IDistributedApplicationBuilder,Aspire.Hosting.ApplicationModel.IResourceBuilder{Aspire.Hosting.ApplicationModel.ProjectResource})">
             <summary>
                 Configures eShop projects to use OpenAI for text embedding and chat.
             </summary>
+            <param name="builder">The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> used to configure the application and its services.</param>
+            <param name="servicesApi">The <see cref="T:Aspire.Hosting.ApplicationModel.IResourceBuilder`1" /> representing the services API project to which OpenAI models will be added.</param>
+            <returns>The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> with Ollama services added.</returns>
         </member>
         <member name="M:Watch.Manager.AppHost.Extensions.AddOllama(Aspire.Hosting.IDistributedApplicationBuilder,Aspire.Hosting.ApplicationModel.IResourceBuilder{Aspire.Hosting.ApplicationModel.ProjectResource})">
             <summary>
                 Configures eShop projects to use Ollama for text embedding and chat.
             </summary>
+            <param name="builder">The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> used to configure the application and its services.</param>
+            <param name="catalogApi">The <see cref="T:Aspire.Hosting.ApplicationModel.IResourceBuilder`1" /> representing the catalog API project to which Ollama models will be added.</param>
+            <returns>The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> with Ollama services added.</returns>
         </member>
     </members>
 </doc>

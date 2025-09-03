@@ -1,42 +1,42 @@
-namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.ApiService.ViewModels;
 
 /// <summary>
-/// ViewModel pour créer ou mettre à jour une catégorie.
+/// ViewModel for creating or updating a category.
 /// </summary>
-public class CreateCategoryModel
+public sealed class CreateCategoryModel
 {
     /// <summary>
-    /// Nom de la catégorie.
+    /// Gets or sets the name of the category.
     /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
-    /// Description de la catégorie.
+    /// Gets or sets the description of the category.
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// Couleur associée à la catégorie (format hex).
+    /// Gets or sets the color associated with the category (hex format).
     /// </summary>
     public string? Color { get; set; }
 
     /// <summary>
-    /// Icône associée à la catégorie.
+    /// Gets or sets the icon associated with the category.
     /// </summary>
     public string? Icon { get; set; }
 
     /// <summary>
-    /// Mots-clés pour la classification automatique.
+    /// Gets or sets the keywords for automatic classification.
     /// </summary>
     public string[] Keywords { get; set; } = [];
 
     /// <summary>
-    /// Identifiant de la catégorie parente.
+    /// Gets or sets the parent category identifier.
     /// </summary>
     public int? ParentId { get; set; }
 
     /// <summary>
-    /// Seuil de confiance pour la classification automatique.
+    /// Gets or sets the confidence threshold for automatic classification.
     /// </summary>
     public double? ConfidenceThreshold { get; set; }
 }

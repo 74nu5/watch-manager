@@ -3,7 +3,7 @@ namespace Watch.Manager.Service.Analyse.Models;
 /// <summary>
 /// Suggestion pour une nouvelle catégorie basée sur l'analyse des articles.
 /// </summary>
-public class CategorySuggestion
+public sealed class CategorySuggestion
 {
     /// <summary>
     /// Nom suggéré pour la nouvelle catégorie.

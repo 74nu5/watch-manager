@@ -23,15 +23,15 @@
     </p>
 
     @* Section Classification IA *@
-    @if (showClassification)
+    @if (this.showClassification)
     {
-        <ArticleClassification ArticleId="@ArticleModel.Id" OnCategoryAssigned="@OnCategoryAssignedAsync" />
+        <ArticleClassification ArticleId="@this.ArticleModel.Id" OnCategoryAssigned="@this.OnCategoryAssignedAsync" />
     }
     else
     {
         <div style="margin: 8px 0;">
             <FluentButton Appearance="Appearance.Stealth"
-                         @onclick="() => showClassification = true"
+                         @onclick="() => this.showClassification = true"
                          IconStart="@(new Size20.Bot())"
                          Title="Afficher la classification IA">
                 Classifier avec l'IA

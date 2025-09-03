@@ -8,17 +8,26 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 using Watch.Manager.Service.Database.Context;
 
-public class Worker(
-    IServiceProvider serviceProvider,
-    IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
+/// <summary>
+///     Background service responsible for ensuring the database exists, running migrations, and seeding initial data.
+/// </summary>
+public sealed class Worker(IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
 {
+    /// <summary>
+    ///     The name of the activity source for diagnostics.
+    /// </summary>
     internal const string ActivitySourceName = "Migrations";
 
     private static readonly ActivitySource ActivitySource = new(ActivitySourceName);
 
+    /// <summary>
+    ///     Executes the background service logic: ensures the database exists, applies migrations, and seeds data.
+    /// </summary>
+    /// <param name="cancellationToken">Token to signal cancellation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity("Migrating database", ActivityKind.Client);
+        using var activity = ActivitySource.StartActivity("Migrating database", ActivityKind.Client, default(ActivityContext));
 
         try
         {
@@ -27,17 +36,23 @@ public class Worker(
 
             await EnsureDatabaseAsync(dbContext, cancellationToken).ConfigureAwait(false);
             await RunMigrationAsync(dbContext, cancellationToken).ConfigureAwait(false);
-            await SeedDataAsync(dbContext, cancellationToken).ConfigureAwait(false);
+
+            // await SeedDataAsync(dbContext, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            activity?.AddException(ex);
+            _ = activity?.AddException(ex);
             throw;
         }
 
         hostApplicationLifetime.StopApplication();
     }
 
+    /// <summary>
+    ///     Ensures the database exists by creating it if it does not.
+    /// </summary>
+    /// <param name="dbContext">The database context.</param>
+    /// <param name="cancellationToken">Token to signal cancellation.</param>
     private static async Task EnsureDatabaseAsync(ArticlesContext dbContext, CancellationToken cancellationToken)
     {
         var dbCreator = dbContext.GetService<IRelationalDatabaseCreator>();
@@ -52,30 +67,15 @@ public class Worker(
         }).ConfigureAwait(false);
     }
 
+    /// <summary>
+    ///     Applies any pending migrations to the database.
+    /// </summary>
+    /// <param name="dbContext">The database context.</param>
+    /// <param name="cancellationToken">Token to signal cancellation.</param>
     private static async Task RunMigrationAsync(ArticlesContext dbContext, CancellationToken cancellationToken)
     {
         var strategy = dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
-        {
-            // Run migration in a transaction to avoid partial migration if it fails.
-            //await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-            await dbContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
-           // await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }).ConfigureAwait(false);
-    }
-
-    private static async Task SeedDataAsync(ArticlesContext dbContext, CancellationToken cancellationToken)
-    {
-        // new Article
-
-        //var strategy = dbContext.Database.CreateExecutionStrategy();
-        //await strategy.ExecuteAsync(async () =>
-        //{
-        //    // Seed the database
-        //    await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-        //    await dbContext.Tickets.AddAsync(firstTicket, cancellationToken);
-        //    await dbContext.SaveChangesAsync(cancellationToken);
-        //    await transaction.CommitAsync(cancellationToken);
-        //});
+            await dbContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
     }
 }

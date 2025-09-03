@@ -11,7 +11,7 @@ namespace Watch.Manager.Service.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -30,8 +30,8 @@ namespace Watch.Manager.Service.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Categories", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Categories_Categories_ParentId",
                         column: x => x.ParentId,
                         principalTable: "Categories",
@@ -39,7 +39,7 @@ namespace Watch.Manager.Service.Database.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "ArticleCategories",
                 columns: table => new
                 {
@@ -51,14 +51,14 @@ namespace Watch.Manager.Service.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleCategories", x => new { x.ArticleId, x.CategoryId });
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_ArticleCategories", x => new { x.ArticleId, x.CategoryId });
+                    _ = table.ForeignKey(
                         name: "FK_ArticleCategories_Articles_ArticleId",
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_ArticleCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
@@ -66,23 +66,23 @@ namespace Watch.Manager.Service.Database.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ArticleCategories_CategoryId",
                 table: "ArticleCategories",
                 column: "CategoryId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_ArticleCategories_ConfidenceScore",
                 table: "ArticleCategories",
                 column: "ConfidenceScore");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Categories_Name",
                 table: "Categories",
                 column: "Name",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentId",
                 table: "Categories",
                 column: "ParentId");
@@ -91,10 +91,10 @@ namespace Watch.Manager.Service.Database.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "ArticleCategories");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Categories");
         }
     }

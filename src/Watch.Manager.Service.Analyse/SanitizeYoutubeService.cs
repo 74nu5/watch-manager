@@ -1,43 +1,40 @@
-﻿#pragma warning disable KMEXP00
-namespace Watch.Manager.Service.Analyse;
+﻿namespace Watch.Manager.Service.Analyse;
 
 using AngleSharp;
 using AngleSharp.Dom;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.KernelMemory.AI;
 
 using Watch.Manager.Service.Analyse.Models;
 
-internal class SanitizeYoutubeService
+/// <summary>
+///     Provides methods to sanitize and extract relevant content from YouTube website sources,
+///     including HTML strings and URIs. Removes unnecessary elements and extracts metadata for embedding.
+/// </summary>
+internal sealed class SanitizeYoutubeService
 {
-    private const int MaxEmbeddingTokens = 8192;
-
-    private const int MaxTextLengthforEmbedding = 39000;
-
-    private readonly ITextTokenizer tokenizer;
-
     private readonly ILogger<SanitizeService> logger;
     private readonly HttpClient client;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SanitizeYoutubeService" /> class.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
     public SanitizeYoutubeService(IServiceProvider serviceProvider)
     {
-        this.tokenizer = serviceProvider.GetRequiredService<ITextTokenizer>();
         this.client = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
         this.logger = serviceProvider.GetRequiredService<ILogger<SanitizeService>>();
     }
 
-    public async Task<ExtractedSite> SanitizeWebSiteSource(string source, CancellationToken cancellationToken)
-    {
-        var config = Configuration.Default.WithDefaultLoader();
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(req => req.Content(source), cancellationToken).ConfigureAwait(false);
-
-
-        return await this.SanitizeInternal(document).ConfigureAwait(false);
-    }
-
+    /// <summary>
+    ///     Sanitizes the YouTube website content from the specified URI and extracts the head, body, and thumbnail.
+    /// </summary>
+    /// <param name="source">The URI of the YouTube website to sanitize.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    ///     An <see cref="ExtractedSite" /> containing the sanitized head, body, and thumbnail URI.
+    /// </returns>
     public async Task<ExtractedSite> SanitizeWebSiteSource(Uri source, CancellationToken cancellationToken)
     {
         var config = Configuration.Default.WithDefaultLoader();
@@ -47,6 +44,14 @@ internal class SanitizeYoutubeService
         return await this.SanitizeInternal(document).ConfigureAwait(false);
     }
 
+    /// <summary>
+    ///     Internal method to sanitize the provided HTML document, removing scripts, styles, and links,
+    ///     and extracting the head, body, and thumbnail.
+    /// </summary>
+    /// <param name="document">The HTML document to sanitize.</param>
+    /// <returns>
+    ///     An <see cref="ExtractedSite" /> containing the sanitized head, body, and thumbnail URI.
+    /// </returns>
     private async Task<ExtractedSite> SanitizeInternal(IDocument document)
     {
         var head = document.DocumentElement.GetElementsByTagName("head").FirstOrDefault();

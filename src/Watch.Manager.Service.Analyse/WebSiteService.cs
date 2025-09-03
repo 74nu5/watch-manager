@@ -3,7 +3,7 @@
 using Watch.Manager.Service.Analyse.Abstractions;
 using Watch.Manager.Service.Analyse.Models;
 
-internal class WebSiteService(IHttpClientFactory factory, SanitizeService sanitizeService, SanitizeYoutubeService sanitizeYoutubeService) : IWebSiteService
+internal sealed class WebSiteService(SanitizeService sanitizeService, SanitizeYoutubeService sanitizeYoutubeService) : IWebSiteService
 {
     public async Task<ExtractedSite> GetWebSiteSource(Uri url, CancellationToken cancellationToken)
     {

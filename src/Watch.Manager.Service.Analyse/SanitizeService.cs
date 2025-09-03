@@ -10,40 +10,53 @@ using Microsoft.KernelMemory.AI;
 
 using Watch.Manager.Service.Analyse.Models;
 
+/// <summary>
+///     Provides methods to sanitize and extract relevant content from website sources,
+///     including HTML strings and URIs. Removes unnecessary elements and limits content size for embedding.
+/// </summary>
 internal sealed class SanitizeService
 {
     private const int MaxEmbeddingTokens = 8192;
-
     private const int MaxTextLengthforEmbedding = 39000;
 
     private readonly ITextTokenizer tokenizer;
-
     private readonly ILogger<SanitizeService> logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SanitizeService" /> class.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
     public SanitizeService(IServiceProvider serviceProvider)
     {
         this.tokenizer = serviceProvider.GetRequiredService<ITextTokenizer>();
         this.logger = serviceProvider.GetRequiredService<ILogger<SanitizeService>>();
     }
 
-    public async Task<ExtractedSite> SanitizeWebSiteSource(string source, CancellationToken cancellationToken)
-    {
-        var config = Configuration.Default.WithDefaultLoader();
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(req => req.Content(source), cancellationToken).ConfigureAwait(false);
-
-
-        return this.SanitizeInternal(document);
-    }
+    /// <summary>
+    ///     Sanitizes the website content from the specified URI and extracts the head, body, and thumbnail.
+    /// </summary>
+    /// <param name="source">The URI of the website to sanitize.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    ///     An <see cref="ExtractedSite" /> containing the sanitized head, body, and thumbnail URI.
+    /// </returns>
     public async Task<ExtractedSite> SanitizeWebSiteSource(Uri source, CancellationToken cancellationToken)
     {
-        var config = Configuration.Default.WithDefaultLoader(); 
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(new Url(source.ToString()), cancellationToken).ConfigureAwait(false);
 
         return this.SanitizeInternal(document);
     }
 
+    /// <summary>
+    ///     Internal method to sanitize the provided HTML document, removing scripts, styles, and links,
+    ///     and extracting the head, body, and thumbnail.
+    /// </summary>
+    /// <param name="document">The HTML document to sanitize.</param>
+    /// <returns>
+    ///     An <see cref="ExtractedSite" /> containing the sanitized head, body, and thumbnail URI.
+    /// </returns>
     private ExtractedSite SanitizeInternal(IDocument document)
     {
         var body = document.DocumentElement.GetElementsByTagName("body").FirstOrDefault();

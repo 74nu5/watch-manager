@@ -4,6 +4,53 @@
         <name>Watch.Manager.Service.Database</name>
     </assembly>
     <members>
+        <member name="T:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore">
+            <summary>
+                Interface for storing and retrieving analyzed articles and related data.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.StoreArticleAnalyzeAsync(Watch.Manager.Service.Database.Entities.Article,System.Threading.CancellationToken)">
+            <summary>
+                Stores an analyzed article asynchronously.
+            </summary>
+            <param name="analyzeModel">The analyzed article model to store.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.SearchArticleAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+                Searches for articles asynchronously based on search terms and tag.
+            </summary>
+            <param name="searchTerms">The search terms to filter articles, or null to ignore.</param>
+            <param name="tag">The tag to filter articles, or null to ignore.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>An asynchronous stream of article result DTOs matching the criteria.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.IsArticleExistsAsync(System.Uri,System.Threading.CancellationToken)">
+            <summary>
+                Checks asynchronously if an article exists by its URL.
+            </summary>
+            <param name="url">The URL of the article to check.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task that returns true if the article exists, otherwise false.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.GetAllTagsAsync(System.Threading.CancellationToken)">
+            <summary>
+                Retrieves all tags used in articles asynchronously.
+            </summary>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task that returns an array of all tags.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.GetThumbnailAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+                Retrieves the thumbnail image for a given article asynchronously.
+            </summary>
+            <param name="id">The unique identifier of the article.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>
+                A value task that returns a tuple containing the thumbnail as a memory stream and the file name (if available).
+            </returns>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Abstractions.ICategoryStore">
             <summary>
             Interface pour la gestion des catégories.
@@ -119,8 +166,61 @@
             <param name="cancellationToken">Token d'annulation.</param>
             <returns>Liste des titres d'articles.</returns>
         </member>
+        <member name="T:Watch.Manager.Service.Database.ArticleAnalyseStore">
+            <summary>
+                Provides storage and retrieval operations for analyzed articles, including search and thumbnail access.
+            </summary>
+            <param name="articlesContext">The database context used for accessing and managing article data.</param>
+            <param name="searchable">The vector searchable interface used for performing vector-based searches on article data.</param>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.#ctor(Watch.Manager.Service.Database.Context.ArticlesContext,Microsoft.Extensions.VectorData.IVectorSearchable{Watch.Manager.Service.Database.Entities.ArticleSearchEntity})">
+            <summary>
+                Provides storage and retrieval operations for analyzed articles, including search and thumbnail access.
+            </summary>
+            <param name="articlesContext">The database context used for accessing and managing article data.</param>
+            <param name="searchable">The vector searchable interface used for performing vector-based searches on article data.</param>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.StoreArticleAnalyzeAsync(Watch.Manager.Service.Database.Entities.Article,System.Threading.CancellationToken)">
+            <summary>
+                Stores an analyzed article asynchronously in the database.
+            </summary>
+            <param name="analyzeModel">The analyzed article model to store.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.IsArticleExistsAsync(System.Uri,System.Threading.CancellationToken)">
+            <summary>
+                Checks asynchronously if an article exists by its URL.
+            </summary>
+            <param name="url">The URL of the article to check.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task that returns true if the article exists, otherwise false.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.SearchArticleAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+                Searches for articles asynchronously based on search terms and/or tag.
+            </summary>
+            <param name="searchTerms">The search terms to filter articles, or null to ignore.</param>
+            <param name="tag">The tag to filter articles, or null to ignore.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>An asynchronous stream of article result DTOs matching the criteria.</returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GetAllTagsAsync(System.Threading.CancellationToken)">
+            <summary>
+                Retrieves all unique tags used in articles asynchronously.
+            </summary>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>A task that returns an array of all tags.</returns>
+        </member>
         <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GetThumbnailAsync(System.Int32,System.Threading.CancellationToken)">
-            <inheritdoc />
+            <summary>
+                Retrieves the thumbnail image for a given article asynchronously.
+            </summary>
+            <param name="id">The unique identifier of the article.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+            <returns>
+                A value task that returns a tuple containing the thumbnail as a memory stream and the file name (if available).
+            </returns>
         </member>
         <member name="T:Watch.Manager.Service.Database.CategoryStore">
             <summary>
@@ -205,99 +305,69 @@
         <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
-        <member name="T:Watch.Manager.Service.Database.Context.ArticlesContextFactory">
-            <summary>
-            Factory pour créer le contexte ArticlesContext lors du design-time (migrations).
-            </summary>
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Context.ArticlesContextFactory.CreateDbContext(System.String[])">
-            <summary>
-            Crée un contexte ArticlesContext pour le design-time.
-            </summary>
-            <param name="args">Arguments de ligne de commande.</param>
-            <returns>Instance du contexte.</returns>
-        </member>
         <member name="T:Watch.Manager.Service.Database.Entities.Article">
             <summary>
-            Représente un article analysé et stocké dans le système.
+                Représente un article analysé et stocké dans le système.
             </summary>
-        </member>
-        <member name="F:Watch.Manager.Service.Database.Entities.Article.VectorDimensions">
-            <summary>
-                Represents the fixed number of dimensions for a vector.
-            </summary>
-            <remarks>
-                This constant defines the dimensionality of vectors used in the application.
-                It is set to 1536, indicating that all vectors are 1536-dimensional.
-            </remarks>
-        </member>
-        <member name="F:Watch.Manager.Service.Database.Entities.Article.VectorDistanceFunction">
-            <summary>
-                Represents the distance function used for vector calculations.
-            </summary>
-            <remarks>
-                This constant specifies the use of the cosine distance function for vector distance
-                calculations. It is intended to be used in scenarios where cosine similarity or distance is required.
-            </remarks>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Id">
             <summary>
-            Identifiant unique de l'article.
+                Identifiant unique de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Title">
             <summary>
-            Titre de l'article.
+                Titre de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Tags">
             <summary>
-            Tags associés à l'article.
+                Tags associés à l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Authors">
             <summary>
-            Auteurs de l'article.
+                Auteurs de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Summary">
             <summary>
-            Résumé de l'article.
+                Résumé de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Url">
             <summary>
-            URL de l'article.
+                URL de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.AnalyzeDate">
             <summary>
-            Date d'analyse de l'article.
+                Date d'analyse de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.EmbeddingHead">
             <summary>
-            Embedding vectoriel de l'en-tête de l'article.
+                Embedding vectoriel de l'en-tête de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.EmbeddingBody">
             <summary>
-            Embedding vectoriel du corps de l'article.
+                Embedding vectoriel du corps de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Thumbnail">
             <summary>
-            URL de la miniature de l'article.
+                URL de la miniature de l'article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.ThumbnailBase64">
             <summary>
-            Miniature de l'article encodée en base64.
+                Miniature de l'article encodée en base64.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.ArticleCategories">
             <summary>
-            Catégories associées à cet article.
+                Catégories associées à cet article.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Database.Entities.ArticleCategory">
@@ -340,6 +410,11 @@
             Date d'assignation de la catégorie à l'article.
             </summary>
         </member>
+        <member name="T:Watch.Manager.Service.Database.Entities.ArticleSearchEntity">
+            <summary>
+                Represents an article entity used for search and vector storage operations.
+            </summary>
+        </member>
         <member name="F:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.VectorDimensions">
             <summary>
                 Represents the fixed number of dimensions for a vector.
@@ -357,6 +432,61 @@
                 This constant specifies the use of the cosine distance function for vector distance
                 calculations. It is intended to be used in scenarios where cosine similarity or distance is required.
             </remarks>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Id">
+            <summary>
+                Gets or sets the unique identifier for the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Title">
+            <summary>
+                Gets or sets the title of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Tags">
+            <summary>
+                Gets or sets the tags associated with the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Authors">
+            <summary>
+                Gets or sets the authors of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Summary">
+            <summary>
+                Gets or sets the summary of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Url">
+            <summary>
+                Gets or sets the URL of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.AnalyzeDate">
+            <summary>
+                Gets or sets the date when the article was analyzed.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.EmbeddingHead">
+            <summary>
+                Gets or sets the vector embedding representing the head (main content) of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.EmbeddingBody">
+            <summary>
+                Gets or sets the vector embedding representing the body of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.Thumbnail">
+            <summary>
+                Gets or sets the thumbnail image URL for the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.ArticleSearchEntity.ThumbnailBase64">
+            <summary>
+                Gets or sets the base64-encoded thumbnail image for the article.
+            </summary>
         </member>
         <member name="T:Watch.Manager.Service.Database.Entities.Category">
             <summary>
@@ -448,6 +578,20 @@
             Seuil manuel pour la classification.
             </summary>
         </member>
+        <member name="T:Watch.Manager.Service.Database.Extensions.DatabaseExtensions">
+            <summary>
+                Provides extension methods for registering database-related services in the application.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Extensions.DatabaseExtensions.AddDatabaseServices(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Registers database services, DbContext, and vector store components with the application's dependency injection container.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> used to configure the application.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if the required connection string 'articlesdb' is not configured.
+            </exception>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Migrations.InitDatabase">
             <inheritdoc />
         </member>
@@ -508,9 +652,71 @@
         <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:Watch.Manager.Service.Database.Migrations.UpdateStringLength">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.ArticleResultDto">
+            <summary>
+            Data Transfer Object representing the result of an article analysis.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Id">
+            <summary>
+            Gets or sets the unique identifier of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Title">
+            <summary>
+            Gets or sets the title of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Tags">
+            <summary>
+            Gets or sets the tags associated with the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Authors">
+            <summary>
+            Gets or sets the authors of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Summary">
+            <summary>
+            Gets or sets the summary of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Url">
+            <summary>
+            Gets or sets the URL of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.AnalyzeDate">
+            <summary>
+            Gets or sets the date when the article was analyzed.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Thumbnail">
+            <summary>
+            Gets or sets the thumbnail image URL of the article.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Score">
+            <summary>
+            Gets or sets the score assigned to the article, if any.
+            </summary>
+        </member>
         <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Categories">
             <summary>
-            Catégories assignées à cet article.
+            Gets or sets the categories assigned to this article.
             </summary>
         </member>
     </members>

@@ -1,16 +1,18 @@
+﻿namespace Watch.Manager.Web.Components.Pages;
+
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
+
+using Watch.Manager.Common;
 using Watch.Manager.Web.Services;
 using Watch.Manager.Web.Services.Models;
-using Watch.Manager.Common;
-
-namespace Watch.Manager.Web.Components.Pages;
 
 /// <summary>
-/// Page de gestion des catégories.
+///     Page for managing categories, including creation, editing, deletion, and AI-based suggestions.
 /// </summary>
-public partial class Categories : ComponentBase, IDisposable
+public sealed partial class Categories : ComponentBase, IDisposable
 {
     private readonly AnalyzeService analyzeService;
     private readonly IToastService toastService;
@@ -18,31 +20,33 @@ public partial class Categories : ComponentBase, IDisposable
 
     private CategoryModel[] categories = [];
     private bool loading = true;
-    private bool showInactive = false;
+    private bool showInactive;
 
     // Dialog states
     private bool hideDialog = true;
     private bool hideDeleteDialog = true;
     private bool hideBatchDialog = true;
-    private bool saving = false;
-    private bool deleting = false;
+    private bool saving;
+    private bool deleting;
 
     // Editing
-    private CategoryModel? editingCategory = null;
-    private CategoryModel? categoryToDelete = null;
+    private CategoryModel? editingCategory;
+    private CategoryModel? categoryToDelete;
     private CategoryFormModel categoryForm = new();
     private string keywordsText = string.Empty;
-    private int? selectedParent = null;
+    private int? selectedParent;
 
     // AI Classification
-    private bool suggestingCategories = false;
+    private bool suggestingCategories;
     private NewCategorySuggestion[] newCategorySuggestions = [];
-    private bool batchClassifying = false;
+    private bool batchClassifying;
     private BatchClassificationResult[] batchResults = [];
 
     /// <summary>
-    /// Constructeur.
+    ///     Initializes a new instance of the <see cref="Categories" /> class.
     /// </summary>
+    /// <param name="analyzeService">The <see cref="AnalyzeService" /> used to interact with category data and AI functionalities.</param>
+    /// <param name="toastService">The <see cref="IToastService" /> used to display notifications to the user.</param>
     public Categories(AnalyzeService analyzeService, IToastService toastService)
     {
         this.analyzeService = analyzeService;
@@ -52,350 +56,423 @@ public partial class Categories : ComponentBase, IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        cts.Cancel();
-        cts.Dispose();
+        this.cts.Cancel();
+        this.cts.Dispose();
     }
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
-    {
-        await LoadCategoriesAsync();
-    }
+        => await this.LoadCategoriesAsync().ConfigureAwait(true);
 
+    /// <summary>
+    ///     Loads the list of categories from the service.
+    /// </summary>
     private async Task LoadCategoriesAsync()
     {
-        loading = true;
+        this.loading = true;
+
         try
         {
-            categories = await analyzeService.GetCategoriesAsync(showInactive, cts.Token);
+            this.categories = await this.analyzeService.GetCategoriesAsync(this.showInactive, this.cts.Token).ConfigureAwait(true);
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Erreur lors du chargement des catégories: {ex.Message}");
+            this.toastService.ShowError($"Erreur lors du chargement des catégories: {ex.Message}");
         }
         finally
         {
-            loading = false;
+            this.loading = false;
         }
     }
 
-    private async Task OnShowInactiveChanged()
-    {
-        await LoadCategoriesAsync();
-    }
+    /// <summary>
+    ///     Handles the change event for showing inactive categories.
+    /// </summary>
+    private async Task OnShowInactiveChangedAsync()
+        => await this.LoadCategoriesAsync().ConfigureAwait(true);
 
+    /// <summary>
+    ///     Displays the dialog for creating a new category.
+    /// </summary>
     private void ShowCreateDialog()
     {
-        editingCategory = null;
-        categoryForm = new CategoryFormModel();
-        keywordsText = string.Empty;
-        selectedParent = null;
-        hideDialog = false;
+        this.editingCategory = null;
+        this.categoryForm = new();
+        this.keywordsText = string.Empty;
+        this.selectedParent = null;
+        this.hideDialog = false;
     }
 
+    /// <summary>
+    ///     Opens the edit dialog for the specified category.
+    /// </summary>
+    /// <param name="category">The category to edit.</param>
     private void EditCategory(CategoryModel category)
     {
-        editingCategory = category;
-        categoryForm = new CategoryFormModel
+        this.editingCategory = category;
+        this.categoryForm = new()
         {
             Name = category.Name,
             Description = category.Description,
             Color = category.Color,
             Icon = category.Icon,
-            ConfidenceThreshold = category.ConfidenceThreshold
+            ConfidenceThreshold = category.ConfidenceThreshold,
         };
-        keywordsText = string.Join(", ", category.Keywords);
-        selectedParent = category.ParentId;
-        hideDialog = false;
+
+        this.keywordsText = string.Join(", ", category.Keywords);
+        this.selectedParent = category.ParentId;
+        this.hideDialog = false;
     }
 
+    /// <summary>
+    ///     Opens the delete confirmation dialog for the specified category.
+    /// </summary>
+    /// <param name="category">The category to delete.</param>
     private void DeleteCategory(CategoryModel category)
     {
-        categoryToDelete = category;
-        hideDeleteDialog = false;
+        this.categoryToDelete = category;
+        this.hideDeleteDialog = false;
     }
 
-    private async Task ToggleActiveCategory(CategoryModel category)
+    /// <summary>
+    ///     Toggles the active state of a category.
+    /// </summary>
+    /// <param name="category">The category to activate or deactivate.</param>
+    private async Task ToggleActiveCategoryAsync(CategoryModel category)
     {
         try
         {
-            var result = await analyzeService.UpdateCategoryAsync(
-                category.Id,
-                isActive: !category.IsActive,
-                cancellationToken: cts.Token);
+            var result = await this.analyzeService.UpdateCategoryAsync(
+                             category.Id,
+                             isActive: !category.IsActive,
+                             cancellationToken: this.cts.Token).ConfigureAwait(true);
 
             if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
             {
-                toastService.ShowError($"Erreur lors de la modification: {result.Error}");
+                this.toastService.ShowError($"Erreur lors de la modification: {result.Error}");
                 return;
             }
 
-            toastService.ShowSuccess($"Catégorie {(category.IsActive ? "désactivée" : "activée")} avec succès");
-            await LoadCategoriesAsync();
+            this.toastService.ShowSuccess($"Catégorie {(category.IsActive ? "désactivée" : "activée")} avec succès");
+            await this.LoadCategoriesAsync().ConfigureAwait(true);
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Erreur: {ex.Message}");
+            this.toastService.ShowError($"Erreur: {ex.Message}");
         }
     }
 
-    private async Task SaveCategory()
+    /// <summary>
+    ///     Saves the category (create or update) using the form data.
+    /// </summary>
+    private async Task SaveCategoryAsync()
     {
-        if (categoryForm.Name == null)
+        if (this.categoryForm.Name == null)
         {
-            toastService.ShowError("Le nom de la catégorie est obligatoire");
+            this.toastService.ShowError("Le nom de la catégorie est obligatoire");
             return;
         }
 
-        saving = true;
+        this.saving = true;
+
         try
         {
-            var keywords = string.IsNullOrWhiteSpace(keywordsText)
-                ? Array.Empty<string>()
-                : keywordsText.Split(',').Select(k => k.Trim()).Where(k => !string.IsNullOrEmpty(k)).ToArray();
+            var keywords = string.IsNullOrWhiteSpace(this.keywordsText)
+                                   ? Array.Empty<string>()
+                                   : [.. this.keywordsText.Split(',').Select(k => k.Trim()).Where(k => !string.IsNullOrEmpty(k))];
 
             ApiResult<CategoryModel> result;
 
-            if (editingCategory == null)
+            if (this.editingCategory == null)
             {
-                // Création
-                result = await analyzeService.CreateCategoryAsync(
-                    categoryForm.Name,
-                    categoryForm.Description,
-                    categoryForm.Color,
-                    categoryForm.Icon,
-                    keywords,
-                    selectedParent,
-                    categoryForm.ConfidenceThreshold,
-                    cts.Token);
+                // Creation
+                result = await this.analyzeService.CreateCategoryAsync(
+                             this.categoryForm.Name,
+                             this.categoryForm.Description,
+                             this.categoryForm.Color,
+                             this.categoryForm.Icon,
+                             keywords,
+                             this.selectedParent,
+                             this.categoryForm.ConfidenceThreshold,
+                             this.cts.Token).ConfigureAwait(true);
             }
             else
             {
-                // Modification
-                result = await analyzeService.UpdateCategoryAsync(
-                    editingCategory.Id,
-                    categoryForm.Name,
-                    categoryForm.Description,
-                    categoryForm.Color,
-                    categoryForm.Icon,
-                    keywords,
-                    selectedParent,
-                    null, // isActive not changed here
-                    categoryForm.ConfidenceThreshold,
-                    cts.Token);
+                // Update
+                result = await this.analyzeService.UpdateCategoryAsync(
+                             this.editingCategory.Id,
+                             this.categoryForm.Name,
+                             this.categoryForm.Description,
+                             this.categoryForm.Color,
+                             this.categoryForm.Icon,
+                             keywords,
+                             this.selectedParent,
+                             null, // isActive not changed here
+                             this.categoryForm.ConfidenceThreshold,
+                             this.cts.Token).ConfigureAwait(true);
             }
 
             if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
             {
-                toastService.ShowError($"Erreur: {result.Error}");
+                this.toastService.ShowError($"Erreur: {result.Error}");
                 return;
             }
 
-            toastService.ShowSuccess(editingCategory == null ? "Catégorie créée avec succès" : "Catégorie modifiée avec succès");
-            hideDialog = true;
-            await LoadCategoriesAsync();
+            this.toastService.ShowSuccess(this.editingCategory == null ? "Catégorie créée avec succès" : "Catégorie modifiée avec succès");
+            this.hideDialog = true;
+            await this.LoadCategoriesAsync().ConfigureAwait(true);
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Erreur: {ex.Message}");
+            this.toastService.ShowError($"Erreur: {ex.Message}");
         }
         finally
         {
-            saving = false;
+            this.saving = false;
         }
     }
 
-    private async Task ConfirmDelete()
+    /// <summary>
+    ///     Confirms and performs the deletion of the selected category.
+    /// </summary>
+    private async Task ConfirmDeleteAsync()
     {
-        if (categoryToDelete == null) return;
+        if (this.categoryToDelete == null)
+            return;
 
-        deleting = true;
+        this.deleting = true;
+
         try
         {
-            var result = await analyzeService.DeleteCategoryAsync(categoryToDelete.Id, cts.Token);
+            var result = await this.analyzeService.DeleteCategoryAsync(this.categoryToDelete.Id, this.cts.Token).ConfigureAwait(true);
 
             if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
             {
-                toastService.ShowError($"Erreur lors de la suppression: {result.Error}");
+                this.toastService.ShowError($"Erreur lors de la suppression: {result.Error}");
                 return;
             }
 
-            toastService.ShowSuccess("Catégorie supprimée avec succès");
-            hideDeleteDialog = true;
-            categoryToDelete = null;
-            await LoadCategoriesAsync();
+            this.toastService.ShowSuccess("Catégorie supprimée avec succès");
+            this.hideDeleteDialog = true;
+            this.categoryToDelete = null;
+            await this.LoadCategoriesAsync().ConfigureAwait(true);
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Erreur: {ex.Message}");
+            this.toastService.ShowError($"Erreur: {ex.Message}");
         }
         finally
         {
-            deleting = false;
+            this.deleting = false;
         }
     }
 
+    /// <summary>
+    ///     Hides the create/edit dialog and resets the editing state.
+    /// </summary>
     private void HideDialog()
     {
-        hideDialog = true;
-        editingCategory = null;
+        this.hideDialog = true;
+        this.editingCategory = null;
     }
 
+    /// <summary>
+    ///     Hides the delete confirmation dialog and resets the deletion state.
+    /// </summary>
     private void HideDeleteDialog()
     {
-        hideDeleteDialog = true;
-        categoryToDelete = null;
+        this.hideDeleteDialog = true;
+        this.categoryToDelete = null;
     }
 
+    /// <summary>
+    ///     Gets the list of available parent categories, excluding the current category and its children to prevent circular references.
+    /// </summary>
+    /// <returns>Enumerable of available parent categories.</returns>
     private IEnumerable<CategoryModel> GetAvailableParentCategories()
     {
-        // Exclure la catégorie en cours d'édition et ses enfants pour éviter les références circulaires
-        if (editingCategory == null)
-        {
-            return categories.Where(c => c.IsActive);
-        }
+        // Exclude the category being edited and its children to avoid circular references
+        if (this.editingCategory == null)
+            return this.categories.Where(c => c.IsActive);
 
-        return categories.Where(c => c.IsActive && c.Id != editingCategory.Id && !IsChildOf(c, editingCategory));
+        return this.categories.Where(c => c.IsActive && c.Id != this.editingCategory.Id && !this.IsChildOf(c, this.editingCategory));
     }
 
+    /// <summary>
+    ///     Determines if a category is a child of a potential parent category.
+    /// </summary>
+    /// <param name="category">The category to check.</param>
+    /// <param name="potentialParent">The potential parent category.</param>
+    /// <returns>True if <paramref name="category" /> is a child of <paramref name="potentialParent" />; otherwise, false.</returns>
     private bool IsChildOf(CategoryModel category, CategoryModel potentialParent)
     {
         var current = category;
+
         while (current?.ParentId != null)
         {
             if (current.ParentId == potentialParent.Id)
                 return true;
-            current = categories.FirstOrDefault(c => c.Id == current.ParentId);
+
+            current = this.categories.FirstOrDefault(c => c.Id == current.ParentId);
         }
+
         return false;
     }
 
     // AI Classification Methods
-    private async Task SuggestNewCategories()
+
+    /// <summary>
+    ///     Requests new category suggestions from the AI service.
+    /// </summary>
+    private async Task SuggestNewCategoriesAsync()
     {
-        suggestingCategories = true;
+        this.suggestingCategories = true;
+
         try
         {
-            var result = await analyzeService.SuggestNewCategoriesAsync(cts.Token);
+            var result = await this.analyzeService.SuggestNewCategoriesAsync(this.cts.Token).ConfigureAwait(true);
 
             if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
             {
-                toastService.ShowError($"Erreur lors de la suggestion de catégories: {result.Error}");
+                this.toastService.ShowError($"Erreur lors de la suggestion de catégories: {result.Error}");
                 return;
             }
 
-            newCategorySuggestions = result.Result ?? [];
-            if (newCategorySuggestions.Length == 0)
-            {
-                toastService.ShowInfo("Aucune nouvelle catégorie suggérée. Vos catégories actuelles semblent couvrir tous les articles.");
-            }
+            this.newCategorySuggestions = result.Result ?? [];
+            if (this.newCategorySuggestions.Length == 0)
+                this.toastService.ShowInfo("Aucune nouvelle catégorie suggérée. Vos catégories actuelles semblent couvrir tous les articles.");
             else
-            {
-                toastService.ShowSuccess($"{newCategorySuggestions.Length} nouvelles catégories suggérées");
-            }
+                this.toastService.ShowSuccess($"{this.newCategorySuggestions.Length} nouvelles catégories suggérées");
         }
         catch (Exception ex)
         {
-            toastService.ShowError($"Erreur: {ex.Message}");
+            this.toastService.ShowError($"Erreur: {ex.Message}");
         }
         finally
         {
-            suggestingCategories = false;
+            this.suggestingCategories = false;
         }
-    }
-
-    private async Task ShowBatchClassificationDialog()
-    {
-        batchClassifying = true;
-        batchResults = [];
-        hideBatchDialog = false;
-
-        try
-        {
-            var result = await analyzeService.BatchClassifyAsync(cts.Token);
-
-            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
-            {
-                toastService.ShowError($"Erreur lors de la classification par lot: {result.Error}");
-                return;
-            }
-
-            batchResults = result.Result ?? [];
-            toastService.ShowSuccess($"{batchResults.Length} articles classifiés");
-        }
-        catch (Exception ex)
-        {
-            toastService.ShowError($"Erreur: {ex.Message}");
-        }
-        finally
-        {
-            batchClassifying = false;
-        }
-    }
-
-    private async Task CreateCategoryFromSuggestion(NewCategorySuggestion suggestion)
-    {
-        try
-        {
-            var result = await analyzeService.CreateCategoryAsync(
-                suggestion.Name,
-                suggestion.Description,
-                suggestion.Color,
-                suggestion.Icon,
-                suggestion.Keywords,
-                null, // pas de parent pour les suggestions
-                suggestion.ConfidenceThreshold,
-                cts.Token);
-
-            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
-            {
-                toastService.ShowError($"Erreur lors de la création: {result.Error}");
-                return;
-            }
-
-            toastService.ShowSuccess($"Catégorie '{suggestion.Name}' créée avec succès");
-
-            // Retirer la suggestion de la liste
-            newCategorySuggestions = newCategorySuggestions.Where(s => s != suggestion).ToArray();
-
-            // Recharger les catégories
-            await LoadCategoriesAsync();
-        }
-        catch (Exception ex)
-        {
-            toastService.ShowError($"Erreur: {ex.Message}");
-        }
-    }
-
-    private void DismissSuggestion(NewCategorySuggestion suggestion)
-    {
-        newCategorySuggestions = newCategorySuggestions.Where(s => s != suggestion).ToArray();
-    }
-
-    private void HideBatchDialog()
-    {
-        hideBatchDialog = true;
-        batchResults = [];
     }
 
     /// <summary>
-    /// Modèle de formulaire pour les catégories.
+    ///     Shows the dialog for batch classification and loads the results.
     /// </summary>
-    private class CategoryFormModel
+    private async Task ShowBatchClassificationDialogAsync()
     {
+        this.batchClassifying = true;
+        this.batchResults = [];
+        this.hideBatchDialog = false;
+
+        try
+        {
+            var result = await this.analyzeService.BatchClassifyAsync(this.cts.Token).ConfigureAwait(true);
+
+            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
+            {
+                this.toastService.ShowError($"Erreur lors de la classification par lot: {result.Error}");
+                return;
+            }
+
+            this.batchResults = result.Result ?? [];
+            this.toastService.ShowSuccess($"{this.batchResults.Length} articles classifiés");
+        }
+        catch (Exception ex)
+        {
+            this.toastService.ShowError($"Erreur: {ex.Message}");
+        }
+        finally
+        {
+            this.batchClassifying = false;
+        }
+    }
+
+    /// <summary>
+    ///     Creates a new category from an AI suggestion.
+    /// </summary>
+    /// <param name="suggestion">The suggestion to use for creating the category.</param>
+    private async Task CreateCategoryFromSuggestionAsync(NewCategorySuggestion suggestion)
+    {
+        try
+        {
+            var result = await this.analyzeService.CreateCategoryAsync(
+                             suggestion.Name,
+                             suggestion.Description,
+                             suggestion.Color,
+                             suggestion.Icon,
+                             suggestion.Keywords,
+                             null, // no parent for suggestions
+                             suggestion.ConfidenceThreshold,
+                             this.cts.Token).ConfigureAwait(true);
+
+            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
+            {
+                this.toastService.ShowError($"Erreur lors de la création: {result.Error}");
+                return;
+            }
+
+            this.toastService.ShowSuccess($"Catégorie '{suggestion.Name}' créée avec succès");
+
+            // Remove the suggestion from the list
+            this.newCategorySuggestions = [.. this.newCategorySuggestions.Where(s => s != suggestion)];
+
+            // Reload categories
+            await this.LoadCategoriesAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            this.toastService.ShowError($"Erreur: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    ///     Dismisses a category suggestion from the list.
+    /// </summary>
+    /// <param name="suggestion">The suggestion to dismiss.</param>
+    private void DismissSuggestion(NewCategorySuggestion suggestion)
+        => this.newCategorySuggestions = [.. this.newCategorySuggestions.Where(s => s != suggestion)];
+
+    /// <summary>
+    ///     Hides the batch classification dialog and clears the results.
+    /// </summary>
+    private void HideBatchDialog()
+    {
+        this.hideBatchDialog = true;
+        this.batchResults = [];
+    }
+
+    /// <summary>
+    ///     Form model for category creation and editing.
+    /// </summary>
+    private sealed class CategoryFormModel
+    {
+        /// <summary>
+        ///     Gets or sets the name of the category.
+        /// </summary>
         [Required(ErrorMessage = "Le nom est obligatoire")]
         [StringLength(200, ErrorMessage = "Le nom ne peut pas dépasser 200 caractères")]
         public string? Name { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the description of the category.
+        /// </summary>
         [StringLength(1000, ErrorMessage = "La description ne peut pas dépasser 1000 caractères")]
         public string? Description { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the color of the category in hexadecimal format.
+        /// </summary>
         [RegularExpression(@"^#[0-9A-Fa-f]{6}$", ErrorMessage = "La couleur doit être au format hexadécimal (#000000)")]
         public string? Color { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the icon of the category.
+        /// </summary>
         [StringLength(50, ErrorMessage = "L'icône ne peut pas dépasser 50 caractères")]
         public string? Icon { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the confidence threshold for automatic classification.
+        /// </summary>
         [Range(0.0, 1.0, ErrorMessage = "Le seuil de confiance doit être entre 0 et 1")]
         public double? ConfidenceThreshold { get; set; }
     }

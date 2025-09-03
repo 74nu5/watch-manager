@@ -3,7 +3,7 @@ namespace Watch.Manager.Service.Analyse.Models;
 /// <summary>
 /// Représente une catégorie utilisée pour la classification.
 /// </summary>
-public class CategoryForClassification
+public sealed class CategoryForClassification
 {
     /// <summary>
     /// Identifiant unique de la catégorie.
@@ -49,7 +49,7 @@ public class CategoryForClassification
 /// <summary>
 /// Représente une suggestion de catégorie avec un score de confiance.
 /// </summary>
-public class CategorySuggestionResult
+public sealed class CategorySuggestionResult
 {
     /// <summary>
     /// Identifiant de la catégorie suggérée.
@@ -85,7 +85,7 @@ public class CategorySuggestionResult
 /// <summary>
 /// Représente une suggestion de nouvelle catégorie à créer.
 /// </summary>
-public class NewCategorySuggestion
+public sealed class NewCategorySuggestion
 {
     /// <summary>
     /// Nom suggéré pour la nouvelle catégorie.
@@ -116,7 +116,7 @@ public class NewCategorySuggestion
 /// <summary>
 /// Représente les résultats de la classification automatique d'un article.
 /// </summary>
-public class ArticleClassificationResult
+public sealed class ArticleClassificationResult
 {
     /// <summary>
     /// Identifiant de l'article classifié.

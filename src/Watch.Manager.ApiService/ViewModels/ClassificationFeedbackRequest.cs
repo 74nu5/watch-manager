@@ -1,22 +1,22 @@
-namespace Watch.Manager.ApiService.ViewModels;
+﻿namespace Watch.Manager.ApiService.ViewModels;
 
 /// <summary>
-/// Modèle de requête pour fournir un retour sur la classification
+/// Request model for providing feedback on classification.
 /// </summary>
 public sealed class ClassificationFeedbackRequest
 {
     /// <summary>
-    /// Identifiant de l'article classifié
+    /// Gets the identifier of the classified article.
     /// </summary>
     public required int ArticleId { get; init; }
 
     /// <summary>
-    /// Identifiants des catégories correctes
+    /// Gets the identifiers of the correct categories.
     /// </summary>
     public required int[] CorrectCategories { get; init; }
 
     /// <summary>
-    /// Identifiants des catégories incorrectes suggérées par l'IA
+    /// Gets the identifiers of the incorrect categories suggested by AI.
     /// </summary>
     public required int[] IncorrectCategories { get; init; }
 }

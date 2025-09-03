@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.VectorData;
 
+/// <summary>
+///     Represents an article entity used for search and vector storage operations.
+/// </summary>
 public class ArticleSearchEntity
 {
     /// <summary>
@@ -26,49 +29,82 @@ public class ArticleSearchEntity
     /// </remarks>
     private const string VectorDistanceFunction = DistanceFunction.CosineDistance;
 
+    /// <summary>
+    ///     Gets or sets the unique identifier for the article.
+    /// </summary>
     [VectorStoreKey]
     public int Id { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the title of the article.
+    /// </summary>
     [StringLength(500)]
     [VectorStoreData]
     [Required]
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the tags associated with the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string Tags { get; set; }
+    public required string Tags { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the authors of the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string Authors { get; set; }
+    public required string Authors { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the summary of the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string Summary { get; set; }
+    public required string Summary { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the URL of the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the date when the article was analyzed.
+    /// </summary>
     [Required]
     [VectorStoreData]
     public DateTime AnalyzeDate { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the vector embedding representing the head (main content) of the article.
+    /// </summary>
     [VectorStoreVector(VectorDimensions, DistanceFunction = VectorDistanceFunction)]
     [Column(TypeName = "vector(1536)")]
     [JsonIgnore]
-    public float[] EmbeddingHead { get; set; }
+    public required float[] EmbeddingHead { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the vector embedding representing the body of the article.
+    /// </summary>
     [VectorStoreVector(VectorDimensions, DistanceFunction = VectorDistanceFunction)]
     [Column(TypeName = "vector(1536)")]
     [JsonIgnore]
-    public float[] EmbeddingBody { get; set; }
+    public required float[] EmbeddingBody { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the thumbnail image URL for the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string Thumbnail { get; set; }
+    public required string Thumbnail { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the base64-encoded thumbnail image for the article.
+    /// </summary>
     [Required]
     [VectorStoreData]
-    public string ThumbnailBase64 { get; set; }
+    public required string ThumbnailBase64 { get; set; }
 }

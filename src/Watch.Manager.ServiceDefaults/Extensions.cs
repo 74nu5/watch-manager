@@ -10,8 +10,16 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
+/// <summary>
+///     Provides extension methods for configuring service defaults, OpenTelemetry, health checks, and endpoints.
+/// </summary>
 public static partial class Extensions
 {
+    /// <summary>
+    ///     Adds default service configurations including OpenTelemetry, health checks, service discovery, and HTTP client defaults.
+    /// </summary>
+    /// <param name="builder">The <see cref="IHostApplicationBuilder" /> to configure.</param>
+    /// <returns>The configured <see cref="IHostApplicationBuilder" />.</returns>
     public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBuilder builder)
     {
         _ = builder.ConfigureOpenTelemetry();
@@ -21,18 +29,46 @@ public static partial class Extensions
         _ = builder.Services.AddServiceDiscovery();
 
         _ = builder.Services.ConfigureHttpClientDefaults(http =>
-        {
-            // Turn on resilience by default
-            //_ = http.AddStandardResilienceHandler();
 
-            // Turn on service discovery by default
-            _ = http.AddServiceDiscovery();
-        });
+                // Turn on resilience by default
+                // _ = http.AddStandardResilienceHandler();
+
+                // Turn on service discovery by default
+                _ = http.AddServiceDiscovery());
 
         return builder;
     }
 
-    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
+    /// <summary>
+    ///     Maps default endpoints for health checks and optionally Prometheus scraping.
+    /// </summary>
+    /// <param name="app">The <see cref="WebApplication" /> to configure.</param>
+    /// <returns>The configured <see cref="WebApplication" />.</returns>
+    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    {
+        if (!app.Environment.IsDevelopment())
+            return app;
+
+        // All health checks must pass for app to be considered ready to accept traffic after starting
+        _ = app.MapHealthChecks("/health");
+
+        // Only health checks tagged with the "live" tag must pass for app to be considered alive
+        _ = app.MapHealthChecks(
+            "/alive",
+            new()
+            {
+                Predicate = r => r.Tags.Contains("live"),
+            });
+
+        return app;
+    }
+
+    /// <summary>
+    ///     Configures OpenTelemetry logging, metrics, and tracing for the application.
+    /// </summary>
+    /// <param name="builder">The <see cref="IHostApplicationBuilder" /> to configure.</param>
+    /// <returns>The configured <see cref="IHostApplicationBuilder" />.</returns>
+    private static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
         _ = builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -41,23 +77,15 @@ public static partial class Extensions
         });
 
         _ = builder.Services.AddOpenTelemetry()
-                   .WithMetrics(metrics =>
-                    {
-                        _ = metrics.AddAspNetCoreInstrumentation()
-                                   .AddHttpClientInstrumentation()
-                                   .AddRuntimeInstrumentation();
-                    })
+                   .WithMetrics(metrics => _ = metrics.AddAspNetCoreInstrumentation()
+                                                      .AddHttpClientInstrumentation()
+                                                      .AddRuntimeInstrumentation())
                    .WithTracing(tracing =>
                     {
                         if (builder.Environment.IsDevelopment())
-                        {
-                            // We want to view all traces in development
                             _ = tracing.SetSampler(new AlwaysOnSampler());
-                        }
 
                         _ = tracing.AddAspNetCoreInstrumentation()
-                                    // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-                                    //.AddGrpcClientInstrumentation()
                                    .AddHttpClientInstrumentation();
                     });
 
@@ -66,38 +94,23 @@ public static partial class Extensions
         return builder;
     }
 
-    public static IHostApplicationBuilder AddDefaultHealthChecks(this IHostApplicationBuilder builder)
+    /// <summary>
+    ///     Adds default health checks to the application, including a liveness check.
+    /// </summary>
+    /// <param name="builder">The <see cref="IHostApplicationBuilder" /> to configure.</param>
+    /// <returns>The configured <see cref="IHostApplicationBuilder" />.</returns>
+    private static IHostApplicationBuilder AddDefaultHealthChecks(this IHostApplicationBuilder builder)
     {
-        _ = builder.Services.AddHealthChecks()
-                    // Add a default liveness check to ensure app is responsive
-                   .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+        _ = builder.Services.AddHealthChecks().AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
         return builder;
     }
 
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
-    {
-        // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
-        // app.MapPrometheusScrapingEndpoint();
-
-        // Adding health checks endpoints to applications in non-development environments has security implications.
-        // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
-        if (app.Environment.IsDevelopment())
-        {
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            _ = app.MapHealthChecks("/health");
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            _ = app.MapHealthChecks("/alive",
-                new()
-                {
-                    Predicate = r => r.Tags.Contains("live"),
-                });
-        }
-
-        return app;
-    }
-
+    /// <summary>
+    ///     Adds OpenTelemetry exporters based on configuration, such as OTLP, Prometheus, or Azure Monitor.
+    /// </summary>
+    /// <param name="builder">The <see cref="IHostApplicationBuilder" /> to configure.</param>
+    /// <returns>The configured <see cref="IHostApplicationBuilder" />.</returns>
     private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder)
     {
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
@@ -109,17 +122,12 @@ public static partial class Extensions
             _ = builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
         }
 
-        // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
-        // builder.Services.AddOpenTelemetry()
-        //    .WithMetrics(metrics => metrics.AddPrometheusExporter());
-
         // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
-        //if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-        //{
-        //    builder.Services.AddOpenTelemetry()
-        //       .UseAzureMonitor();
-        //}
-
+        // if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+        // {
+        //     builder.Services.AddOpenTelemetry()
+        //        .UseAzureMonitor();
+        // }
         return builder;
     }
 }

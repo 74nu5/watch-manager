@@ -18,5 +18,134 @@
             <returns>The value of the configuration.</returns>
             <exception cref="T:System.InvalidOperationException">Thrown if the configuration value is missing.</exception>
         </member>
+        <member name="T:Watch.Manager.ServiceDefaults.Extensions">
+            <summary>
+                Provides extension methods for configuring service defaults, OpenTelemetry, health checks, and endpoints.
+            </summary>
+            <summary>
+                Provides extension methods for configuring and using OpenAPI in the application.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.AddServiceDefaults(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds default service configurations including OpenTelemetry, health checks, service discovery, and HTTP client defaults.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> to configure.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.MapDefaultEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+                Maps default endpoints for health checks and optionally Prometheus scraping.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> to configure.</param>
+            <returns>The configured <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.ConfigureOpenTelemetry(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Configures OpenTelemetry logging, metrics, and tracing for the application.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> to configure.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.AddDefaultHealthChecks(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds default health checks to the application, including a liveness check.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> to configure.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.AddOpenTelemetryExporters(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds OpenTelemetry exporters based on configuration, such as OTLP, Prometheus, or Azure Monitor.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> to configure.</param>
+            <returns>The configured <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.UseDefaultOpenApi(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+                Configures the application to use the default OpenAPI endpoints if the "OpenApi" section exists in the configuration.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder" /> for chaining.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.Extensions.AddDefaultOpenApi(Microsoft.Extensions.Hosting.IHostApplicationBuilder,Asp.Versioning.IApiVersioningBuilder)">
+            <summary>
+                Adds and configures the default OpenAPI services and documentation for the application if the "OpenApi" section exists in the configuration.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> instance.</param>
+            <param name="apiVersioning">The optional <see cref="T:Asp.Versioning.IApiVersioningBuilder" /> for API versioning support.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" /> for chaining.</returns>
+        </member>
+        <member name="T:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions">
+            <summary>
+                Provides extension methods for configuring OpenAPI options.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplyApiVersionInfo(Microsoft.AspNetCore.OpenApi.OpenApiOptions,System.String,System.String)">
+            <summary>
+                Applies API version information to the OpenAPI document.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <param name="title">The API title.</param>
+            <param name="description">The API description.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplySecuritySchemeDefinitions(Microsoft.AspNetCore.OpenApi.OpenApiOptions)">
+            <summary>
+                Adds security scheme definitions to the OpenAPI document.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplyAuthorizationChecks(Microsoft.AspNetCore.OpenApi.OpenApiOptions,System.String[])">
+            <summary>
+                Adds authorization checks and security requirements to OpenAPI operations.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <param name="scopes">The required OAuth2 scopes.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplyOperationDeprecatedStatus(Microsoft.AspNetCore.OpenApi.OpenApiOptions)">
+            <summary>
+                Marks OpenAPI operations as deprecated if the corresponding API description is deprecated.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplyApiVersionDescription(Microsoft.AspNetCore.OpenApi.OpenApiOptions)">
+            <summary>
+                Adds a description and example to the "api-version" parameter in OpenAPI operations.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.ApplySchemaNullableFalse(Microsoft.AspNetCore.OpenApi.OpenApiOptions)">
+            <summary>
+                Sets the "nullable" property to false for all optional properties in OpenAPI schemas.
+            </summary>
+            <param name="options">The OpenAPI options.</param>
+            <returns>The updated <see cref="T:Microsoft.AspNetCore.OpenApi.OpenApiOptions" />.</returns>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.BuildDescription(Asp.Versioning.ApiExplorer.ApiVersionDescription,System.String)">
+            <summary>
+                Builds the API description, including deprecation and sunset policy information if applicable.
+            </summary>
+            <param name="api">The API version description.</param>
+            <param name="description">The base description.</param>
+            <returns>The composed description string.</returns>
+        </member>
+        <member name="T:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.SecuritySchemeDefinitionsTransformer">
+            <summary>
+                Transformer for adding OAuth2 security scheme definitions to the OpenAPI document.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.SecuritySchemeDefinitionsTransformer.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+                Transformer for adding OAuth2 security scheme definitions to the OpenAPI document.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ServiceDefaults.OpenApiOptionsExtensions.SecuritySchemeDefinitionsTransformer.TransformAsync(Microsoft.OpenApi.Models.OpenApiDocument,Microsoft.AspNetCore.OpenApi.OpenApiDocumentTransformerContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

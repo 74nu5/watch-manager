@@ -1,15 +1,17 @@
-namespace Watch.Manager.Service.Analyse.Services;
+﻿namespace Watch.Manager.Service.Analyse.Services;
 
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Watch.Manager.Service.Analyse.Models;
 
 /// <summary>
-/// Service de classification automatique d'articles par IA.
+///     Service de classification automatique d'articles par IA.
 /// </summary>
 internal sealed class ArticleClassificationAI : IArticleClassificationAI
 {
@@ -30,7 +32,7 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         this.chatOptions = new()
         {
             ResponseFormat = ChatResponseFormat.Json,
-            Temperature = 0.3f // Plus déterministe pour la classification
+            Temperature = 0.3f, // Plus déterministe pour la classification
         };
     }
 
@@ -38,10 +40,9 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
     public bool IsEnabled => this.chatClient is not null && this.embeddingGenerator is not null;
 
     /// <inheritdoc />
-    public async Task<IEnumerable<CategorySuggestionResult>> ClassifyArticleAsync(
-        string articleContent,
-        IEnumerable<CategoryForClassification> availableCategories,
-        CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<CategorySuggestionResult>> ClassifyArticleAsync(string articleContent,
+                                                                                  IEnumerable<CategoryForClassification> availableCategories,
+                                                                                  CancellationToken cancellationToken = default)
     {
         if (!this.IsEnabled)
         {
@@ -49,8 +50,9 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
             return [];
         }
 
-        var categoriesList = availableCategories.ToList();
-        if (!categoriesList.Any())
+        var categoriesList = availableCategories.ToArray();
+
+        if (categoriesList.Length == 0)
         {
             this.logger.LogInformation("Aucune catégorie disponible pour la classification");
             return [];
@@ -62,22 +64,23 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         try
         {
             // 1. Classification par similarité sémantique (embeddings)
-            var semanticSuggestions = await this.ClassifyBySemanticSimilarityAsync(articleContent, categoriesList, cancellationToken);
+            var semanticSuggestions = await this.ClassifyBySemanticSimilarityAsync(articleContent, categoriesList, cancellationToken).ConfigureAwait(false);
             suggestions.AddRange(semanticSuggestions);
 
             // 2. Classification par mots-clés
-            var keywordSuggestions = this.ClassifyByKeywords(articleContent, categoriesList);
-            this.MergeSuggestions(suggestions, keywordSuggestions);
+            var keywordSuggestions = ClassifyByKeywords(articleContent, categoriesList);
+            MergeSuggestions(suggestions, keywordSuggestions);
 
             // 3. Classification par IA contextuelle
-            var aiSuggestions = await this.ClassifyByAIAsync(articleContent, categoriesList, cancellationToken);
-            this.MergeSuggestions(suggestions, aiSuggestions);
+            var aiSuggestions = await this.ClassifyByAIAsync(articleContent, categoriesList, cancellationToken).ConfigureAwait(false);
+            MergeSuggestions(suggestions, aiSuggestions);
 
             // 4. Normaliser et trier les résultats
-            var finalSuggestions = this.NormalizeAndRankSuggestions(suggestions, categoriesList);
+            CategorySuggestionResult[] finalSuggestions = [.. NormalizeAndRankSuggestions(suggestions, categoriesList)];
 
             this.logger.LogInformation("Classification terminée en {ElapsedMs}ms - {SuggestionsCount} suggestions générées",
-                stopwatch.ElapsedMilliseconds, finalSuggestions.Count());
+                stopwatch.ElapsedMilliseconds,
+                finalSuggestions.Length);
 
             return finalSuggestions;
         }
@@ -89,36 +92,32 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<NewCategorySuggestion>> SuggestNewCategoriesAsync(
-        string articleContent,
-        IEnumerable<string> existingCategories,
-        CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<NewCategorySuggestion>> SuggestNewCategoriesAsync(string articleContent,
+                                                                                    IEnumerable<string> existingCategories,
+                                                                                    CancellationToken cancellationToken = default)
     {
         if (!this.IsEnabled)
-        {
             return [];
-        }
 
         try
         {
             var existingCategoriesList = existingCategories.ToList();
-            var systemPrompt = this.BuildNewCategorySystemPrompt(existingCategoriesList);
+            var systemPrompt = BuildNewCategorySystemPrompt(existingCategoriesList);
 
             var messages = new List<ChatMessage>
             {
                 new(ChatRole.System, systemPrompt),
-                new(ChatRole.User, $"Analyse ce contenu d'article et suggère de nouvelles catégories si nécessaire :\n\n{articleContent}")
+                new(ChatRole.User, $"Analyse ce contenu d'article et suggère de nouvelles catégories si nécessaire :\n\n{articleContent}"),
             };
 
-            var response = await this.chatClient!.GetResponseAsync(messages, this.chatOptions, cancellationToken);
+            var response = await this.chatClient!.GetResponseAsync(messages, this.chatOptions, cancellationToken).ConfigureAwait(false);
             var responseText = response.Messages.FirstOrDefault()?.Text;
 
             if (string.IsNullOrEmpty(responseText))
-            {
                 return [];
-            }
 
             List<NewCategorySuggestion> suggestions;
+
             try
             {
                 // Essayer de désérialiser comme un tableau
@@ -154,9 +153,7 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
     public double CalculateSemanticSimilarity(float[] articleEmbedding, float[] categoryEmbedding)
     {
         if (articleEmbedding.Length != categoryEmbedding.Length)
-        {
             throw new ArgumentException("Les embeddings doivent avoir la même dimension");
-        }
 
         // Calcul de la similarité cosinus
         var dotProduct = articleEmbedding.Zip(categoryEmbedding, (a, b) => a * b).Sum();
@@ -164,9 +161,7 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         var magnitudeB = Math.Sqrt(categoryEmbedding.Select(x => x * x).Sum());
 
         if (magnitudeA == 0 || magnitudeB == 0)
-        {
             return 0;
-        }
 
         var similarity = dotProduct / (magnitudeA * magnitudeB);
 
@@ -175,11 +170,10 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
     }
 
     /// <inheritdoc />
-    public async Task LearnFromFeedbackAsync(
-        string articleContent,
-        IEnumerable<int> correctCategories,
-        IEnumerable<int> incorrectCategories,
-        CancellationToken cancellationToken = default)
+    public async Task LearnFromFeedbackAsync(string articleContent,
+                                             IEnumerable<int> correctCategories,
+                                             IEnumerable<int> incorrectCategories,
+                                             CancellationToken cancellationToken = default)
     {
         // Implémentation future pour l'apprentissage supervisé
         // Pour l'instant, on log les informations pour analysis future
@@ -188,32 +182,77 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         var incorrectList = incorrectCategories.ToList();
 
         this.logger.LogInformation("Feedback d'apprentissage reçu - Correctes: {CorrectCount}, Incorrectes: {IncorrectCount}",
-            correctList.Count, incorrectList.Count);
+            correctList.Count,
+            incorrectList.Count);
 
         // TODO: Implémenter la logique d'apprentissage supervisé
         // - Stocker les feedbacks dans une base de données
         // - Ajuster les poids des modèles
         // - Réentraîner périodiquement
 
-        await Task.CompletedTask;
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    private async Task<IEnumerable<CategorySuggestionResult>> ClassifyBySemanticSimilarityAsync(
-        string articleContent,
-        IEnumerable<CategoryForClassification> categories,
-        CancellationToken cancellationToken)
+    private static List<CategorySuggestionResult> ClassifyByKeywords(string articleContent, IEnumerable<CategoryForClassification> categories)
+    {
+        var suggestions = new List<CategorySuggestionResult>();
+        var contentLower = articleContent.ToLowerInvariant();
+
+        foreach (var category in categories.Where(c => c.Keywords.Length > 0))
+        {
+            var matchingKeywords = category.Keywords
+                                           .Where(keyword => contentLower.Contains(keyword, StringComparison.InvariantCultureIgnoreCase))
+                                           .ToList();
+
+            if (matchingKeywords.Count == 0)
+                continue;
+
+            var keywordScore = (double)matchingKeywords.Count / category.Keywords.Length;
+            var confidence = Math.Min(0.9, keywordScore); // Limiter à 90% pour les mots-clés
+
+            suggestions.Add(new()
+            {
+                CategoryId = category.Id,
+                CategoryName = category.Name,
+                ConfidenceScore = confidence,
+                Reason = $"Mots-clés correspondants: {string.Join(", ", matchingKeywords)}",
+                ExceedsAutoThreshold = confidence >= category.AutoThreshold,
+                ExceedsManualThreshold = confidence >= category.ManualThreshold,
+            });
+        }
+
+        return suggestions;
+    }
+
+    private static void MergeSuggestions(List<CategorySuggestionResult> existingSuggestions, IEnumerable<CategorySuggestionResult> newSuggestions)
+    {
+        foreach (var newSuggestion in newSuggestions)
+        {
+            var existingSuggestion = existingSuggestions.FirstOrDefault(s => s.CategoryId == newSuggestion.CategoryId);
+
+            if (existingSuggestion == null)
+            {
+                existingSuggestions.Add(newSuggestion);
+                continue;
+            }
+
+            // Combiner les scores (moyenne pondérée)
+            existingSuggestion.ConfidenceScore = (existingSuggestion.ConfidenceScore + newSuggestion.ConfidenceScore) / 2;
+            existingSuggestion.Reason = $"{existingSuggestion.Reason}; {newSuggestion.Reason}";
+        }
+    }
+
+    private async Task<IEnumerable<CategorySuggestionResult>> ClassifyBySemanticSimilarityAsync(string articleContent, CategoryForClassification[] categories, CancellationToken cancellationToken)
     {
         var suggestions = new List<CategorySuggestionResult>();
 
         if (this.embeddingGenerator == null)
-        {
             return suggestions;
-        }
 
         try
         {
             // Générer l'embedding de l'article
-            var articleEmbedding = await this.embeddingGenerator.GenerateVectorAsync(articleContent, cancellationToken: cancellationToken);
+            var articleEmbedding = await this.embeddingGenerator.GenerateVectorAsync(articleContent, cancellationToken: cancellationToken).ConfigureAwait(false);
             var articleVector = articleEmbedding[..EmbeddingDimensions].ToArray();
 
             foreach (var category in categories.Where(c => c.Embedding != null))
@@ -222,14 +261,14 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
 
                 if (similarity >= DefaultSimilarityThreshold)
                 {
-                    suggestions.Add(new CategorySuggestionResult
+                    suggestions.Add(new()
                     {
                         CategoryId = category.Id,
                         CategoryName = category.Name,
                         ConfidenceScore = similarity,
                         Reason = $"Similarité sémantique: {similarity:P1}",
                         ExceedsAutoThreshold = similarity >= category.AutoThreshold,
-                        ExceedsManualThreshold = similarity >= category.ManualThreshold
+                        ExceedsManualThreshold = similarity >= category.ManualThreshold,
                     });
                 }
             }
@@ -242,68 +281,29 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         return suggestions;
     }
 
-    private IEnumerable<CategorySuggestionResult> ClassifyByKeywords(
-        string articleContent,
-        IEnumerable<CategoryForClassification> categories)
-    {
-        var suggestions = new List<CategorySuggestionResult>();
-        var contentLower = articleContent.ToLowerInvariant();
-
-        foreach (var category in categories.Where(c => c.Keywords.Length > 0))
-        {
-            var matchingKeywords = category.Keywords
-                .Where(keyword => contentLower.Contains(keyword.ToLowerInvariant()))
-                .ToList();
-
-            if (matchingKeywords.Any())
-            {
-                var keywordScore = (double)matchingKeywords.Count / category.Keywords.Length;
-                var confidence = Math.Min(0.9, keywordScore); // Limiter à 90% pour les mots-clés
-
-                suggestions.Add(new CategorySuggestionResult
-                {
-                    CategoryId = category.Id,
-                    CategoryName = category.Name,
-                    ConfidenceScore = confidence,
-                    Reason = $"Mots-clés correspondants: {string.Join(", ", matchingKeywords)}",
-                    ExceedsAutoThreshold = confidence >= category.AutoThreshold,
-                    ExceedsManualThreshold = confidence >= category.ManualThreshold
-                });
-            }
-        }
-
-        return suggestions;
-    }
-
-    private async Task<IEnumerable<CategorySuggestionResult>> ClassifyByAIAsync(
-        string articleContent,
-        IEnumerable<CategoryForClassification> categories,
-        CancellationToken cancellationToken)
+    private async Task<IEnumerable<CategorySuggestionResult>> ClassifyByAIAsync(string articleContent, CategoryForClassification[] categories, CancellationToken cancellationToken)
     {
         if (this.chatClient == null)
-        {
             return [];
-        }
 
         try
         {
-            var systemPrompt = this.BuildClassificationSystemPrompt(categories);
+            var systemPrompt = BuildClassificationSystemPrompt(categories);
 
             var messages = new List<ChatMessage>
             {
                 new(ChatRole.System, systemPrompt),
-                new(ChatRole.User, $"Classifie ce contenu d'article :\n\n{articleContent}")
+                new(ChatRole.User, $"Classifie ce contenu d'article :\n\n{articleContent}"),
             };
 
-            var response = await this.chatClient.GetResponseAsync(messages, this.chatOptions, cancellationToken);
+            var response = await this.chatClient.GetResponseAsync(messages, this.chatOptions, cancellationToken).ConfigureAwait(false);
             var responseText = response.Messages.FirstOrDefault()?.Text;
 
             if (string.IsNullOrEmpty(responseText))
-            {
                 return [];
-            }
 
             List<CategorySuggestionResult> aiSuggestions;
+
             try
             {
                 // Essayer de désérialiser comme un tableau
@@ -334,100 +334,83 @@ internal sealed class ArticleClassificationAI : IArticleClassificationAI
         }
     }
 
-    private void MergeSuggestions(List<CategorySuggestionResult> existingSuggestions, IEnumerable<CategorySuggestionResult> newSuggestions)
-    {
-        foreach (var newSuggestion in newSuggestions)
-        {
-            var existingSuggestion = existingSuggestions.FirstOrDefault(s => s.CategoryId == newSuggestion.CategoryId);
-
-            if (existingSuggestion != null)
-            {
-                // Combiner les scores (moyenne pondérée)
-                existingSuggestion.ConfidenceScore = (existingSuggestion.ConfidenceScore + newSuggestion.ConfidenceScore) / 2;
-                existingSuggestion.Reason = $"{existingSuggestion.Reason}; {newSuggestion.Reason}";
-            }
-            else
-            {
-                existingSuggestions.Add(newSuggestion);
-            }
-        }
-    }
-
-    private IEnumerable<CategorySuggestionResult> NormalizeAndRankSuggestions(
-        List<CategorySuggestionResult> suggestions,
-        IEnumerable<CategoryForClassification> categories)
+    private static IEnumerable<CategorySuggestionResult> NormalizeAndRankSuggestions(List<CategorySuggestionResult> suggestions,
+                                                                                     IEnumerable<CategoryForClassification> categories)
     {
         var categoriesDict = categories.ToDictionary(c => c.Id, c => c);
 
-        return suggestions
-            .Where(s => categoriesDict.ContainsKey(s.CategoryId))
-            .Select(s =>
-            {
-                var category = categoriesDict[s.CategoryId];
-                s.ExceedsAutoThreshold = s.ConfidenceScore >= category.AutoThreshold;
-                s.ExceedsManualThreshold = s.ConfidenceScore >= category.ManualThreshold;
-                return s;
-            })
-            .OrderByDescending(s => s.ConfidenceScore)
-            .Take(10) // Limiter à 10 suggestions maximum
-            .ToList();
+        return
+        [
+            .. suggestions
+              .Where(s => categoriesDict.ContainsKey(s.CategoryId))
+              .Select(s =>
+               {
+                   var category = categoriesDict[s.CategoryId];
+                   s.ExceedsAutoThreshold = s.ConfidenceScore >= category.AutoThreshold;
+                   s.ExceedsManualThreshold = s.ConfidenceScore >= category.ManualThreshold;
+                   return s;
+               })
+              .OrderByDescending(s => s.ConfidenceScore)
+              .Take(10),
+        ];
     }
 
-    private string BuildClassificationSystemPrompt(IEnumerable<CategoryForClassification> categories)
+    private static string BuildClassificationSystemPrompt(IEnumerable<CategoryForClassification> categories)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Tu es un expert en classification d'articles techniques.");
-        sb.AppendLine("Ton rôle est de classifier des articles en sélectionnant les catégories les plus pertinentes.");
-        sb.AppendLine();
-        sb.AppendLine("Catégories disponibles:");
+        _ = sb.AppendLine("Tu es un expert en classification d'articles techniques.");
+        _ = sb.AppendLine("Ton rôle est de classifier des articles en sélectionnant les catégories les plus pertinentes.");
+        _ = sb.AppendLine();
+        _ = sb.AppendLine("Catégories disponibles:");
 
         foreach (var category in categories)
         {
-            sb.AppendLine($"- ID: {category.Id}, Nom: {category.Name}");
+            _ = sb.AppendLine($"- ID: {category.Id}, Nom: {category.Name}");
             if (!string.IsNullOrEmpty(category.Description))
-                sb.AppendLine($"  Description: {category.Description}");
+                _ = sb.AppendLine($"  Description: {category.Description}");
+
             if (category.Keywords.Length > 0)
-                sb.AppendLine($"  Mots-clés: {string.Join(", ", category.Keywords)}");
+                _ = sb.AppendLine($"  Mots-clés: {string.Join(", ", category.Keywords)}");
         }
 
-        sb.AppendLine();
-        sb.AppendLine("Réponds uniquement en JSON avec ce format:");
-        sb.AppendLine("[");
-        sb.AppendLine("  {");
-        sb.AppendLine("    \"CategoryId\": 1,");
-        sb.AppendLine("    \"CategoryName\": \"Nom de la catégorie\",");
-        sb.AppendLine("    \"ConfidenceScore\": 0.85,");
-        sb.AppendLine("    \"Reason\": \"Raison de la classification\",");
-        sb.AppendLine("    \"ExceedsAutoThreshold\": true,");
-        sb.AppendLine("    \"ExceedsManualThreshold\": false");
-        sb.AppendLine("  }");
-        sb.AppendLine("]");
+        _ = sb.AppendLine();
+        _ = sb.AppendLine("Réponds uniquement en JSON avec ce format:");
+        _ = sb.AppendLine("[");
+        _ = sb.AppendLine("  {");
+        _ = sb.AppendLine("    \"CategoryId\": 1,");
+        _ = sb.AppendLine("    \"CategoryName\": \"Nom de la catégorie\",");
+        _ = sb.AppendLine("    \"ConfidenceScore\": 0.85,");
+        _ = sb.AppendLine("    \"Reason\": \"Raison de la classification\",");
+        _ = sb.AppendLine("    \"ExceedsAutoThreshold\": true,");
+        _ = sb.AppendLine("    \"ExceedsManualThreshold\": false");
+        _ = sb.AppendLine("  }");
+        _ = sb.AppendLine("]");
 
         return sb.ToString();
     }
 
-    private string BuildNewCategorySystemPrompt(IEnumerable<string> existingCategories)
+    private static string BuildNewCategorySystemPrompt(IEnumerable<string> existingCategories)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Tu es un expert en taxonomie et classification d'articles techniques.");
-        sb.AppendLine("Ton rôle est d'analyser du contenu et de suggérer de nouvelles catégories si le contenu ne correspond à aucune catégorie existante.");
-        sb.AppendLine();
-        sb.AppendLine("Catégories existantes à éviter:");
-        sb.AppendLine(string.Join(", ", existingCategories));
-        sb.AppendLine();
-        sb.AppendLine("Suggère uniquement des nouvelles catégories si le contenu contient des concepts non couverts par les catégories existantes.");
-        sb.AppendLine("Limite-toi à 3 suggestions maximum et assure-toi qu'elles sont pertinentes et spécifiques.");
-        sb.AppendLine();
-        sb.AppendLine("Réponds uniquement en JSON avec ce format:");
-        sb.AppendLine("[");
-        sb.AppendLine("  {");
-        sb.AppendLine("    \"SuggestedName\": \"Nom de la nouvelle catégorie\",");
-        sb.AppendLine("    \"SuggestedDescription\": \"Description de la catégorie\",");
-        sb.AppendLine("    \"SuggestedKeywords\": [\"mot-clé1\", \"mot-clé2\"],");
-        sb.AppendLine("    \"RelevanceScore\": 0.75,");
-        sb.AppendLine("    \"Justification\": \"Pourquoi cette catégorie est nécessaire\"");
-        sb.AppendLine("  }");
-        sb.AppendLine("]");
+        _ = sb.AppendLine("Tu es un expert en taxonomie et classification d'articles techniques.");
+        _ = sb.AppendLine("Ton rôle est d'analyser du contenu et de suggérer de nouvelles catégories si le contenu ne correspond à aucune catégorie existante.");
+        _ = sb.AppendLine();
+        _ = sb.AppendLine("Catégories existantes à éviter:");
+        _ = sb.AppendLine(string.Join(", ", existingCategories));
+        _ = sb.AppendLine();
+        _ = sb.AppendLine("Suggère uniquement des nouvelles catégories si le contenu contient des concepts non couverts par les catégories existantes.");
+        _ = sb.AppendLine("Limite-toi à 3 suggestions maximum et assure-toi qu'elles sont pertinentes et spécifiques.");
+        _ = sb.AppendLine();
+        _ = sb.AppendLine("Réponds uniquement en JSON avec ce format:");
+        _ = sb.AppendLine("[");
+        _ = sb.AppendLine("  {");
+        _ = sb.AppendLine("    \"SuggestedName\": \"Nom de la nouvelle catégorie\",");
+        _ = sb.AppendLine("    \"SuggestedDescription\": \"Description de la catégorie\",");
+        _ = sb.AppendLine("    \"SuggestedKeywords\": [\"mot-clé1\", \"mot-clé2\"],");
+        _ = sb.AppendLine("    \"RelevanceScore\": 0.75,");
+        _ = sb.AppendLine("    \"Justification\": \"Pourquoi cette catégorie est nécessaire\"");
+        _ = sb.AppendLine("  }");
+        _ = sb.AppendLine("]");
 
         return sb.ToString();
     }

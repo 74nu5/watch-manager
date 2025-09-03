@@ -13,8 +13,8 @@
         <div class="classification-actions">
             <div class="action-group">
                 <FluentButton Appearance="Appearance.Accent"
-                            @onclick="SuggestNewCategories"
-                            Loading="suggestingCategories">
+                            @onclick="this.SuggestNewCategoriesAsync"
+                            Loading="this.suggestingCategories">
                     ✨ Suggérer de nouvelles catégories
                 </FluentButton>
                 <p class="action-description">Analyse les articles non catégorisés pour suggérer de nouvelles catégories</p>
@@ -22,7 +22,7 @@
 
             <div class="action-group">
                 <FluentButton Appearance="Appearance.Outline"
-                            @onclick="ShowBatchClassificationDialog"
+                            @onclick="this.ShowBatchClassificationDialogAsync"
                             Loading="false">
                     📊 Classification en lot
                 </FluentButton>
@@ -30,12 +30,12 @@
             </div>
         </div>
 
-        @if (newCategorySuggestions.Length > 0)
+        @if (this.newCategorySuggestions.Length > 0)
         {
             <div class="suggestions-section">
                 <h5>💡 Nouvelles catégories suggérées</h5>
                 <div class="suggestions-grid">
-                    @foreach (var suggestion in newCategorySuggestions)
+                    @foreach (var suggestion in this.newCategorySuggestions)
                     {
                         <div class="suggestion-card">
                             <div class="suggestion-header">
@@ -63,12 +63,12 @@
                             <div class="suggestion-actions">
                                 <FluentButton Size="ButtonSize.Small"
                                             Appearance="Appearance.Accent"
-                                            @onclick="() => CreateCategoryFromSuggestion(suggestion)">
+                                            @onclick="() => this.CreateCategoryFromSuggestionAsync(suggestion)">
                                     ➕ Créer
                                 </FluentButton>
                                 <FluentButton Size="ButtonSize.Small"
                                             Appearance="Appearance.Stealth"
-                                            @onclick="() => DismissSuggestion(suggestion)">
+                                            @onclick="() => this.DismissSuggestion(suggestion)">
                                     ❌ Ignorer
                                 </FluentButton>
                             </div>
@@ -80,27 +80,27 @@
     </FluentCard>
 
     <div class="categories-header">
-        <FluentButton Appearance="Appearance.Accent" @onclick="ShowCreateDialog">
+        <FluentButton Appearance="Appearance.Accent" @onclick="this.ShowCreateDialog">
             ➕ Nouvelle Catégorie
         </FluentButton>
-        <FluentSwitch @bind-Value="showInactive" @bind-Value:after="OnShowInactiveChanged" Label="Afficher les catégories inactives" />
+        <FluentSwitch @bind-Value="this.showInactive" @bind-Value:after="this.OnShowInactiveChangedAsync" Label="Afficher les catégories inactives" />
     </div>
 
-    @if (loading)
+    @if (this.loading)
     {
         <div class="loading-container">
             <FluentProgressRing />
             <p>Chargement des catégories...</p>
         </div>
     }
-    else if (categories.Length == 0)
+    else if (this.categories.Length == 0)
     {
         <FluentCard>
             <div class="empty-state">
                 <p style="font-size: 3em;">📁</p>
                 <h4>Aucune catégorie</h4>
                 <p>Commencez par créer votre première catégorie pour organiser vos articles.</p>
-                <FluentButton Appearance="Appearance.Accent" @onclick="ShowCreateDialog">
+                <FluentButton Appearance="Appearance.Accent" @onclick="this.ShowCreateDialog">
                     Créer une catégorie
                 </FluentButton>
             </div>
@@ -109,68 +109,68 @@
     else
     {
         <div class="categories-grid">
-            @foreach (var category in categories)
+            @foreach (var category in this.categories)
             {
                 <CategoryCard Category="category"
-                             OnEdit="EditCategory"
-                             OnDelete="DeleteCategory"
-                             OnToggleActive="ToggleActiveCategory" />
+                             OnEdit="this.EditCategory"
+                             OnDelete="this.DeleteCategory"
+                             OnToggleActive="this.ToggleActiveCategoryAsync" />
             }
         </div>
     }
 </div>
 
 <!-- Dialog pour créer/éditer une catégorie -->
-<FluentDialog @bind-Hidden="hideDialog" Modal="true" TrapFocus="true" CloseOnOverlayClick="false">
+<FluentDialog @bind-Hidden="this.hideDialog" Modal="true" TrapFocus="true" CloseOnOverlayClick="false">
     <FluentDialogHeader>
         <FluentLabel Typo="Typography.H4">
-            @(editingCategory == null ? "Nouvelle Catégorie" : "Modifier la Catégorie")
+            @(this.editingCategory == null ? "Nouvelle Catégorie" : "Modifier la Catégorie")
         </FluentLabel>
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        <EditForm Model="categoryForm" OnValidSubmit="SaveCategory">
+        <EditForm Model="this.categoryForm" OnValidSubmit="this.SaveCategoryAsync">
             <DataAnnotationsValidator />
 
             <div class="form-group">
-                <FluentTextField @bind-Value="categoryForm.Name"
+                <FluentTextField @bind-Value="this.categoryForm.Name"
                                Label="Nom *"
                                Required="true"
                                Placeholder="Nom de la catégorie" />
-                <ValidationMessage For="@(() => categoryForm.Name)" />
+                <ValidationMessage For="@(() => this.categoryForm.Name)" />
             </div>
 
             <div class="form-group">
-                <FluentTextArea @bind-Value="categoryForm.Description"
+                <FluentTextArea @bind-Value="this.categoryForm.Description"
                               Label="Description"
                               Placeholder="Description de la catégorie"
                               Rows="3" />
             </div>
 
             <div class="form-group">
-                <FluentTextField @bind-Value="categoryForm.Color"
+                <FluentTextField @bind-Value="this.categoryForm.Color"
                                Label="Couleur (hex)"
                                Placeholder="#3498db" />
             </div>
 
             <div class="form-group">
-                <FluentTextField @bind-Value="categoryForm.Icon"
+                <FluentTextField @bind-Value="this.categoryForm.Icon"
                                Label="Icône"
                                Placeholder="folder" />
             </div>
 
             <div class="form-group">
-                <FluentTextField @bind-Value="keywordsText"
+                <FluentTextField @bind-Value="this.keywordsText"
                                Label="Mots-clés (séparés par des virgules)"
                                Placeholder="react, javascript, frontend" />
             </div>
 
             <div class="form-group">
-                <FluentSelect @bind-SelectedOption="selectedParent"
+                <FluentSelect @bind-SelectedOption="this.selectedParent"
                             Label="Catégorie parente"
                             Placeholder="Sélectionner une catégorie parente">
                     <FluentOption Value="null">Aucune (catégorie racine)</FluentOption>
-                    @foreach (var cat in GetAvailableParentCategories())
+                    @foreach (var cat in this.GetAvailableParentCategories())
                     {
                         <FluentOption Value="cat.Id">@cat.Name</FluentOption>
                     }
@@ -178,7 +178,7 @@
             </div>
 
             <div class="form-group">
-                <FluentNumberField @bind-Value="categoryForm.ConfidenceThreshold"
+                <FluentNumberField @bind-Value="this.categoryForm.ConfidenceThreshold"
                                  Label="Seuil de confiance (0.0 - 1.0)"
                                  Min="0"
                                  Max="1"
@@ -186,13 +186,13 @@
             </div>
 
             <div class="dialog-actions">
-                <FluentButton @onclick="HideDialog" Appearance="Appearance.Neutral">
+                <FluentButton @onclick="this.HideDialog" Appearance="Appearance.Neutral">
                     Annuler
                 </FluentButton>
                 <FluentButton Type="ButtonType.Submit"
                             Appearance="Appearance.Accent"
-                            Loading="saving">
-                    @(editingCategory == null ? "Créer" : "Modifier")
+                            Loading="this.saving">
+                    @(this.editingCategory == null ? "Créer" : "Modifier")
                 </FluentButton>
             </div>
         </EditForm>
@@ -200,49 +200,49 @@
 </FluentDialog>
 
 <!-- Dialog de confirmation de suppression -->
-<FluentDialog @bind-Hidden="hideDeleteDialog" Modal="true" TrapFocus="true">
+<FluentDialog @bind-Hidden="this.hideDeleteDialog" Modal="true" TrapFocus="true">
     <FluentDialogHeader>
         <FluentLabel Typo="Typography.H4">Confirmer la suppression</FluentLabel>
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        <p>Êtes-vous sûr de vouloir supprimer la catégorie "<strong>@categoryToDelete?.Name</strong>" ?</p>
+        <p>Êtes-vous sûr de vouloir supprimer la catégorie "<strong>@(this.categoryToDelete?.Name)</strong>" ?</p>
         <p class="warning-text">Cette action est irréversible et supprimera également toutes les assignations d'articles à cette catégorie.</p>
     </FluentDialogBody>
 
     <FluentDialogFooter>
-        <FluentButton @onclick="HideDeleteDialog" Appearance="Appearance.Neutral">
+        <FluentButton @onclick="this.HideDeleteDialog" Appearance="Appearance.Neutral">
             Annuler
         </FluentButton>
-        <FluentButton @onclick="ConfirmDelete"
+        <FluentButton @onclick="this.ConfirmDeleteAsync"
                     Appearance="Appearance.Accent"
-                    Loading="deleting">
+                    Loading="this.deleting">
             Supprimer
         </FluentButton>
     </FluentDialogFooter>
 </FluentDialog>
 
 @* Dialogue de classification par lot *@
-<FluentDialog @bind-Hidden="hideBatchDialog" Modal="true" TrapFocus="true">
+<FluentDialog @bind-Hidden="this.hideBatchDialog" Modal="true" TrapFocus="true">
     <FluentDialogHeader>
         <h4>Résultats de la classification par lot</h4>
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        @if (batchClassifying)
+        @if (this.batchClassifying)
         {
             <div class="loading-container">
                 <FluentProgressRing />
                 <p>Classification en cours...</p>
             </div>
         }
-        else if (batchResults.Any())
+        else if (this.batchResults.Any())
         {
             <div class="batch-classification-content">
-                <p>@batchResults.Length articles classifiés automatiquement :</p>
+                <p>@(this.batchResults.Length) articles classifiés automatiquement :</p>
 
                 <div class="classification-results">
-                    @foreach (var result in batchResults)
+                    @foreach (var result in this.batchResults)
                     {
                         <div class="result-item">
                             <div class="result-article">@result.ArticleTitle</div>
@@ -266,7 +266,7 @@
     </FluentDialogBody>
 
     <FluentDialogFooter>
-        <FluentButton @onclick="HideBatchDialog">Fermer</FluentButton>
+        <FluentButton @onclick="this.HideBatchDialog">Fermer</FluentButton>
     </FluentDialogFooter>
 </FluentDialog>
 

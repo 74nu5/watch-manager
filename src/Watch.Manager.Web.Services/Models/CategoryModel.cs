@@ -3,7 +3,7 @@ namespace Watch.Manager.Web.Services.Models;
 /// <summary>
 /// Modèle pour représenter une catégorie dans l'interface web.
 /// </summary>
-public class CategoryModel
+public sealed class CategoryModel
 {
     /// <summary>
     /// Identifiant unique de la catégorie.

@@ -27,7 +27,7 @@ public sealed class ArticleCategory
     /// <summary>
     /// Catégorie associée.
     /// </summary>
-    public Category Category { get; set; } = null!;
+    public Category? Category { get; set; }
 
     /// <summary>
     /// Score de confiance de la classification (pour les classifications automatiques).

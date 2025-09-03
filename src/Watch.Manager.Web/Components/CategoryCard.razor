@@ -3,66 +3,66 @@
 <FluentCard Class="category-card">
     <div class="category-header">
         <div class="category-title">
-            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
-            <h4>@Category.Name</h4>
+            <span class="category-icon">@(string.IsNullOrEmpty(this.Category.Icon) ? "📁" : this.Category.Icon)</span>
+            <h4>@(this.Category.Name)</h4>
         </div>
         <div class="category-actions">
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
                         Title="Modifier"
-                        @onclick="() => OnEdit.InvokeAsync(Category)">
+                        @onclick="() => this.OnEdit.InvokeAsync(this.Category)">
                 ✏️
             </FluentButton>
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
-                        Title="@(Category.IsActive ? "Désactiver" : "Activer")"
-                        @onclick="() => OnToggleActive.InvokeAsync(Category)">
-                @(Category.IsActive ? "👁️" : "🚫")
+                        Title="@(this.Category.IsActive ? "Désactiver" : "Activer")"
+                        @onclick="() => this.OnToggleActive.InvokeAsync(this.Category)">
+                @(this.Category.IsActive ? "👁️" : "🚫")
             </FluentButton>
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
                         Title="Supprimer"
-                        @onclick="() => OnDelete.InvokeAsync(Category)">
+                        @onclick="() => this.OnDelete.InvokeAsync(this.Category)">
                 🗑️
             </FluentButton>
         </div>
     </div>
 
-    @if (!string.IsNullOrEmpty(Category.Description))
+    @if (!string.IsNullOrEmpty(this.Category.Description))
     {
-        <p class="category-description">@Category.Description</p>
+        <p class="category-description">@(this.Category.Description)</p>
     }
 
     <div class="category-info">
         <div class="info-item">
             <FluentIcon Value="@(new Size16.Document())" />
-            <span>@Category.ArticleCount articles</span>
+            <span>@(this.Category.ArticleCount) articles</span>
         </div>
 
-        @if (Category.ParentName != null)
+        @if (this.Category.ParentName != null)
         {
             <div class="info-item">
                 <FluentIcon Value="@(new Size16.FolderOpen())" />
-                <span>Parent: @Category.ParentName</span>
+                <span>Parent: @(this.Category.ParentName)</span>
             </div>
         }
 
-        @if (Category.Children.Any())
+        @if (this.Category.Children.Any())
         {
             <div class="info-item">
                 <FluentIcon Value="@(new Size16.Folder())" />
-                <span>@Category.Children.Count sous-catégories</span>
+                <span>@(this.Category.Children.Count) sous-catégories</span>
             </div>
         }
     </div>
 
     @* Affichage des articles liés *@
-    @if (Category.LinkedArticles.Count > 0)
+    @if (this.Category.LinkedArticles.Count > 0)
     {
         <details class="linked-articles-details">
-            <summary>Articles liés (@Category.LinkedArticles.Count)</summary>
+            <summary>Articles liés (@(this.Category.LinkedArticles.Count))</summary>
             <div class="linked-articles-list">
-                @foreach (var article in Category.LinkedArticles)
+                @foreach (var article in this.Category.LinkedArticles)
                 {
                     <div class="linked-article">
                         <FluentIcon Value="@(new Size16.Document())" />
@@ -73,12 +73,12 @@
         </details>
     }
 
-    @if (Category.Keywords.Any())
+    @if (this.Category.Keywords.Any())
     {
         <div class="category-keywords">
-            @foreach (var keyword in Category.Keywords)
+            @foreach (var keyword in this.Category.Keywords)
             {
-                <FluentBadge Appearance="Appearance.Neutral" BackgroundColor="@GetColor()" Color="white">
+                <FluentBadge Appearance="Appearance.Neutral" BackgroundColor="@this.GetColor()" Color="white">
                     @keyword
                 </FluentBadge>
             }
@@ -87,37 +87,37 @@
 
     <div class="category-footer">
         <div class="category-dates">
-            <small>Créée: @Category.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</small>
-            @if (Category.UpdatedAt != Category.CreatedAt)
+            <small>Créée: @(this.Category.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy"))</small>
+            @if (this.Category.UpdatedAt != this.Category.CreatedAt)
             {
-                <small>Modifiée: @Category.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy")</small>
+                <small>Modifiée: @(this.Category.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy"))</small>
             }
         </div>
 
-        @if (!Category.IsActive)
+        @if (!this.Category.IsActive)
         {
             <FluentBadge Appearance="Appearance.Neutral">Inactive</FluentBadge>
         }
 
-        @if (Category.ConfidenceThreshold.HasValue)
+        @if (this.Category.ConfidenceThreshold.HasValue)
         {
             <FluentBadge Appearance="Appearance.Neutral" Title="Seuil de confiance pour la classification automatique">
-                Confiance: @Category.ConfidenceThreshold.Value.ToString("P0")
+                Confiance: @(this.Category.ConfidenceThreshold.Value.ToString("P0"))
             </FluentBadge>
         }
     </div>
 
-    @if (Category.Children.Any())
+    @if (this.Category.Children.Any())
     {
         <details class="children-details">
-            <summary>Sous-catégories (@Category.Children.Count)</summary>
+            <summary>Sous-catégories (@(this.Category.Children.Count))</summary>
             <div class="children-list">
-                @foreach (var child in Category.Children)
+                @foreach (var child in this.Category.Children)
                 {
                     <div class="child-category">
                         @if (!string.IsNullOrEmpty(child.Icon))
                         {
-                            <FluentIcon Value="@GetIcon(child.Icon)" />
+                            <FluentIcon Value="@this.GetIcon(child.Icon)" />
                         }
                         <span class="@(child.IsActive ? "" : "inactive")">@child.Name</span>
                         @if (!child.IsActive)
@@ -310,19 +310,19 @@
             "book" => new Size20.Book(),
             "star" => new Size20.Star(),
             "tag" => new Size20.Tag(),
-            _ => new Size20.Folder()
+            _ => new Size20.Folder(),
         };
     }
 
     private string GetColor()
     {
-        if (!string.IsNullOrEmpty(Category.Color))
+        if (!string.IsNullOrEmpty(this.Category.Color))
         {
-            return Category.Color;
+            return this.Category.Color;
         }
 
         // Couleur par défaut basée sur le hash du nom
-        var hash = Category.Name.GetHashCode();
+        var hash = this.Category.Name.GetHashCode();
         var colors = new[] { "#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c", "#34495e", "#e67e22" };
         return colors[Math.Abs(hash) % colors.Length];
     }

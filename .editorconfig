@@ -6,6 +6,9 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+# ReSharper properties
+resharper_braces_for_ifelse = not_required_for_both
+
 [*.{cs,vb}]
 
 # IDE0003: Supprimer une qualification
@@ -145,15 +148,15 @@ dotnet_diagnostic.s2360.severity = warning
 dotnet_diagnostic.s1541.severity = warning
 dotnet_diagnostic.sa1413.severity = silent
 
-dotnet_diagnostic.CA1716.severity = none
-dotnet_diagnostic.CA1001.severity=warning
-dotnet_diagnostic.CA1200.severity=suggestion
-dotnet_diagnostic.CA1805.severity=suggestion
-dotnet_diagnostic.CA2007.severity=warning
-dotnet_diagnostic.SA1117.severity = suggestion
-dotnet_diagnostic.SA1206.severity = silent
+dotnet_diagnostic.ca1716.severity = none
+dotnet_diagnostic.ca1001.severity = warning
+dotnet_diagnostic.ca1200.severity = suggestion
+dotnet_diagnostic.ca1805.severity = suggestion
+dotnet_diagnostic.ca2007.severity = warning
+dotnet_diagnostic.sa1117.severity = suggestion
+dotnet_diagnostic.sa1206.severity = silent
 
-dotnet_diagnostic.SA1010.severity = silent
+dotnet_diagnostic.sa1010.severity = silent
 csharp_style_prefer_readonly_struct_member = true:suggestion
 csharp_style_prefer_utf8_string_literals = true:suggestion
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
@@ -161,7 +164,7 @@ csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimenta
 
 
 # VSTHRD011: Use AsyncLazy<T>
-dotnet_diagnostic.VSTHRD011.severity = silent
+dotnet_diagnostic.vsthrd011.severity = silent
 csharp_style_prefer_primary_constructors = true:suggestion
 csharp_prefer_system_threading_lock = true:suggestion
 csharp_prefer_static_anonymous_function = true:suggestion
@@ -216,14 +219,14 @@ dotnet_naming_style.casse_pascal.capitalization = pascal_case
 
 
 [tests/**/*.cs]
-dotnet_diagnostic.CS1591.severity = none
-dotnet_diagnostic.CA1707.severity = none
-dotnet_diagnostic.SA1600.severity = none
-dotnet_diagnostic.SA1200.severity = none
-dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.cs1591.severity = none
+dotnet_diagnostic.ca1707.severity = none
+dotnet_diagnostic.sa1600.severity = none
+dotnet_diagnostic.sa1200.severity = none
+dotnet_diagnostic.sa0001.severity = none
 
 
 [src/**/Samples/**/*.cs]
-dotnet_diagnostic.CS1591.severity = none
-dotnet_diagnostic.CA1707.severity = none
-dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.cs1591.severity = none
+dotnet_diagnostic.ca1707.severity = none
+dotnet_diagnostic.sa1600.severity = none

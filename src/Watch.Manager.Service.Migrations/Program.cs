@@ -1,4 +1,4 @@
-﻿using Watch.Manager.Service.Database.Context;
+﻿using Watch.Manager.Service.Database.Extensions;
 using Watch.Manager.Service.Migrations;
 using Watch.Manager.ServiceDefaults;
 
@@ -10,7 +10,7 @@ builder.Services.AddHostedService<Worker>();
 builder.Services.AddOpenTelemetry()
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
 
-builder.AddSqlServerDbContext<ArticlesContext>("articlesdb");
+builder.AddDatabaseServices();
 
 var host = builder.Build();
 host.Run();
