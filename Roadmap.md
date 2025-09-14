@@ -79,103 +79,103 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 - [ ] **Choix de sujets aléatoires**
   
   #### 🎯 Sélection intelligente de contenus
-  - **Algorithme de découverte** : Sélection d'articles non consultés basée sur les lacunes de connaissances identifiées
-  - **Filtrage par niveau d'expertise** : Adaptation automatique selon le profil technique utilisateur (junior, senior, expert)
-  - **Diversité thématique garantie** : Équilibrage entre technologies maîtrisées et domaines à explorer
-  - **Évitement de la surcharge cognitive** : Limitation du nombre de nouveaux concepts par session
-  - **Contextualisation professionnelle** : Priorisation selon les projets en cours et objectifs de carrière
-  - **Trending topics** : Intégration des technologies émergentes et sujets d'actualité
+  - [ ] **Algorithme de découverte** : Sélection d'articles non consultés basée sur les lacunes de connaissances identifiées
+  - [ ] **Filtrage par niveau d'expertise** : Adaptation automatique selon le profil technique utilisateur (junior, senior, expert)
+  - [ ] **Diversité thématique garantie** : Équilibrage entre technologies maîtrisées et domaines à explorer
+  - [ ] **Évitement de la surcharge cognitive** : Limitation du nombre de nouveaux concepts par session
+  - [ ] **Contextualisation professionnelle** : Priorisation selon les projets en cours et objectifs de carrière
+  - [ ] **Trending topics** : Intégration des technologies émergentes et sujets d'actualité
 
   #### 🏷️ Filtrage par domaine de compétence
-  - **Cartographie des compétences** : Mapping automatique des domaines techniques selon l'historique de lecture
-  - **Niveaux de maîtrise granulaires** : Évaluation fine des connaissances (découverte, apprentissage, maîtrise, expertise)
-  - **Recommandations progressives** : Suggestions de sujets suivant une courbe d'apprentissage optimale
-  - **Détection des prérequis** : Identification des concepts fondamentaux nécessaires avant approfondissement
-  - **Synergie inter-domaines** : Mise en avant des technologies complémentaires et interconnexions
-  - **Adaptation temporelle** : Ajustement selon l'évolution des compétences et changements de rôle
+  - [ ] **Cartographie des compétences** : Mapping automatique des domaines techniques selon l'historique de lecture
+  - [ ] **Niveaux de maîtrise granulaires** : Évaluation fine des connaissances (découverte, apprentissage, maîtrise, expertise)
+  - [ ] **Recommandations progressives** : Suggestions de sujets suivant une courbe d'apprentissage optimale
+  - [ ] **Détection des prérequis** : Identification des concepts fondamentaux nécessaires avant approfondissement
+  - [ ] **Synergie inter-domaines** : Mise en avant des technologies complémentaires et interconnexions
+  - [ ] **Adaptation temporelle** : Ajustement selon l'évolution des compétences et changements de rôle
 
   #### 🎮 Génération d'exercices pratiques par IA
-  - **Contextualisation automatique** : Création d'exercices basés sur le contenu des articles consultés
-  - **Niveaux de difficulté adaptatifs** : Challenges progressifs selon les compétences acquises
-  - **Formats diversifiés** : Quiz, projets pratiques, analyses de code, résolution de problèmes
-  - **Scénarios réels** : Simulation de cas d'usage professionnels et problématiques concrètes
-  - **Feedback instantané** : Correction automatique avec explications détaillées et ressources complémentaires
-  - **Gamification intelligente** : Système de points, badges et défis pour maintenir l'engagement
+  - [ ] **Contextualisation automatique** : Création d'exercices basés sur le contenu des articles consultés
+  - [ ] **Niveaux de difficulté adaptatifs** : Challenges progressifs selon les compétences acquises
+  - [ ] **Formats diversifiés** : Quiz, projets pratiques, analyses de code, résolution de problèmes
+  - [ ] **Scénarios réels** : Simulation de cas d'usage professionnels et problématiques concrètes
+  - [ ] **Feedback instantané** : Correction automatique avec explications détaillées et ressources complémentaires
+  - [ ] **Gamification intelligente** : Système de points, badges et défis pour maintenir l'engagement
 
   #### 📊 Suivi de progression avancé
-  - **Métriques d'apprentissage** : Vitesse d'acquisition, taux de rétention, et profondeur de compréhension
-  - **Visualisations de croissance** : Graphiques de progression par domaine et timeline d'évolution
-  - **Détection de plateaux** : Identification automatique des périodes de stagnation avec suggestions d'actions
-  - **Corrélation performance** : Analyse de l'impact de l'apprentissage sur l'efficacité professionnelle
-  - **Prédiction de besoins** : Anticipation des compétences futures nécessaires selon les tendances du marché
-  - **Portfolios de compétences** : Documentation automatique des acquis avec preuves et certifications
+  - [ ] **Métriques d'apprentissage** : Vitesse d'acquisition, taux de rétention, et profondeur de compréhension
+  - [ ] **Visualisations de croissance** : Graphiques de progression par domaine et timeline d'évolution
+  - [ ] **Détection de plateaux** : Identification automatique des périodes de stagnation avec suggestions d'actions
+  - [ ] **Corrélation performance** : Analyse de l'impact de l'apprentissage sur l'efficacité professionnelle
+  - [ ] **Prédiction de besoins** : Anticipation des compétences futures nécessaires selon les tendances du marché
+  - [ ] **Portfolios de compétences** : Documentation automatique des acquis avec preuves et certifications
 
   #### 🎲 Mécanismes de randomisation intelligente
-  - **Sérendipité contrôlée** : Découverte de sujets inattendus mais pertinents pour l'élargissement des horizons
-  - **Algorithmes de surprise** : Introduction de concepts adjacents pour stimuler la créativité et l'innovation
-  - **Rotation thématique** : Alternance automatique entre différents domaines pour éviter la spécialisation excessive
-  - **Facteur curiosité** : Prise en compte des intérêts personnels et passions pour maintenir la motivation
-  - **Apprentissage par contraste** : Présentation de technologies alternatives pour développer l'esprit critique
-  - **Exploration dirigée** : Parcours découverte avec objectifs pédagogiques cachés mais structurés
+  - [ ] **Sérendipité contrôlée** : Découverte de sujets inattendus mais pertinents pour l'élargissement des horizons
+  - [ ] **Algorithmes de surprise** : Introduction de concepts adjacents pour stimuler la créativité et l'innovation
+  - [ ] **Rotation thématique** : Alternance automatique entre différents domaines pour éviter la spécialisation excessive
+  - [ ] **Facteur curiosité** : Prise en compte des intérêts personnels et passions pour maintenir la motivation
+  - [ ] **Apprentissage par contraste** : Présentation de technologies alternatives pour développer l'esprit critique
+  - [ ] **Exploration dirigée** : Parcours découverte avec objectifs pédagogiques cachés mais structurés
 
   #### 🧠 Personnalisation cognitive
-  - **Profils d'apprentissage** : Adaptation selon les préférences cognitives (visuel, auditif, kinesthésique)
-  - **Rythmes personnels** : Respect des cycles d'attention et périodes optimales de concentration
-  - **Styles de traitement** : Support pour approches analytiques vs synthétiques, théorie vs pratique
-  - **Mémorisation optimisée** : Utilisation de techniques de répétition espacée et ancrage mémoriel
-  - **Gestion de la charge cognitive** : Dosage intelligent de la complexité selon les capacités momentanées
-  - **Adaptation émotionnelle** : Prise en compte du stress, motivation et confiance pour optimiser l'apprentissage
+  - [ ] **Profils d'apprentissage** : Adaptation selon les préférences cognitives (visuel, auditif, kinesthésique)
+  - [ ] **Rythmes personnels** : Respect des cycles d'attention et périodes optimales de concentration
+  - [ ] **Styles de traitement** : Support pour approches analytiques vs synthétiques, théorie vs pratique
+  - [ ] **Mémorisation optimisée** : Utilisation de techniques de répétition espacée et ancrage mémoriel
+  - [ ] **Gestion de la charge cognitive** : Dosage intelligent de la complexité selon les capacités momentanées
+  - [ ] **Adaptation émotionnelle** : Prise en compte du stress, motivation et confiance pour optimiser l'apprentissage
 
-  #### 📅 Planification de veille
+#### 📅 Planification de veille
 - [ ] **Plans de veille personnalisés**
   
   #### ⚙️ Configuration des plans de veille
-  - **Fréquences multiples** : Support de planifications quotidiennes, hebdomadaires, mensuelles et personnalisées
-  - **Profils de veille** : Création de profils thématiques (Frontend, Backend, DevOps, IA, etc.)
-  - **Quotas intelligents** : Définition du nombre d'articles par session selon le temps disponible
-  - **Horaires préférés** : Configuration des créneaux de veille optimaux selon l'emploi du temps
-  - **Seuils de pertinence** : Ajustement automatique du niveau de complexité selon l'expertise utilisateur
-  - **Exclusions temporaires** : Pause automatique pendant congés ou périodes chargées
+  - [ ] **Fréquences multiples** : Support de planifications quotidiennes, hebdomadaires, mensuelles et personnalisées
+  - [ ] **Profils de veille** : Création de profils thématiques (Frontend, Backend, DevOps, IA, etc.)
+  - [ ] **Quotas intelligents** : Définition du nombre d'articles par session selon le temps disponible
+  - [ ] **Horaires préférés** : Configuration des créneaux de veille optimaux selon l'emploi du temps
+  - [ ] **Seuils de pertinence** : Ajustement automatique du niveau de complexité selon l'expertise utilisateur
+  - [ ] **Exclusions temporaires** : Pause automatique pendant congés ou périodes chargées
 
   #### 🎯 Sélection automatique de contenus
-  - **Algorithme de recommandation** : Sélection basée sur l'historique de lecture et les préférences utilisateur
-  - **Diversité thématique** : Équilibrage automatique entre sujets familiers et nouvelles découvertes
-  - **Priorisation intelligente** : Articles récents, tendances émergentes et sujets manqués prioritaires
-  - **Filtrage par niveau** : Adaptation du contenu selon le niveau technique (débutant, intermédiaire, expert)
-  - **Sources équilibrées** : Répartition entre différents types de sources (blogs, documentation, actualités)
-  - **Évitement des doublons** : Détection sémantique des contenus similaires déjà consultés
+  - [ ] **Algorithme de recommandation** : Sélection basée sur l'historique de lecture et les préférences utilisateur
+  - [ ] **Diversité thématique** : Équilibrage automatique entre sujets familiers et nouvelles découvertes
+  - [ ] **Priorisation intelligente** : Articles récents, tendances émergentes et sujets manqués prioritaires
+  - [ ] **Filtrage par niveau** : Adaptation du contenu selon le niveau technique (débutant, intermédiaire, expert)
+  - [ ] **Sources équilibrées** : Répartition entre différents types de sources (blogs, documentation, actualités)
+  - [ ] **Évitement des doublons** : Détection sémantique des contenus similaires déjà consultés
 
   #### 📊 Calendrier de veille intelligent
-  - **Planning adaptatif** : Ajustement automatique selon la charge de travail et les événements calendrier
-  - **Synchronisation externe** : Intégration avec Google Calendar, Outlook, et autres agendas
-  - **Sessions de rattrapage** : Reprogrammation automatique des sessions manquées
-  - **Blocs de temps optimisés** : Suggestion de créneaux selon l'énergie cognitive disponible
-  - **Préparation de sessions** : Pré-chargement et organisation des articles avant chaque session
-  - **Métriques de planification** : Statistiques sur l'efficacité des créneaux choisis
+  - [ ] **Planning adaptatif** : Ajustement automatique selon la charge de travail et les événements calendrier
+  - [ ] **Synchronisation externe** : Intégration avec Google Calendar, Outlook, et autres agendas
+  - [ ] **Sessions de rattrapage** : Reprogrammation automatique des sessions manquées
+  - [ ] **Blocs de temps optimisés** : Suggestion de créneaux selon l'énergie cognitive disponible
+  - [ ] **Préparation de sessions** : Pré-chargement et organisation des articles avant chaque session
+  - [ ] **Métriques de planification** : Statistiques sur l'efficacité des créneaux choisis
 
   #### 🔔 Notifications et rappels
-  - **Canaux multiples** : Notifications push, email, SMS selon les préférences et l'urgence
-  - **Personnalisation contextuelle** : Adaptation du ton et du contenu selon le moment de la journée
-  - **Rappels progressifs** : Séquence d'alertes douces avant les sessions planifiées
-  - **Résumés préparatoires** : Aperçu des articles sélectionnés 30 minutes avant la session
-  - **Alertes de tendances** : Notifications urgentes pour les sujets critiques ou tendances majeures
-  - **Feedback en temps réel** : Ajustement des notifications selon les réactions utilisateur
+  - [ ] **Canaux multiples** : Notifications push, email, SMS selon les préférences et l'urgence
+  - [ ] **Personnalisation contextuelle** : Adaptation du ton et du contenu selon le moment de la journée
+  - [ ] **Rappels progressifs** : Séquence d'alertes douces avant les sessions planifiées
+  - [ ] **Résumés préparatoires** : Aperçu des articles sélectionnés 30 minutes avant la session
+  - [ ] **Alertes de tendances** : Notifications urgentes pour les sujets critiques ou tendances majeures
+  - [ ] **Feedback en temps réel** : Ajustement des notifications selon les réactions utilisateur
 
   #### 📈 Tableau de bord de suivi
-  - **Métriques de progression** : Suivi des domaines couverts, lacunes identifiées, et objectifs atteints
-  - **Visualisations interactives** : Graphiques de progression, cartes de compétences, et timelines d'apprentissage
-  - **Analyse de performance** : Corrélation entre planning de veille et productivité professionnelle
-  - **Recommandations d'ajustement** : Suggestions d'optimisation basées sur les patterns de consommation
-  - **Rapports périodiques** : Synthèses hebdomadaires/mensuelles avec points clés et nouvelles découvertes
-  - **Objectifs gamifiés** : Système de challenges et récompenses pour maintenir la motivation
+  - [ ] **Métriques de progression** : Suivi des domaines couverts, lacunes identifiées, et objectifs atteints
+  - [ ] **Visualisations interactives** : Graphiques de progression, cartes de compétences, et timelines d'apprentissage
+  - [ ] **Analyse de performance** : Corrélation entre planning de veille et productivité professionnelle
+  - [ ] **Recommandations d'ajustement** : Suggestions d'optimisation basées sur les patterns de consommation
+  - [ ] **Rapports périodiques** : Synthèses hebdomadaires/mensuelles avec points clés et nouvelles découvertes
+  - [ ] **Objectifs gamifiés** : Système de challenges et récompenses pour maintenir la motivation
 
   #### 🤖 Intelligence prédictive
-  - **Prédiction de pertinence** : Machine learning pour anticiper l'intérêt utilisateur sur de nouveaux contenus
-  - **Détection de lacunes** : Identification automatique des domaines techniques insuffisamment couverts
-  - **Anticipation des besoins** : Suggestions proactives basées sur l'évolution des projets utilisateur
-  - **Optimisation temporelle** : Apprentissage des moments optimaux pour différents types de contenus
-  - **Adaptation comportementale** : Évolution du système selon les changements d'habitudes et d'intérêts
-  - **Veille prédictive** : Identification précoce des technologies émergentes selon le profil utilisateur
+  - [ ] **Prédiction de pertinence** : Machine learning pour anticiper l'intérêt utilisateur sur de nouveaux contenus
+  - [ ] **Détection de lacunes** : Identification automatique des domaines techniques insuffisamment couverts
+  - [ ] **Anticipation des besoins** : Suggestions proactives basées sur l'évolution des projets utilisateur
+  - [ ] **Optimisation temporelle** : Apprentissage des moments optimaux pour différents types de contenus
+  - [ ] **Adaptation comportementale** : Évolution du système selon les changements d'habitudes et d'intérêts
+  - [ ] **Veille prédictive** : Identification précoce des technologies émergentes selon le profil utilisateur
 
 ## 🛠️ Améliorations techniques
 
