@@ -77,12 +77,56 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 
 #### 🎲 Apprentissage dirigé
 - [ ] **Choix de sujets aléatoires**
-  - Sélection intelligente d'articles non consultés
-  - Filtrage par domaine de compétence
-  - Génération d'exercices pratiques par IA
-  - Suivi de progression
+  
+  #### 🎯 Sélection intelligente de contenus
+  - **Algorithme de découverte** : Sélection d'articles non consultés basée sur les lacunes de connaissances identifiées
+  - **Filtrage par niveau d'expertise** : Adaptation automatique selon le profil technique utilisateur (junior, senior, expert)
+  - **Diversité thématique garantie** : Équilibrage entre technologies maîtrisées et domaines à explorer
+  - **Évitement de la surcharge cognitive** : Limitation du nombre de nouveaux concepts par session
+  - **Contextualisation professionnelle** : Priorisation selon les projets en cours et objectifs de carrière
+  - **Trending topics** : Intégration des technologies émergentes et sujets d'actualité
 
-#### 📅 Planification de veille
+  #### 🏷️ Filtrage par domaine de compétence
+  - **Cartographie des compétences** : Mapping automatique des domaines techniques selon l'historique de lecture
+  - **Niveaux de maîtrise granulaires** : Évaluation fine des connaissances (découverte, apprentissage, maîtrise, expertise)
+  - **Recommandations progressives** : Suggestions de sujets suivant une courbe d'apprentissage optimale
+  - **Détection des prérequis** : Identification des concepts fondamentaux nécessaires avant approfondissement
+  - **Synergie inter-domaines** : Mise en avant des technologies complémentaires et interconnexions
+  - **Adaptation temporelle** : Ajustement selon l'évolution des compétences et changements de rôle
+
+  #### 🎮 Génération d'exercices pratiques par IA
+  - **Contextualisation automatique** : Création d'exercices basés sur le contenu des articles consultés
+  - **Niveaux de difficulté adaptatifs** : Challenges progressifs selon les compétences acquises
+  - **Formats diversifiés** : Quiz, projets pratiques, analyses de code, résolution de problèmes
+  - **Scénarios réels** : Simulation de cas d'usage professionnels et problématiques concrètes
+  - **Feedback instantané** : Correction automatique avec explications détaillées et ressources complémentaires
+  - **Gamification intelligente** : Système de points, badges et défis pour maintenir l'engagement
+
+  #### 📊 Suivi de progression avancé
+  - **Métriques d'apprentissage** : Vitesse d'acquisition, taux de rétention, et profondeur de compréhension
+  - **Visualisations de croissance** : Graphiques de progression par domaine et timeline d'évolution
+  - **Détection de plateaux** : Identification automatique des périodes de stagnation avec suggestions d'actions
+  - **Corrélation performance** : Analyse de l'impact de l'apprentissage sur l'efficacité professionnelle
+  - **Prédiction de besoins** : Anticipation des compétences futures nécessaires selon les tendances du marché
+  - **Portfolios de compétences** : Documentation automatique des acquis avec preuves et certifications
+
+  #### 🎲 Mécanismes de randomisation intelligente
+  - **Sérendipité contrôlée** : Découverte de sujets inattendus mais pertinents pour l'élargissement des horizons
+  - **Algorithmes de surprise** : Introduction de concepts adjacents pour stimuler la créativité et l'innovation
+  - **Rotation thématique** : Alternance automatique entre différents domaines pour éviter la spécialisation excessive
+  - **Facteur curiosité** : Prise en compte des intérêts personnels et passions pour maintenir la motivation
+  - **Apprentissage par contraste** : Présentation de technologies alternatives pour développer l'esprit critique
+  - **Exploration dirigée** : Parcours découverte avec objectifs pédagogiques cachés mais structurés
+
+  #### 🧠 Personnalisation cognitive
+  - **Profils d'apprentissage** : Adaptation selon les préférences cognitives (visuel, auditif, kinesthésique)
+  - **Rythmes personnels** : Respect des cycles d'attention et périodes optimales de concentration
+  - **Styles de traitement** : Support pour approches analytiques vs synthétiques, théorie vs pratique
+  - **Mémorisation optimisée** : Utilisation de techniques de répétition espacée et ancrage mémoriel
+  - **Gestion de la charge cognitive** : Dosage intelligent de la complexité selon les capacités momentanées
+  - **Adaptation émotionnelle** : Prise en compte du stress, motivation et confiance pour optimiser l'apprentissage
+
+  #### 📅 Planification de veille
 - [ ] **Plans de veille personnalisés**
   
   #### ⚙️ Configuration des plans de veille
