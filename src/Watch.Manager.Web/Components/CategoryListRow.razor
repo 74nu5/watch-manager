@@ -1,19 +1,15 @@
-@using Watch.Manager.Web.Services.Models
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
-@using Microsoft.FluentUI.AspNetCore.Components.Icons
-@inject IJSRuntime JSRuntime
+﻿@using Watch.Manager.Web.Services.Models
 
-<tr class="category-row @(IsChild ? "child-row" : "parent-row") @(IsExpanded ? "expanded" : "")">
+<tr class="category-row @(this.IsChild ? "child-row" : "parent-row") @(this.IsExpanded ? "expanded" : "")">
     <td style="width: 40px;">
-        @if (Category.Children?.Any() == true)
+        @if (this.Category.Children.Any())
         {
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
-                        @onclick="OnToggleExpanded"
-                        Title="@(IsExpanded ? "Réduire" : "Développer")"
-                        Style="@($"margin-left: {(IsChild ? 16 : 0)}px")">>
-                @if (IsExpanded)
+                        @onclick="this.OnToggleExpanded"
+                        Title="@(this.IsExpanded ? "Réduire" : "Développer")"
+                        Style="@($"margin-left: {(this.IsChild ? 16 : 0)}px")">
+                @if (this.IsExpanded)
                 {
                     <FluentIcon Value="@(new Size16.ChevronDown())" />
                 }
@@ -23,35 +19,35 @@
                 }
             </FluentButton>
         }
-        else if (GetIndentationLevel() > 0)
+        else if (this.GetIndentationLevel() > 0)
         {
-            <div style="@($"margin-left: {(GetIndentationLevel() * 16)}px"); width: 20px;"></div>
+            <div style="@($"margin-left: {(this.GetIndentationLevel() * 16)}px"); width: 20px;"></div>
         }
     </td>
 
     <td>
-        <div class="category-name-cell" style="@($"margin-left: {(GetIndentationLevel() * 16)}px")">
-            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
+        <div class="category-name-cell" style="@($"margin-left: {(this.GetIndentationLevel() * 16)}px")">
+            <span class="category-icon">@(string.IsNullOrEmpty(this.Category.Icon) ? "📁" : this.Category.Icon)</span>
             <div class="category-info">
                 <div class="name-with-path">
-                    @if (!string.IsNullOrEmpty(Category.HierarchyPath) && Category.HierarchyPath != Category.Name)
+                    @if (!string.IsNullOrEmpty(this.Category.HierarchyPath) && this.Category.HierarchyPath != this.Category.Name)
                     {
-                        <span class="hierarchy-path">@Category.HierarchyPath.Replace(Category.Name, "").TrimEnd('/')/</span>
+                        <span class="hierarchy-path">@(this.Category.HierarchyPath.Replace(this.Category.Name, "").TrimEnd('/'))/</span>
                     }
-                    <strong>@Category.Name</strong>
+                    <strong>@(this.Category.Name)</strong>
                 </div>
-                @if (!string.IsNullOrEmpty(Category.Description))
+                @if (!string.IsNullOrEmpty(this.Category.Description))
                 {
-                    <div class="category-description">@Category.Description</div>
+                    <div class="category-description">@(this.Category.Description)</div>
                 }
             </div>
         </div>
     </td>
 
     <td>
-        @if (!string.IsNullOrEmpty(Category.ParentName))
+        @if (!string.IsNullOrEmpty(this.Category.ParentName))
         {
-            <span class="parent-name">@Category.ParentName</span>
+            <span class="parent-name">@(this.Category.ParentName)</span>
         }
         else
         {
@@ -61,24 +57,24 @@
 
     <td style="text-align: center;">
         <FluentBadge Appearance="Appearance.Neutral">
-            @Category.ArticleCount
+            @(this.Category.ArticleCount)
         </FluentBadge>
     </td>
 
     <td>
         <div class="keywords-cell">
-            @if (Category.Keywords?.Any() == true)
+            @if (this.Category.Keywords.Any())
             {
-                @foreach (var keyword in Category.Keywords.Take(3))
+                @foreach (var keyword in this.Category.Keywords.Take(3))
                 {
                     <FluentBadge Appearance="Appearance.Lightweight" Size="BadgeSize.Small">
                         @keyword
                     </FluentBadge>
                 }
-                @if (Category.Keywords.Length > 3)
+                @if (this.Category.Keywords.Length > 3)
                 {
                     <FluentBadge Appearance="Appearance.Lightweight" Size="BadgeSize.Small">
-                        +@(Category.Keywords.Length - 3)
+                        +@(this.Category.Keywords.Length - 3)
                     </FluentBadge>
                 }
             }
@@ -90,7 +86,7 @@
     </td>
 
     <td style="text-align: center;">
-        @if (Category.IsActive)
+        @if (this.Category.IsActive)
         {
             <FluentBadge Appearance="Appearance.Accent" BackgroundColor="green">
                 Actif
@@ -105,20 +101,20 @@
     </td>
 
     <td style="text-align: center;">
-        <span class="date-cell">@Category.CreatedAt.ToString("dd/MM/yyyy")</span>
+        <span class="date-cell">@(this.Category.CreatedAt.ToString("dd/MM/yyyy"))</span>
     </td>
 
     <td>
         <div class="action-buttons">
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
-                        @onclick="() => OnCategoryEdit.InvokeAsync(Category)"
+                        @onclick="() => this.OnCategoryEdit.InvokeAsync(this.Category)"
                         Title="Modifier">
                 <FluentIcon Value="@(new Size16.Edit())" />
             </FluentButton>
             <FluentButton Appearance="Appearance.Stealth"
                         IconOnly="true"
-                        @onclick="() => OnCategoryDelete.InvokeAsync(Category)"
+                        @onclick="() => this.OnCategoryDelete.InvokeAsync(this.Category)"
                         Title="Supprimer">
                 <FluentIcon Value="@(new Size16.Delete())" />
             </FluentButton>
@@ -217,7 +213,7 @@
 </style>
 
 @code {
-    [Parameter] public CategoryModel Category { get; set; } = default!;
+    [Parameter] public CategoryModel Category { get; set; } = null!;
     [Parameter] public bool IsChild { get; set; }
     [Parameter] public bool IsExpanded { get; set; }
     [Parameter] public EventCallback OnToggleExpanded { get; set; }
@@ -226,6 +222,6 @@
 
     private int GetIndentationLevel()
     {
-        return Category.HierarchyLevel;
+        return this.Category.HierarchyLevel;
     }
 }

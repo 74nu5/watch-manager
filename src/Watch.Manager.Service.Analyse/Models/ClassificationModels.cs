@@ -1,145 +1,145 @@
-namespace Watch.Manager.Service.Analyse.Models;
+﻿namespace Watch.Manager.Service.Analyse.Models;
 
 /// <summary>
-/// Représente une catégorie utilisée pour la classification.
+///     Represents a category used for classification.
 /// </summary>
 public sealed class CategoryForClassification
 {
     /// <summary>
-    /// Identifiant unique de la catégorie.
+    ///     Gets or sets the unique identifier of the category.
     /// </summary>
     public int Id { get; set; }
 
     /// <summary>
-    /// Nom de la catégorie.
+    ///     Gets or sets the name of the category.
     /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
-    /// Description de la catégorie.
+    ///     Gets or sets the description of the category.
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// Mots-clés associés à la catégorie.
+    ///     Gets or sets the keywords associated with the category.
     /// </summary>
     public string[] Keywords { get; set; } = [];
 
     /// <summary>
-    /// Seuil de confiance pour la classification automatique.
+    ///     Gets or sets the confidence threshold for automatic classification.
     /// </summary>
     public double AutoThreshold { get; set; }
 
     /// <summary>
-    /// Seuil de confiance pour la classification manuelle.
+    ///     Gets or sets the confidence threshold for manual classification.
     /// </summary>
     public double ManualThreshold { get; set; }
 
     /// <summary>
-    /// Embedding vectoriel de la catégorie pour la comparaison sémantique.
+    ///     Gets or sets the vector embedding of the category for semantic comparison.
     /// </summary>
     public float[]? Embedding { get; set; }
 
     /// <summary>
-    /// Indique si la catégorie est active.
+    ///     Gets or sets a value indicating whether the category is active.
     /// </summary>
     public bool IsActive { get; set; } = true;
 }
 
 /// <summary>
-/// Représente une suggestion de catégorie avec un score de confiance.
+///     Represents a category suggestion with a confidence score.
 /// </summary>
 public sealed class CategorySuggestionResult
 {
     /// <summary>
-    /// Identifiant de la catégorie suggérée.
+    ///     Gets or sets the identifier of the suggested category.
     /// </summary>
     public int CategoryId { get; set; }
 
     /// <summary>
-    /// Nom de la catégorie suggérée.
+    ///     Gets or sets the name of the suggested category.
     /// </summary>
     public required string CategoryName { get; set; }
 
     /// <summary>
-    /// Score de confiance entre 0 et 1.
+    ///     Gets or sets the confidence score between 0 and 1.
     /// </summary>
     public double ConfidenceScore { get; set; }
 
     /// <summary>
-    /// Raison de la suggestion (mots-clés correspondants, similarité sémantique, etc.).
+    ///     Gets or sets the reason for the suggestion (matching keywords, semantic similarity, etc.).
     /// </summary>
     public string? Reason { get; set; }
 
     /// <summary>
-    /// Indique si la suggestion dépasse le seuil automatique.
+    ///     Gets or sets a value indicating whether the suggestion exceeds the automatic threshold.
     /// </summary>
     public bool ExceedsAutoThreshold { get; set; }
 
     /// <summary>
-    /// Indique si la suggestion dépasse le seuil manuel.
+    ///     Gets or sets a value indicating whether the suggestion exceeds the manual threshold.
     /// </summary>
     public bool ExceedsManualThreshold { get; set; }
 }
 
 /// <summary>
-/// Représente une suggestion de nouvelle catégorie à créer.
+///     Represents a suggestion for a new category to be created.
 /// </summary>
 public sealed class NewCategorySuggestion
 {
     /// <summary>
-    /// Nom suggéré pour la nouvelle catégorie.
+    ///     Gets or sets the suggested name for the new category.
     /// </summary>
     public required string SuggestedName { get; set; }
 
     /// <summary>
-    /// Description suggérée pour la nouvelle catégorie.
+    ///     Gets or sets the suggested description for the new category.
     /// </summary>
     public string? SuggestedDescription { get; set; }
 
     /// <summary>
-    /// Mots-clés suggérés pour la nouvelle catégorie.
+    ///     Gets or sets the suggested keywords for the new category.
     /// </summary>
     public string[] SuggestedKeywords { get; set; } = [];
 
     /// <summary>
-    /// Score de pertinence de la suggestion entre 0 et 1.
+    ///     Gets or sets the relevance score of the suggestion between 0 and 1.
     /// </summary>
     public double RelevanceScore { get; set; }
 
     /// <summary>
-    /// Justification de la suggestion de nouvelle catégorie.
+    ///     Gets or sets the justification for the new category suggestion.
     /// </summary>
     public string? Justification { get; set; }
 }
 
 /// <summary>
-/// Représente les résultats de la classification automatique d'un article.
+///     Represents the results of the automatic classification of an article.
 /// </summary>
 public sealed class ArticleClassificationResult
 {
     /// <summary>
-    /// Identifiant de l'article classifié.
+    ///     Gets or sets the identifier of the classified article.
     /// </summary>
     public int ArticleId { get; set; }
 
     /// <summary>
-    /// Suggestions de catégories existantes.
+    ///     Gets or sets the suggestions for existing categories.
     /// </summary>
     public IEnumerable<CategorySuggestionResult> CategorySuggestions { get; set; } = [];
 
     /// <summary>
-    /// Suggestions de nouvelles catégories à créer.
+    ///     Gets or sets the suggestions for new categories to be created.
     /// </summary>
     public IEnumerable<NewCategorySuggestion> NewCategorySuggestions { get; set; } = [];
 
     /// <summary>
-    /// Score de confiance global de la classification.
+    ///     Gets or sets the overall confidence score of the classification.
     /// </summary>
     public double OverallConfidence { get; set; }
 
     /// <summary>
-    /// Horodatage de la classification.
+    ///     Gets or sets the timestamp of the classification.
     /// </summary>
     public DateTime ClassificationDate { get; set; } = DateTime.UtcNow;
 }

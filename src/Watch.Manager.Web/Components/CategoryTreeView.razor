@@ -1,19 +1,19 @@
 @using Watch.Manager.Web.Services.Models
 
 <div class="category-tree">
-    @if (Categories?.Any() == true)
+    @if (this.Categories?.Any() == true)
     {
-        @foreach (var category in Categories.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
+        @foreach (var category in this.Categories.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
         {
             <CategoryTreeNode
                 Category="category"
-                SelectedCategoryId="SelectedCategoryId"
-                OnCategorySelected="OnCategorySelected"
-                OnCategoryEdit="OnCategoryEdit"
-                OnCategoryDelete="OnCategoryDelete"
-                ShowActions="ShowActions"
-                ExpandedCategories="ExpandedCategories"
-                OnToggleExpanded="OnToggleExpanded" />
+                SelectedCategoryId="this.SelectedCategoryId"
+                OnCategorySelected="this.OnCategorySelected"
+                OnCategoryEdit="this.OnCategoryEdit"
+                OnCategoryDelete="this.OnCategoryDelete"
+                ShowActions="this.ShowActions"
+                ExpandedCategories="this.ExpandedCategories"
+                OnToggleExpanded="this.OnToggleExpanded" />
         }
     }
     else

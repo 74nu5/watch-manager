@@ -459,7 +459,7 @@ public static class CategoryEndpoints
 
     private static List<CategoryViewModel> MapCategoryChildren(ICollection<Category> children)
     {
-        return children.Select(child => new CategoryViewModel
+        return [.. children.Select(child => new CategoryViewModel
         {
             Id = child.Id,
             Name = child.Name,
@@ -477,6 +477,6 @@ public static class CategoryEndpoints
             DisplayOrder = child.DisplayOrder,
             HierarchyPath = child.HierarchyPath,
             HierarchyLevel = child.HierarchyLevel,
-        }).ToList();
+        })];
     }
 }

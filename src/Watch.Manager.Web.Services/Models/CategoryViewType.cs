@@ -1,22 +1,22 @@
-namespace Watch.Manager.Web.Services.Models;
+﻿namespace Watch.Manager.Web.Services.Models;
 
 /// <summary>
-/// Types de vues disponibles pour afficher les catégories.
+///     Available view types for displaying categories.
 /// </summary>
 public enum CategoryViewType
 {
     /// <summary>
-    /// Vue en grille (affichage par cartes).
+    ///     Grid view (display as cards).
     /// </summary>
     Grid,
 
     /// <summary>
-    /// Vue en liste (affichage tabulaire).
+    ///     List view (tabular display).
     /// </summary>
     List,
 
     /// <summary>
-    /// Vue en arbre hiérarchique.
+    ///     Tree view (hierarchical display).
     /// </summary>
-    Tree
+    Tree,
 }

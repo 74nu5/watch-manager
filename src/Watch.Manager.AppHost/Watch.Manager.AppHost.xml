@@ -40,5 +40,10 @@
             <param name="catalogApi">The <see cref="T:Aspire.Hosting.ApplicationModel.IResourceBuilder`1" /> representing the catalog API project to which Ollama models will be added.</param>
             <returns>The <see cref="T:Aspire.Hosting.IDistributedApplicationBuilder" /> with Ollama services added.</returns>
         </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
     </members>
 </doc>

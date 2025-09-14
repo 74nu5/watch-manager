@@ -1,4 +1,4 @@
-namespace Watch.Manager.Service.Analyse.Services;
+﻿namespace Watch.Manager.Service.Analyse.Services;
 
 using Watch.Manager.Service.Analyse.Models;
 using Watch.Manager.Service.Database.Entities;
@@ -109,7 +109,7 @@ public sealed class ClassificationQualityReport
     /// <summary>
     /// Catégories les plus utilisées.
     /// </summary>
-    public Dictionary<string, int> TopCategories { get; set; } = new();
+    public Dictionary<string, int> TopCategories { get; set; } = [];
 
     /// <summary>
     /// Articles suggérés pour révision manuelle.

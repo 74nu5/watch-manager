@@ -26,6 +26,15 @@ public interface IArticleAnalyseStore
     IAsyncEnumerable<ArticleResultDto> SearchArticleAsync(string? searchTerms, string? tag, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Performs an advanced search for articles using multiple filter criteria.
+    /// </summary>
+    /// <param name="filters">The search filters to apply. Allows filtering articles by search terms, tags, authors, categories, date range, minimum score, pagination, and sorting.</param>
+    /// <param name="includeFacets">Indicates whether facets (counts by category, tag, author, period) should be included in the result to enable dynamic filtering on the client side.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that returns an <see cref="ArticleSearchResult" /> containing the paginated list of matching articles, the total result count, the pagination parameters used, and, if requested, the search facets.</returns>
+    Task<ArticleSearchResult> AdvancedSearchArticlesAsync(ArticleSearchFilters filters, bool includeFacets = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Checks asynchronously if an article exists by its URL.
     /// </summary>
     /// <param name="url">The URL of the article to check.</param>

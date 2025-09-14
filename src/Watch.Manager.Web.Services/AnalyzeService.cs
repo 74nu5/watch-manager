@@ -5,20 +5,18 @@ using System.Net.Http.Json;
 
 using Watch.Manager.Common;
 using Watch.Manager.Web.Services.Models;
+using Watch.Manager.Web.Services.Models.Search;
 
 /// <summary>
 ///     Service for analyzing articles, managing categories, and handling classification operations via API.
 /// </summary>
-public sealed class AnalyzeService
+/// <remarks>
+///     Initializes a new instance of the <see cref="AnalyzeService" /> class.
+/// </remarks>
+/// <param name="client">HTTP client for API requests.</param>
+public sealed class AnalyzeService(HttpClient client)
 {
-    private readonly HttpClient client;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="AnalyzeService" /> class.
-    /// </summary>
-    /// <param name="client">HTTP client for API requests.</param>
-    public AnalyzeService(HttpClient client)
-        => this.client = client;
+    private readonly HttpClient client = client;
 
     /// <summary>
     ///     Saves an article by analyzing its content from the specified URL.
@@ -62,6 +60,61 @@ public sealed class AnalyzeService
         var response = await this.client.GetAsync($"/api/articles/search?text={text}&tag={tag}", cancellationToken).ConfigureAwait(false);
         _ = response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<ArticleModel[]>(cancellationToken).ConfigureAwait(false) ?? [];
+    }
+
+    /// <summary>
+    ///     Recherche avancée d'articles avec filtres multicritères.
+    /// </summary>
+    /// <param name="filters">Paramètres de recherche avancée.</param>
+    /// <param name="cancellationToken">Token d'annulation.</param>
+    /// <returns>Résultat de la recherche avancée.</returns>
+    public async Task<AdvancedSearchResult> AdvancedSearchArticleAsync(AdvancedSearchParameters filters, CancellationToken cancellationToken = default)
+    {
+        var queryParams = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(filters.SearchTerms))
+            queryParams.Add($"q={Uri.EscapeDataString(filters.SearchTerms)}");
+
+        if (filters.Tags?.Length > 0)
+            queryParams.Add($"tags={Uri.EscapeDataString(string.Join(",", filters.Tags))}");
+
+        if (filters.Authors?.Length > 0)
+            queryParams.Add($"authors={Uri.EscapeDataString(string.Join(",", filters.Authors))}");
+
+        if (filters.CategoryIds?.Length > 0)
+            queryParams.Add($"categories={string.Join(",", filters.CategoryIds)}");
+
+        if (filters.CategoryNames?.Length > 0)
+            queryParams.Add($"categoryNames={Uri.EscapeDataString(string.Join(",", filters.CategoryNames))}");
+
+        if (filters.DateFrom.HasValue)
+            queryParams.Add($"dateFrom={filters.DateFrom.Value:yyyy-MM-ddTHH:mm:ss}");
+
+        if (filters.DateTo.HasValue)
+            queryParams.Add($"dateTo={filters.DateTo.Value:yyyy-MM-ddTHH:mm:ss}");
+
+        if (filters.MinScore.HasValue)
+            queryParams.Add($"minScore={filters.MinScore.Value}");
+
+        if (filters.Limit.HasValue)
+            queryParams.Add($"limit={filters.Limit.Value}");
+
+        if (filters.Offset.HasValue)
+            queryParams.Add($"offset={filters.Offset.Value}");
+
+        if (filters.SortBy.HasValue)
+            queryParams.Add($"sortBy={filters.SortBy.Value}");
+
+        if (filters.SortOrder.HasValue)
+            queryParams.Add($"sortOrder={filters.SortOrder.Value}");
+
+        if (filters.IncludeFacets)
+            queryParams.Add("includeFacets=true");
+
+        var queryString = queryParams.Count > 0 ? "?" + string.Join("&", queryParams) : string.Empty;
+        var response = await this.client.GetAsync($"/api/articles/search/advanced{queryString}", cancellationToken).ConfigureAwait(false);
+        _ = response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<AdvancedSearchResult>(cancellationToken).ConfigureAwait(false) ?? new AdvancedSearchResult();
     }
 
     /// <summary>
@@ -147,14 +200,7 @@ public sealed class AnalyzeService
     /// <param name="confidenceThreshold">Confidence threshold for classification.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>API result containing the created category.</returns>
-    public async Task<ApiResult<CategoryModel>> CreateCategoryAsync(string name,
-                                                                    string? description = null,
-                                                                    string? color = null,
-                                                                    string? icon = null,
-                                                                    string[]? keywords = null,
-                                                                    int? parentId = null,
-                                                                    double? confidenceThreshold = null,
-                                                                    CancellationToken cancellationToken = default)
+    public async Task<ApiResult<CategoryModel>> CreateCategoryAsync(string name, string? description = null, string? color = null, string? icon = null, string[]? keywords = null, int? parentId = null, double? confidenceThreshold = null, CancellationToken cancellationToken = default)
     {
         var createModel = new
         {
@@ -202,16 +248,17 @@ public sealed class AnalyzeService
     /// <param name="confidenceThreshold">Confidence threshold for classification.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>API result containing the updated category.</returns>
-    public async Task<ApiResult<CategoryModel>> UpdateCategoryAsync(int id,
-                                                                    string? name = null,
-                                                                    string? description = null,
-                                                                    string? color = null,
-                                                                    string? icon = null,
-                                                                    string[]? keywords = null,
-                                                                    int? parentId = null,
-                                                                    bool? isActive = null,
-                                                                    double? confidenceThreshold = null,
-                                                                    CancellationToken cancellationToken = default)
+    public async Task<ApiResult<CategoryModel>> UpdateCategoryAsync(
+        int id,
+        string? name = null,
+        string? description = null,
+        string? color = null,
+        string? icon = null,
+        string[]? keywords = null,
+        int? parentId = null,
+        bool? isActive = null,
+        double? confidenceThreshold = null,
+        CancellationToken cancellationToken = default)
     {
         var updateModel = new
         {

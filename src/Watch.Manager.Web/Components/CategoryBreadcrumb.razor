@@ -1,20 +1,18 @@
-@using Watch.Manager.Web.Services.Models
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+﻿@using Watch.Manager.Web.Services.Models
 
 <div class="breadcrumb-container">
-    @if (CategoryPath?.Any() == true)
+    @if (this.CategoryPath?.Any() == true)
     {
         <nav class="breadcrumb">
             <FluentIcon Value="@(new Size16.Home())" Class="home-icon" />
-            @for (int i = 0; i < CategoryPath.Count; i++)
+            @for (int i = 0; i < this.CategoryPath.Count; i++)
             {
-                var category = CategoryPath[i];
-                var isLast = i == CategoryPath.Count - 1;
+                var category = this.CategoryPath[i];
+                var isLast = i == this.CategoryPath.Count - 1;
 
                 <FluentButton
                     Appearance="@(isLast ? Appearance.Accent : Appearance.Stealth)"
-                    @onclick="() => OnCategorySelected.InvokeAsync(category)"
+                    @onclick="() => this.OnCategorySelected.InvokeAsync(category)"
                     Class="@(isLast ? "breadcrumb-current" : "breadcrumb-item")">
                     @category.Name
                 </FluentButton>
@@ -26,11 +24,11 @@
             }
         </nav>
     }
-    else if (!string.IsNullOrEmpty(CurrentCategoryName))
+    else if (!string.IsNullOrEmpty(this.CurrentCategoryName))
     {
         <nav class="breadcrumb">
             <FluentIcon Value="@(new Size16.Home())" Class="home-icon" />
-            <span class="breadcrumb-current-text">@CurrentCategoryName</span>
+            <span class="breadcrumb-current-text">@(this.CurrentCategoryName)</span>
         </nav>
     }
 </div>

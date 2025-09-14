@@ -6,12 +6,12 @@
     <members>
         <member name="T:Watch.Manager.ApiService.Extensions.ArticleEndpoints">
             <summary>
-            Provides extension methods for mapping article-related endpoints to a <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />.
+                Provides extension methods for mapping article-related endpoints to a <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />.
             </summary>
         </member>
         <member name="M:Watch.Manager.ApiService.Extensions.ArticleEndpoints.MapArticleEndpoints(Microsoft.AspNetCore.Builder.WebApplication)">
             <summary>
-            Configures the application's endpoints for managing articles, including operations for saving, searching, retrieving thumbnails, and getting all tags.
+                Configures the application's endpoints for managing articles, including operations for saving, searching, retrieving thumbnails, and getting all tags.
             </summary>
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance to which the article endpoints will be added.</param>
         </member>
@@ -61,6 +61,106 @@
                 Configures the application's endpoints for managing article classification, including operations for classifying articles, auto-assigning categories, batch classification, suggestions, and feedback.
             </summary>
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> instance to which the classification endpoints will be added.</param>
+        </member>
+        <member name="T:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter">
+            <summary>
+                Parameters for advanced article search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.AnalyseStore">
+            <summary>
+                Gets store for analyzed articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.SearchTerms">
+            <summary>
+                Gets textual search terms.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.Tags">
+            <summary>
+                Gets tags to filter by (comma-separated).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.Authors">
+            <summary>
+                Gets authors to filter by (comma-separated).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.CategoryIds">
+            <summary>
+                Gets category IDs to filter by (comma-separated).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.CategoryNames">
+            <summary>
+                Gets category names to filter by (comma-separated).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.DateFrom">
+            <summary>
+                Gets start date (ISO format).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.DateTo">
+            <summary>
+                Gets end date (ISO format).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.MinScore">
+            <summary>
+                Gets minimum score for vector search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.Limit">
+            <summary>
+                Gets maximum number of results to return.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.Offset">
+            <summary>
+                Gets offset for pagination.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.SortBy">
+            <summary>
+                Gets sort criterion.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.SortOrder">
+            <summary>
+                Gets sort order.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.IncludeFacets">
+            <summary>
+                Gets a value indicating whether whether to include facets in the response.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.CancellationToken">
+            <summary>
+                Gets cancellation token.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.ToFilters">
+            <summary>
+                Converts the parameters to an <see cref="T:Watch.Manager.Service.Database.Models.ArticleSearchFilters" /> object.
+            </summary>
+            <returns>A configured <see cref="T:Watch.Manager.Service.Database.Models.ArticleSearchFilters" /> object.</returns>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.ParseStringArray(System.String)">
+            <summary>
+                Parses a string into a string array.
+            </summary>
+            <param name="input">The input string to parse.</param>
+            <returns>An array of strings, or null if input is null or empty.</returns>
+        </member>
+        <member name="M:Watch.Manager.ApiService.Parameters.Articles.AdvancedSearchArticleParameter.ParseIntArray(System.String)">
+            <summary>
+                Parses a string into an integer array.
+            </summary>
+            <param name="input">The input string to parse.</param>
+            <returns>An array of integers, or null if input is null or empty.</returns>
         </member>
         <member name="T:Watch.Manager.ApiService.Parameters.Articles.AnalyzeParameter">
             <summary>
@@ -1011,6 +1111,151 @@
             Gets or sets the suggested parent category name.
             </summary>
         </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel">
+            <summary>
+                View model for the result of an advanced article search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.Articles">
+            <summary>
+                Gets articles found matching the search criteria.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.TotalCount">
+            <summary>
+                Gets total number of articles matching the filters (without pagination).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.Count">
+            <summary>
+                Gets number of articles returned in this page.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.Offset">
+            <summary>
+                Gets offset used for this search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.Limit">
+            <summary>
+                Gets limit used for this search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.ArticleSearchResultViewModel.Facets">
+            <summary>
+                Gets search facets with counts per category.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.AuthorFacetViewModel">
+            <summary>
+                View model for an author facet.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.AuthorFacetViewModel.AuthorName">
+            <summary>
+                Gets author name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.AuthorFacetViewModel.Count">
+            <summary>
+                Gets number of articles by this author.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel">
+            <summary>
+                View model for a category facet.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel.CategoryId">
+            <summary>
+                Gets category ID.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel.CategoryName">
+            <summary>
+                Gets category name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel.Count">
+            <summary>
+                Gets number of articles in this category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel.Color">
+            <summary>
+                Gets color associated with the category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.CategoryFacetViewModel.Icon">
+            <summary>
+                Gets icon associated with the category.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.DateFacetViewModel">
+            <summary>
+                View model for a date facet.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.DateFacetViewModel.Period">
+            <summary>
+                Gets period (YYYY-MM for monthly, YYYY for yearly).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.DateFacetViewModel.Count">
+            <summary>
+                Gets number of articles in this period.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.DateFacetViewModel.PeriodStart">
+            <summary>
+                Gets start date of the period.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.DateFacetViewModel.PeriodEnd">
+            <summary>
+                Gets end date of the period.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.SearchFacetsViewModel">
+            <summary>
+                View model for search facets.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.SearchFacetsViewModel.Categories">
+            <summary>
+                Gets article counts per category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.SearchFacetsViewModel.Tags">
+            <summary>
+                Gets article counts per tag.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.SearchFacetsViewModel.Authors">
+            <summary>
+                Gets article counts per author.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.SearchFacetsViewModel.DateDistribution">
+            <summary>
+                Gets distribution by period.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.ApiService.ViewModels.SearchFacets.TagFacetViewModel">
+            <summary>
+                View model for a tag facet.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.TagFacetViewModel.TagName">
+            <summary>
+                Gets tag name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.ApiService.ViewModels.SearchFacets.TagFacetViewModel.Count">
+            <summary>
+                Gets number of articles with this tag.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.ApiService.ViewModels.UpdateCategoryModel">
             <summary>
             ViewModel for updating a category.
@@ -1055,6 +1300,55 @@
             <summary>
             Gets or sets the confidence threshold for automatic classification.
             </summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
         </member>
     </members>
 </doc>

@@ -41,8 +41,7 @@ public static class ClassificationEndpoints
         var vApi = app.NewVersionedApi("Classification");
 
         var classificationGroup = vApi.MapGroup("/api/classification")
-                                     .WithTags("Classification")
-                                     .WithOpenApi();
+                                      .WithTags("Classification");
 
         _ = classificationGroup.MapPost("/articles/{id:int}/classify", ClassifyArticleAsync)
                                .WithName("ClassifyArticle")
@@ -89,15 +88,15 @@ public static class ClassificationEndpoints
         var categories = await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false);
         var categoryForClassification = categories.Where(c => c.IsActive)
                                                   .Select(c => new CategoryForClassification
-                                                   {
-                                                       Id = c.Id,
-                                                       Name = c.Name,
-                                                       Description = c.Description,
-                                                       Keywords = c.Keywords,
-                                                       AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
-                                                       ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
-                                                       IsActive = c.IsActive,
-                                                   });
+                                                  {
+                                                      Id = c.Id,
+                                                      Name = c.Name,
+                                                      Description = c.Description,
+                                                      Keywords = c.Keywords,
+                                                      AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
+                                                      ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
+                                                      IsActive = c.IsActive,
+                                                  });
 
         var articleContent = $"{article.Title}\n\n{article.Summary}";
         var suggestions = await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false);
@@ -113,15 +112,15 @@ public static class ClassificationEndpoints
         var categories = await p.CategoryStore.GetAllCategoriesAsync(false, p.CancellationToken).ConfigureAwait(false);
         var categoryForClassification = categories.Where(c => c.IsActive)
                                                   .Select(c => new CategoryForClassification
-                                                   {
-                                                       Id = c.Id,
-                                                       Name = c.Name,
-                                                       Description = c.Description,
-                                                       Keywords = c.Keywords,
-                                                       AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
-                                                       ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
-                                                       IsActive = c.IsActive,
-                                                   });
+                                                  {
+                                                      Id = c.Id,
+                                                      Name = c.Name,
+                                                      Description = c.Description,
+                                                      Keywords = c.Keywords,
+                                                      AutoThreshold = p.Options?.MinAutoClassificationScore ?? 0.7,
+                                                      ManualThreshold = p.Options?.MinSuggestionScore ?? 0.5,
+                                                      IsActive = c.IsActive,
+                                                  });
 
         var articleContent = $"{article.Title}\n\n{article.Summary}";
         CategorySuggestionResult[] suggestions = [.. await p.ClassificationService.ClassifyArticleAsync(articleContent, categoryForClassification, p.CancellationToken).ConfigureAwait(false)];
@@ -196,13 +195,13 @@ public static class ClassificationEndpoints
 
         var consolidatedSuggestions = allSuggestions.GroupBy(s => s.SuggestedName.ToLowerInvariant())
                                                     .Select(g => new ViewModels.NewCategorySuggestion
-                                                     {
-                                                         SuggestedName = g.First().SuggestedName,
-                                                         SuggestedDescription = g.First().SuggestedDescription,
-                                                         SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
-                                                         RelevanceScore = g.Average(s => s.RelevanceScore),
-                                                         Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
-                                                     })
+                                                    {
+                                                        SuggestedName = g.First().SuggestedName,
+                                                        SuggestedDescription = g.First().SuggestedDescription,
+                                                        SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
+                                                        RelevanceScore = g.Average(s => s.RelevanceScore),
+                                                        Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
+                                                    })
                                                     .OrderByDescending(s => s.RelevanceScore)
                                                     .Take(20)
                                                     .ToList();
@@ -245,7 +244,7 @@ public static class ClassificationEndpoints
         {
             var suggestions = await p.ClassificationService.SuggestNewCategoriesAsync(articleContent, existingCategoryNames, p.CancellationToken).ConfigureAwait(false);
 
-            allSuggestions.AddRange(suggestions.Select(suggestion => new ViewModels.NewCategorySuggestion()
+            allSuggestions.AddRange(suggestions.Select(suggestion => new ViewModels.NewCategorySuggestion
             {
                 SuggestedName = suggestion.SuggestedName,
                 SuggestedDescription = suggestion.SuggestedDescription,
@@ -261,17 +260,17 @@ public static class ClassificationEndpoints
 
         var consolidatedSuggestions = allSuggestions.GroupBy(s => s.SuggestedName.ToLowerInvariant())
                                                     .Select(g => new ViewModels.NewCategorySuggestion
-                                                     {
-                                                         SuggestedName = g.First().SuggestedName,
-                                                         SuggestedDescription = g.First().SuggestedDescription,
-                                                         SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
-                                                         RelevanceScore = g.Average(s => s.RelevanceScore),
-                                                         Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
-                                                         SuggestedColor = null,
-                                                         SuggestedIcon = null,
-                                                         SuggestedParentId = null,
-                                                         SuggestedParentName = null,
-                                                     })
+                                                    {
+                                                        SuggestedName = g.First().SuggestedName,
+                                                        SuggestedDescription = g.First().SuggestedDescription,
+                                                        SuggestedKeywords = [.. g.SelectMany(s => s.SuggestedKeywords).Distinct()],
+                                                        RelevanceScore = g.Average(s => s.RelevanceScore),
+                                                        Justification = string.Join("; ", g.Select(s => s.Justification).Where(j => !string.IsNullOrEmpty(j))),
+                                                        SuggestedColor = null,
+                                                        SuggestedIcon = null,
+                                                        SuggestedParentId = null,
+                                                        SuggestedParentName = null,
+                                                    })
                                                     .OrderByDescending(s => s.RelevanceScore)
                                                     .Take(20)
                                                     .ToArray();

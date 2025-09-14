@@ -1,8 +1,4 @@
-@using Watch.Manager.Web.Services.Models
-@using Watch.Manager.Web.Components
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
-@using Microsoft.FluentUI.AspNetCore.Components.Icons
+﻿@using Watch.Manager.Web.Services.Models
 
 <div class="category-view-selector">
     <div class="view-header">
@@ -11,22 +7,22 @@
 
             <div class="view-actions">
                 <div class="view-selector">
-                    <FluentButton Appearance="@(CurrentView == CategoryViewType.Grid ? Appearance.Accent : Appearance.Stealth)"
-                                @onclick="() => SetCurrentView(CategoryViewType.Grid)"
+                    <FluentButton Appearance="@(this.CurrentView == CategoryViewType.Grid ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => this.SetCurrentView(CategoryViewType.Grid)"
                                 Title="Vue en grille">
                         <FluentIcon Value="@(new Size16.GridKanban())" />
                         Grille
                     </FluentButton>
 
-                    <FluentButton Appearance="@(CurrentView == CategoryViewType.List ? Appearance.Accent : Appearance.Stealth)"
-                                @onclick="() => SetCurrentView(CategoryViewType.List)"
+                    <FluentButton Appearance="@(this.CurrentView == CategoryViewType.List ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => this.SetCurrentView(CategoryViewType.List)"
                                 Title="Vue en liste">
                         <FluentIcon Value="@(new Size16.List())" />
                         Liste
                     </FluentButton>
 
-                    <FluentButton Appearance="@(CurrentView == CategoryViewType.Tree ? Appearance.Accent : Appearance.Stealth)"
-                                @onclick="() => SetCurrentView(CategoryViewType.Tree)"
+                    <FluentButton Appearance="@(this.CurrentView == CategoryViewType.Tree ? Appearance.Accent : Appearance.Stealth)"
+                                @onclick="() => this.SetCurrentView(CategoryViewType.Tree)"
                                 Title="Vue arborescente">
                         <FluentIcon Value="@(new Size16.Flow())" />
                         Arbre
@@ -34,25 +30,25 @@
                 </div>
 
                 <FluentButton Appearance="Appearance.Accent"
-                            @onclick="OnAddCategory">
+                            @onclick="this.OnAddCategory">
                     <FluentIcon Value="@(new Size16.Add())" Slot="start" />
                     Nouvelle catégorie
                 </FluentButton>
             </div>
         </div>
 
-        @if (CurrentView == CategoryViewType.Tree || CurrentView == CategoryViewType.List)
+        @if (this.CurrentView == CategoryViewType.Tree || this.CurrentView == CategoryViewType.List)
         {
             <div class="hierarchy-controls">
                 <FluentButton Appearance="Appearance.Stealth"
-                            @onclick="ExpandAll"
+                            @onclick="this.ExpandAll"
                             Title="Tout développer">
                     <FluentIcon Value="@(new Size16.ChevronDoubleDown())" />
                     Tout développer
                 </FluentButton>
 
                 <FluentButton Appearance="Appearance.Stealth"
-                            @onclick="CollapseAll"
+                            @onclick="this.CollapseAll"
                             Title="Tout réduire">
                     <FluentIcon Value="@(new Size16.ChevronDoubleUp())" />
                     Tout réduire
@@ -62,18 +58,18 @@
     </div>
 
     <div class="view-content">
-        @switch (CurrentView)
+        @switch (this.CurrentView)
         {
             case CategoryViewType.Grid:
                 <div class="grid-view">
-                    @if (Categories?.Any() == true)
+                    @if (this.Categories?.Any() == true)
                     {
                         <div class="category-grid">
-                            @foreach (var category in Categories)
+                            @foreach (var category in this.Categories)
                             {
                                 <CategoryCard Category="category"
-                                            OnEdit="OnCategoryEdit"
-                                            OnDelete="OnCategoryDelete" />
+                                            OnEdit="this.OnCategoryEdit"
+                                            OnDelete="this.OnCategoryDelete" />
                             }
                         </div>
                     }
@@ -87,19 +83,19 @@
                 break;
 
             case CategoryViewType.List:
-                <CategoryListView Categories="@Categories"
-                                OnCategoryEdit="OnCategoryEdit"
-                                OnCategoryDelete="OnCategoryDelete"
-                                ExpandedCategories="ExpandedCategories"
-                                OnToggleExpanded="OnToggleExpanded" />
+                <CategoryListView Categories="@this.Categories"
+                                OnCategoryEdit="this.OnCategoryEdit"
+                                OnCategoryDelete="this.OnCategoryDelete"
+                                ExpandedCategories="this.ExpandedCategories"
+                                OnToggleExpanded="this.OnToggleExpanded" />
                 break;
 
             case CategoryViewType.Tree:
-                <CategoryTreeView Categories="@Categories"
-                                OnCategoryEdit="OnCategoryEdit"
-                                OnCategoryDelete="OnCategoryDelete"
-                                ExpandedCategories="ExpandedCategories"
-                                OnToggleExpanded="OnToggleExpanded" />
+                <CategoryTreeView Categories="@this.Categories"
+                                OnCategoryEdit="this.OnCategoryEdit"
+                                OnCategoryDelete="this.OnCategoryDelete"
+                                ExpandedCategories="this.ExpandedCategories"
+                                OnToggleExpanded="this.OnToggleExpanded" />
                 break;
         }
     </div>
@@ -187,68 +183,68 @@
 
     public CategoryViewType CurrentView
     {
-        get => currentView;
+        get => this.currentView;
         set
         {
-            if (currentView != value)
+            if (this.currentView != value)
             {
-                currentView = value;
-                StateHasChanged();
+                this.currentView = value;
+                this.StateHasChanged();
             }
         }
     }
 
-    public HashSet<int> ExpandedCategories => expandedCategories;
+    public HashSet<int> ExpandedCategories => this.expandedCategories;
 
     protected override void OnInitialized()
     {
-        currentView = InitialView;
+        this.currentView = this.InitialView;
     }
 
     private void SetCurrentView(CategoryViewType viewType)
     {
-        CurrentView = viewType;
+        this.CurrentView = viewType;
     }
 
     private async Task OnToggleExpanded(int categoryId)
     {
-        if (expandedCategories.Contains(categoryId))
+        if (this.expandedCategories.Contains(categoryId))
         {
-            expandedCategories.Remove(categoryId);
+            this.expandedCategories.Remove(categoryId);
         }
         else
         {
-            expandedCategories.Add(categoryId);
+            this.expandedCategories.Add(categoryId);
         }
 
-        StateHasChanged();
+        this.StateHasChanged();
         await Task.CompletedTask;
     }
 
     private void ExpandAll()
     {
-        if (Categories?.Any() == true)
+        if (this.Categories?.Any() == true)
         {
-            expandedCategories.Clear();
-            AddAllCategoryIds(Categories);
-            StateHasChanged();
+            this.expandedCategories.Clear();
+            this.AddAllCategoryIds(this.Categories);
+            this.StateHasChanged();
         }
     }
 
     private void CollapseAll()
     {
-        expandedCategories.Clear();
-        StateHasChanged();
+        this.expandedCategories.Clear();
+        this.StateHasChanged();
     }
 
     private void AddAllCategoryIds(IEnumerable<CategoryModel> categories)
     {
         foreach (var category in categories)
         {
-            expandedCategories.Add(category.Id);
-            if (category.Children?.Any() == true)
+            this.expandedCategories.Add(category.Id);
+            if (category.Children.Count > 0)
             {
-                AddAllCategoryIds(category.Children);
+                this.AddAllCategoryIds(category.Children);
             }
         }
     }

@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-    <ItemGroup>
-        <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
-    </ItemGroup>
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -29,5 +26,7 @@
         <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />
         <ProjectReference Include="..\Watch.Manager.ServiceDefaults\Watch.Manager.ServiceDefaults.csproj" />
     </ItemGroup>
-
+    <ItemGroup>
+        <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+    </ItemGroup>
 </Project>

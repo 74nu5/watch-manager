@@ -1,4 +1,4 @@
-
+﻿
 ## 🗺️ Timeline des fonctionnalités
 
 ```mermaid
@@ -38,7 +38,7 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 
 ### 🔄 Phase 2 : Organisation (En cours)
 - [x] **API RESTful** pour la gestion des articles
-- [ ] **Catégorisation avancée des articles**
+- [x] **Catégorisation avancée des articles**
 
   #### 🎛️ Interface de gestion des catégories
   - **Création et édition de catégories** : Interface intuitive pour créer, modifier et supprimer des catégories personnalisées
@@ -71,10 +71,10 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 
 #### 🔍 Recherche assistée par IA
 - [ ] **Résolution de problèmes**
-  - Interface de saisie de problématiques
-  - Recherche sémantique dans la base d'articles
-  - Suggestions d'articles pertinents
-  - Synthèse des solutions trouvées
+  - [ ] Interface de saisie de problématiques
+  - [x] Recherche sémantique dans la base d'articles
+  - [x] Suggestions d'articles pertinents
+  - [ ] Synthèse des solutions trouvées
 
 #### 🎲 Apprentissage dirigé
 - [ ] **Choix de sujets aléatoires**

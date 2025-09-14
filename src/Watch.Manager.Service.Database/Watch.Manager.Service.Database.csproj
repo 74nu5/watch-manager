@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -23,6 +23,12 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.SqlServer" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
+        <PackageReference Include="StyleCop.Analyzers" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Watch.Manager.Common\Watch.Manager.Common.csproj" />
     </ItemGroup>
 
 </Project>

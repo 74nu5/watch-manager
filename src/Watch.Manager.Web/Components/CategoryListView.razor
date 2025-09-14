@@ -1,12 +1,10 @@
-@using Watch.Manager.Web.Services.Models
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+﻿@using Watch.Manager.Web.Services.Models
 
 <div class="category-list">
     <div class="list-header">
         <div class="filter-section">
-            <FluentSearch @bind-Value="nameFilter"
-                         @oninput="OnFilterChanged"
+            <FluentSearch @bind-Value="this.nameFilter"
+                         @oninput="this.OnFilterChanged"
                          Placeholder="Filtrer par nom..."
                          Style="width: 250px;" />
         </div>
@@ -27,16 +25,16 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Categories?.Any() == true)
+                @if (this.Categories?.Any() == true)
                 {
-                    @foreach (var row in GetAllRowsToDisplay())
+                    @foreach (var row in this.GetAllRowsToDisplay())
                     {
                         <CategoryListRow Category="row.Category"
                                        IsChild="row.IsChild"
-                                       IsExpanded="IsExpanded(row.Category.Id)"
-                                       OnToggleExpanded="() => ToggleExpanded(row.Category.Id)"
-                                       OnCategoryEdit="OnCategoryEdit"
-                                       OnCategoryDelete="OnCategoryDelete" />
+                                       IsExpanded="this.IsExpanded(row.Category.Id)"
+                                       OnToggleExpanded="() => this.ToggleExpanded(row.Category.Id)"
+                                       OnCategoryEdit="this.OnCategoryEdit"
+                                       OnCategoryDelete="this.OnCategoryDelete" />
                     }
                 }
                 else
@@ -114,22 +112,22 @@
 
     private string nameFilter = string.Empty;
 
-    private bool IsExpanded(int categoryId) => ExpandedCategories.Contains(categoryId);
+    private bool IsExpanded(int categoryId) => this.ExpandedCategories.Contains(categoryId);
 
     private async Task ToggleExpanded(int categoryId)
     {
-        await OnToggleExpanded.InvokeAsync(categoryId);
+        await this.OnToggleExpanded.InvokeAsync(categoryId);
     }
 
     private IEnumerable<CategoryModel> GetFilteredCategories()
     {
-        if (Categories == null) return Enumerable.Empty<CategoryModel>();
+        if (this.Categories == null) return Enumerable.Empty<CategoryModel>();
 
-        var filtered = Categories.AsEnumerable();
+        var filtered = this.Categories.AsEnumerable();
 
-        if (!string.IsNullOrWhiteSpace(nameFilter))
+        if (!string.IsNullOrWhiteSpace(this.nameFilter))
         {
-            filtered = filtered.Where(c => c.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+            filtered = filtered.Where(c => c.Name.Contains(this.nameFilter, StringComparison.OrdinalIgnoreCase));
         }
 
         return filtered.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name);
@@ -138,11 +136,11 @@
     private IEnumerable<CategoryRowDisplay> GetAllRowsToDisplay()
     {
         var rows = new List<CategoryRowDisplay>();
-        var rootCategories = GetFilteredCategories();
+        var rootCategories = this.GetFilteredCategories();
 
         foreach (var category in rootCategories)
         {
-            AddCategoryAndChildren(category, rows, isChild: false);
+            this.AddCategoryAndChildren(category, rows, isChild: false);
         }
 
         return rows;
@@ -154,11 +152,11 @@
         rows.Add(new CategoryRowDisplay { Category = category, IsChild = isChild });
 
         // Ajouter récursivement les enfants si la catégorie est développée
-        if (IsExpanded(category.Id) && category.Children?.Any() == true)
+        if (this.IsExpanded(category.Id) && category.Children.Any())
         {
             foreach (var child in category.Children.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
             {
-                AddCategoryAndChildren(child, rows, isChild: true);
+                this.AddCategoryAndChildren(child, rows, isChild: true);
             }
         }
     }

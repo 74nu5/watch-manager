@@ -5,79 +5,84 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Version together with Aspire -->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.3.1" />
-    <PackageVersion Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.3.1" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.1" />
-    <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="9.0.6" />
-    <PackageVersion Include="Aspire.Hosting.Redis" Version="9.0.6" />
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="9.3.2" />
-    <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.3.1" />
-    <PackageVersion Include="Aspire.Npgsql" Version="9.0.6" />
-    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.1" />
-    <PackageVersion Include="Aspire.RabbitMQ.Client" Version="9.0.6" />
-    <PackageVersion Include="Aspire.StackExchange.Redis" Version="9.0.6" />
-    <PackageVersion Include="Aspire.Hosting.Testing" Version="9.3.1" />
-    <PackageVersion Include="Aspire.Azure.AI.OpenAI" Version="9.3.0-preview.1.25265.20" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Npgsql" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.4.2" />
+    <PackageVersion Include="Aspire.RabbitMQ.Client" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Aspire.StackExchange.Redis" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="9.4.2" />
+    <PackageVersion Include="Aspire.Azure.AI.OpenAI" Version="9.4.2-preview.1.25428.12" />
     <PackageVersion Include="EFCore.SqlServer.VectorSearch" Version="0.2.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.6">
+    <PackageVersion Include="JetBrains.Annotations" Version="2025.2.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0-rc.1.25451.107">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.1" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.0.0-rc.1.25451.107" />
     <!-- Version together with Asp.Versioning -->
     <PackageVersion Include="Asp.Versioning.Http" Version="8.1.0" />
     <PackageVersion Include="Asp.Versioning.Http.Client" Version="8.1.0" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <!-- Version together with ASP.NET -->
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.6.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.QuickGrid" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
     <PackageVersion Include="Microsoft.KernelMemory.AI.Tiktoken" Version="0.98.250508.3" />
-    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.SqlServer" Version="1.59.0-preview" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.SqlServer" Version="1.65.0-preview" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.7.2" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.7.2" />
     <!-- Version together with EF -->
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0-rc.1.25451.107" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Process" Version="1.12.0-beta.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.12.0-beta.2" />
     <PackageVersion Include="Pgvector" Version="0.3.2" />
     <PackageVersion Include="Pgvector.EntityFrameworkCore" Version="0.2.2" />
     <!-- Version together with runtime -->
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.3.0" />
     <!-- Web -->
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.0" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.0" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.0" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.1" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
     <!-- Xabaril packages -->
     <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
     <!-- AI -->
-    <PackageVersion Include="Microsoft.Extensions.AI" Version="9.6.0" />
-    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="9.6.0" />
-    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="9.5.0-preview.1.25265.7" />
-    <PackageVersion Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.6.0" />
-    <PackageVersion Include="OllamaSharp" Version="5.2.7" />
-    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Ollama" Version="9.5.0" />
-    <PackageVersion Include="CommunityToolkit.Aspire.OllamaSharp" Version="9.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="9.9.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="9.9.0" />
+      <!-- La version 9.8+ ne fontionne pas avec Azure -->
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="9.7.1-preview.1.25365.4" />
+    <PackageVersion Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.7.0" />
+    <PackageVersion Include="OllamaSharp" Version="5.4.1" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Ollama" Version="9.8.0-beta.384" />
+    <PackageVersion Include="CommunityToolkit.Aspire.OllamaSharp" Version="9.8.0-beta.384" />
     <!-- Open Telemetry -->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
@@ -98,17 +103,16 @@
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-    <PackageVersion Include="Polly.Core" Version="8.5.2" />
     <PackageVersion Include="System.Reflection.TypeExtensions" Version="4.7.0" />
     <PackageVersion Include="Tiktoken" Version="2.2.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.2.0" />
     <PackageVersion Include="IdentityModel" Version="7.0.0" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.5.6" />
-    <PackageVersion Include="AngleSharp" Version="1.3.0" />
-    <PackageVersion Include="Markdig" Version="0.41.3" />
-    <PackageVersion Include="Markdown.ColorCode" Version="3.0.0" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.3" />
+    <PackageVersion Include="AngleSharp" Version="1.3.1-beta.491" />
+    <PackageVersion Include="Markdig" Version="0.42.0" />
+    <PackageVersion Include="Markdown.ColorCode" Version="3.0.1" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

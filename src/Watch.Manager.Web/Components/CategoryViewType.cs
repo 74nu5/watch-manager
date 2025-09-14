@@ -1,4 +1,4 @@
-namespace Watch.Manager.Web.Components;
+﻿namespace Watch.Manager.Web.Components;
 
 /// <summary>
 /// Type de vue pour l'affichage des catégories.
@@ -18,5 +18,5 @@ public enum CategoryViewType
     /// <summary>
     /// Vue arborescente hiérarchique.
     /// </summary>
-    Tree
+    Tree,
 }

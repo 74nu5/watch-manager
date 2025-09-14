@@ -46,11 +46,13 @@ internal static class Extensions
 
         _ = servicesApi
            .WithReference(openAI)
-           .WithEnvironment("AI__OPENAI__EMBEDDINGMODEL", TextEmbeddingModelName);
+           .WithEnvironment("AI__OPENAI__EMBEDDINGMODEL", TextEmbeddingModelName)
+           .WithEnvironment("AZURE__OPENAI__EMBEDDINGMODEL", TextEmbeddingModelName);
 
         _ = servicesApi
            .WithReference(openAI)
-           .WithEnvironment("AI__OPENAI__CHATMODEL", ChatModelName);
+           .WithEnvironment("AI__OPENAI__CHATMODEL", ChatModelName)
+           .WithEnvironment("AZURE__OPENAI__CHATMODEL", ChatModelName);
 
         return builder;
     }
@@ -67,8 +69,8 @@ internal static class Extensions
                             .WithImageTag("latest")
                             .WithDataVolume()
 
-                             // 6950 XT drivers are not available in linux yet, so we need to use CPU for now
-                             // .WithGPUSupport(OllamaGpuVendor.AMD)
+                            // 6950 XT drivers are not available in linux yet, so we need to use CPU for now
+                            // .WithGPUSupport(OllamaGpuVendor.AMD)
                             .WithOpenWebUI()
                             .WithEnvironment("OLLAMA_TIMEOUT", 500.ToString());
 
@@ -116,7 +118,7 @@ internal static class Extensions
             builder.Configuration["Parameters:openaiResourceGroup"] is not null)
         {
             _ = openAITyped.AsExisting(
-                builder.AddParameter("openaiName"),
+                builder.AddParameter("openAIName"),
                 builder.AddParameter("openaiResourceGroup"));
         }
 
@@ -125,7 +127,7 @@ internal static class Extensions
            .AddDeployment(new(textEmbeddingModelName, "text-embedding-3-small", "1", skuCapacity: 20)); // 20k tokens per minute are needed to seed the initial embeddings*/
 
         _ = openAITyped
-               .AddDeployment(chatModelName, "gpt-4o-mini", "2024-07-18");
+               .AddDeployment(chatModelName, "gpt-4.1-mini", "2025-04-14");
         _ = openAITyped
                .AddDeployment(textEmbeddingModelName, "text-embedding-3-small", "1"); // 20k tokens per minute are needed to seed the initial embeddings
 

@@ -63,7 +63,8 @@ public static partial class Extensions
                     _ = options.ApplySecuritySchemeDefinitions();
                     _ = options.ApplyOperationDeprecatedStatus();
                     _ = options.ApplyApiVersionDescription();
-                    _ = options.ApplySchemaNullableFalse();
+
+                    // _ = options.ApplySchemaNullableFalse();
 
                     // Clear out the default servers so we can fallback to
                     // whatever ports have been allocated for the service by Aspire

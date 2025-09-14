@@ -26,6 +26,15 @@
             <param name="cancellationToken">A token to monitor for cancellation requests.</param>
             <returns>An asynchronous stream of article result DTOs matching the criteria.</returns>
         </member>
+        <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.AdvancedSearchArticlesAsync(Watch.Manager.Service.Database.Models.ArticleSearchFilters,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+                Performs an advanced search for articles using multiple filter criteria.
+            </summary>
+            <param name="filters">The search filters to apply. Allows filtering articles by search terms, tags, authors, categories, date range, minimum score, pagination, and sorting.</param>
+            <param name="includeFacets">Indicates whether facets (counts by category, tag, author, period) should be included in the result to enable dynamic filtering on the client side.</param>
+            <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+            <returns>A task that returns an <see cref="T:Watch.Manager.Service.Database.Models.ArticleSearchResult" /> containing the paginated list of matching articles, the total result count, the pagination parameters used, and, if requested, the search facets.</returns>
+        </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.IArticleAnalyseStore.IsArticleExistsAsync(System.Uri,System.Threading.CancellationToken)">
             <summary>
                 Checks asynchronously if an article exists by its URL.
@@ -53,179 +62,181 @@
         </member>
         <member name="T:Watch.Manager.Service.Database.Abstractions.ICategoryStore">
             <summary>
-            Interface pour la gestion des catégories.
+                Interface for managing categories.
             </summary>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetAllCategoriesAsync(System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Récupère toutes les catégories.
+                Retrieves all categories.
             </summary>
-            <param name="includeInactive">Inclut les catégories inactives.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des catégories.</returns>
+            <param name="includeInactive">Whether to include inactive categories.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>An array of all categories.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoryByIdAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Récupère une catégorie par son identifiant.
+                Retrieves a category by its identifier.
             </summary>
-            <param name="id">Identifiant de la catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>La catégorie ou null si non trouvée.</returns>
+            <param name="id">The category identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The category if found; otherwise, null.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.CreateCategoryAsync(Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
             <summary>
-            Crée une nouvelle catégorie.
+                Creates a new category.
             </summary>
-            <param name="category">La catégorie à créer.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>La catégorie créée.</returns>
+            <param name="category">The category to create.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The created category.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.UpdateCategoryAsync(Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
             <summary>
-            Met à jour une catégorie existante.
+                Updates an existing category.
             </summary>
-            <param name="category">La catégorie à mettre à jour.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>La catégorie mise à jour.</returns>
+            <param name="category">The category to update.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The updated category.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.DeleteCategoryAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Supprime une catégorie.
+                Deletes a category.
             </summary>
-            <param name="id">Identifiant de la catégorie à supprimer.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True si la suppression a réussi.</returns>
+            <param name="id">The identifier of the category to delete.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the deletion succeeded; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetRootCategoriesAsync(System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Récupère les catégories racines (sans parent).
+                Retrieves root categories (categories without a parent).
             </summary>
-            <param name="includeInactive">Inclut les catégories inactives.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des catégories racines avec leurs enfants.</returns>
+            <param name="includeInactive">Whether to include inactive categories.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>A collection of root categories with their children.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.CategoryExistsAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Vérifie si une catégorie existe.
+                Checks if a category exists.
             </summary>
-            <param name="id">Identifiant de la catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True si la catégorie existe.</returns>
+            <param name="id">The category identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the category exists; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.CategoryNameExistsAsync(System.String,System.Nullable{System.Int32},System.Threading.CancellationToken)">
             <summary>
-            Vérifie si un nom de catégorie existe déjà.
+                Checks if a category name already exists.
             </summary>
-            <param name="name">Nom de la catégorie.</param>
-            <param name="excludeId">Identifiant à exclure de la vérification.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True si le nom existe déjà.</returns>
+            <param name="name">The category name.</param>
+            <param name="excludeId">An identifier to exclude from the check.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the name already exists; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.AssignCategoryToArticleAsync(System.Int32,System.Int32,System.Boolean,System.Nullable{System.Double},System.Threading.CancellationToken)">
             <summary>
-            Assigne une catégorie à un article.
+                Assigns a category to an article.
             </summary>
-            <param name="articleId">Identifiant de l'article.</param>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="isManual">Indique si l'assignation est manuelle.</param>
-            <param name="confidenceScore">Score de confiance pour les assignations automatiques.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True si l'assignation a réussi.</returns>
+            <param name="articleId">The article identifier.</param>
+            <param name="categoryId">The category identifier.</param>
+            <param name="isManual">Indicates if the assignment is manual.</param>
+            <param name="confidenceScore">Confidence score for automatic assignments.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the assignment succeeded; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.RemoveCategoryFromArticleAsync(System.Int32,System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Retire une catégorie d'un article.
+                Removes a category from an article.
             </summary>
-            <param name="articleId">Identifiant de l'article.</param>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True si la suppression a réussi.</returns>
+            <param name="articleId">The article identifier.</param>
+            <param name="categoryId">The category identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the removal succeeded; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetArticleCategoriesAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Récupère les catégories d'un article.
+                Retrieves the categories assigned to an article.
             </summary>
-            <param name="articleId">Identifiant de l'article.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des catégories de l'article.</returns>
+            <param name="articleId">The article identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>A collection of categories assigned to the article.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetArticleCountInCategoryAsync(System.Int32,System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Compte le nombre d'articles dans une catégorie.
+                Counts the number of articles in a category.
             </summary>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="includeChildren">Inclut les articles des sous-catégories.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Nombre d'articles.</returns>
+            <param name="categoryId">The category identifier.</param>
+            <param name="includeChildren">Whether to include articles from subcategories.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The number of articles in the category.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetLinkedArticleTitlesAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Récupère les titres des articles liés à une catégorie.
+                Retrieves the titles of articles linked to a category.
             </summary>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des titres d'articles.</returns>
+            <param name="categoryId">The category identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>An array of article titles.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.UpdateAllHierarchyPathsAsync(System.Threading.CancellationToken)">
             <summary>
-            Met à jour les chemins hiérarchiques de toutes les catégories.
+                Updates the hierarchy paths of all categories.
             </summary>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Nombre de catégories mises à jour.</returns>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The number of categories updated.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoriesAsTreeAsync(System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Récupère les catégories organisées en arbre hiérarchique.
+                Retrieves categories organized as a hierarchical tree.
             </summary>
-            <param name="includeInactive">Inclut les catégories inactives.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Catégories organisées en arbre.</returns>
+            <param name="includeInactive">Whether to include inactive categories.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>An array of categories organized as a tree.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoryDescendantsAsync(System.Int32,System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Récupère tous les descendants d'une catégorie.
+                Retrieves all descendants of a category.
             </summary>
-            <param name="categoryId">Identifiant de la catégorie parent.</param>
-            <param name="includeInactive">Inclut les catégories inactives.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des descendants.</returns>
+            <param name="categoryId">The parent category identifier.</param>
+            <param name="includeInactive">Whether to include inactive categories.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>An array of descendant categories.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.GetCategoryAncestorsAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Récupère les ancêtres d'une catégorie (breadcrumb).
+                Retrieves the ancestors of a category (breadcrumb).
             </summary>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des ancêtres (du plus proche au plus éloigné).</returns>
+            <param name="categoryId">The category identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>An array of ancestor categories, from closest to farthest.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.WouldCreateCircularReferenceAsync(System.Int32,System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Vérifie s'il y aurait des références circulaires lors du changement de parent.
+                Checks if changing the parent would create a circular reference.
             </summary>
-            <param name="categoryId">Identifiant de la catégorie.</param>
-            <param name="newParentId">Identifiant du nouveau parent.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>True s'il y aurait une référence circulaire.</returns>
+            <param name="categoryId">The category identifier.</param>
+            <param name="newParentId">The new parent identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if a circular reference would be created; otherwise, false.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Abstractions.ICategoryStore.ReorderCategoriesAsync(System.Collections.Generic.Dictionary{System.Int32,System.Int32},System.Threading.CancellationToken)">
             <summary>
-            Réorganise l'ordre d'affichage des catégories.
+                Reorders the display order of categories.
             </summary>
-            <param name="categoryOrders">Dictionnaire des ordres d'affichage par ID de catégorie.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Nombre de catégories mises à jour.</returns>
+            <param name="categoryOrders">A dictionary of display orders by category ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The number of categories updated.</returns>
         </member>
         <member name="T:Watch.Manager.Service.Database.ArticleAnalyseStore">
             <summary>
                 Provides storage and retrieval operations for analyzed articles, including search and thumbnail access.
             </summary>
+            <param name="logger">The logger instance used for logging information and errors.</param>
             <param name="articlesContext">The database context used for accessing and managing article data.</param>
             <param name="searchable">The vector searchable interface used for performing vector-based searches on article data.</param>
         </member>
-        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.#ctor(Watch.Manager.Service.Database.Context.ArticlesContext,Microsoft.Extensions.VectorData.IVectorSearchable{Watch.Manager.Service.Database.Entities.ArticleSearchEntity})">
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.#ctor(Microsoft.Extensions.Logging.ILogger{Watch.Manager.Service.Database.ArticleAnalyseStore},Watch.Manager.Service.Database.Context.ArticlesContext,Microsoft.Extensions.VectorData.IVectorSearchable{Watch.Manager.Service.Database.Entities.ArticleSearchEntity})">
             <summary>
                 Provides storage and retrieval operations for analyzed articles, including search and thumbnail access.
             </summary>
+            <param name="logger">The logger instance used for logging information and errors.</param>
             <param name="articlesContext">The database context used for accessing and managing article data.</param>
             <param name="searchable">The vector searchable interface used for performing vector-based searches on article data.</param>
         </member>
@@ -254,6 +265,9 @@
             <param name="cancellationToken">A token to monitor for cancellation requests.</param>
             <returns>An asynchronous stream of article result DTOs matching the criteria.</returns>
         </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.AdvancedSearchArticlesAsync(Watch.Manager.Service.Database.Models.ArticleSearchFilters,System.Boolean,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GetAllTagsAsync(System.Threading.CancellationToken)">
             <summary>
                 Retrieves all unique tags used in articles asynchronously.
@@ -271,14 +285,24 @@
                 A value task that returns a tuple containing the thumbnail as a memory stream and the file name (if available).
             </returns>
         </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.EnhanceWithVectorSearchAsync(Watch.Manager.Service.Database.Models.ArticleResultDto[],System.String,System.Threading.CancellationToken)">
+            <summary>
+                Enhance search results with vector search scores.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.ArticleAnalyseStore.GenerateFacetsAsync(Watch.Manager.Service.Database.Models.ArticleSearchFilters,System.Threading.CancellationToken)">
+            <summary>
+                Generates search facets based on the current filters.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.Service.Database.CategoryStore">
             <summary>
-            Implémentation du service de gestion des catégories.
+                Implementation of the category management service.
             </summary>
         </member>
         <member name="M:Watch.Manager.Service.Database.CategoryStore.#ctor(Microsoft.Extensions.Logging.ILogger{Watch.Manager.Service.Database.CategoryStore},Watch.Manager.Service.Database.Context.ArticlesContext)">
             <summary>
-            Implémentation du service de gestion des catégories.
+                Implementation of the category management service.
             </summary>
         </member>
         <member name="M:Watch.Manager.Service.Database.CategoryStore.GetAllCategoriesAsync(System.Boolean,System.Threading.CancellationToken)">
@@ -320,14 +344,6 @@
         <member name="M:Watch.Manager.Service.Database.CategoryStore.GetLinkedArticleTitlesAsync(System.Int32,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoryAndChildrenIdsAsync(System.Int32,System.Threading.CancellationToken)">
-            <summary>
-            Récupère l'ID d'une catégorie et tous les IDs de ses sous-catégories de manière récursive.
-            </summary>
-            <param name="categoryId">ID de la catégorie parent.</param>
-            <param name="cancellationToken">Token d'annulation.</param>
-            <returns>Liste des IDs de catégories.</returns>
-        </member>
         <member name="M:Watch.Manager.Service.Database.CategoryStore.UpdateAllHierarchyPathsAsync(System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -346,95 +362,119 @@
         <member name="M:Watch.Manager.Service.Database.CategoryStore.ReorderCategoriesAsync(System.Collections.Generic.Dictionary{System.Int32,System.Int32},System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Watch.Manager.Service.Database.CategoryStore.GetCategoryAndChildrenIdsAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+                Retrieves the ID of a category and all its child category IDs recursively.
+            </summary>
+            <param name="categoryId">The parent category ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of category IDs.</returns>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Context.ArticlesContext">
             <summary>
-            Contexte Entity Framework pour la gestion des articles et catégories.
+                Represents the Entity Framework Core database context for managing articles, categories, and saved searches.
             </summary>
+            <remarks>This context exposes <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> properties for each entity in the model. </remarks>
+            <remarks>Initializes a new instance of the <see cref="T:Watch.Manager.Service.Database.Context.ArticlesContext" /> class using the specified options.</remarks>
+            <param name="options">The options to be used by a <see cref="T:Microsoft.EntityFrameworkCore.DbContext" />.</param>
         </member>
-        <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions)">
-            <inheritdoc />
+        <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{Watch.Manager.Service.Database.Context.ArticlesContext})">
+            <summary>
+                Represents the Entity Framework Core database context for managing articles, categories, and saved searches.
+            </summary>
+            <remarks>This context exposes <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> properties for each entity in the model. </remarks>
+            <remarks>Initializes a new instance of the <see cref="T:Watch.Manager.Service.Database.Context.ArticlesContext" /> class using the specified options.</remarks>
+            <param name="options">The options to be used by a <see cref="T:Microsoft.EntityFrameworkCore.DbContext" />.</param>
         </member>
         <member name="P:Watch.Manager.Service.Database.Context.ArticlesContext.Articles">
             <summary>
-            DbSet pour les articles.
+                Gets the <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> of <see cref="T:Watch.Manager.Service.Database.Entities.Article" /> entities.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Context.ArticlesContext.Categories">
             <summary>
-            DbSet pour les catégories.
+                Gets the <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> of <see cref="T:Watch.Manager.Service.Database.Entities.Category" /> entities.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Context.ArticlesContext.ArticleCategories">
             <summary>
-            DbSet pour les relations Article-Category.
+                Gets the <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> of <see cref="T:Watch.Manager.Service.Database.Entities.ArticleCategory" /> entities.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Context.ArticlesContext.SavedSearches">
+            <summary>
+                Gets the <see cref="T:Microsoft.EntityFrameworkCore.DbSet`1" /> of <see cref="T:Watch.Manager.Service.Database.Entities.SavedSearch" /> entities.
             </summary>
         </member>
         <member name="M:Watch.Manager.Service.Database.Context.ArticlesContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
+            <summary>
+                Configures the schema needed for the context.
+            </summary>
+            <param name="modelBuilder">The builder being used to construct the model for this context.</param>
         </member>
         <member name="T:Watch.Manager.Service.Database.Entities.Article">
             <summary>
-                Représente un article analysé et stocké dans le système.
+                Represents an analyzed article stored in the system.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Id">
             <summary>
-                Identifiant unique de l'article.
+                Gets or sets the unique identifier of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Title">
             <summary>
-                Titre de l'article.
+                Gets or sets the title of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Tags">
             <summary>
-                Tags associés à l'article.
+                Gets or sets the tags associated with the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Authors">
             <summary>
-                Auteurs de l'article.
+                Gets or sets the authors of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Summary">
             <summary>
-                Résumé de l'article.
+                Gets or sets the summary of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Url">
             <summary>
-                URL de l'article.
+                Gets or sets the URL of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.AnalyzeDate">
             <summary>
-                Date d'analyse de l'article.
+                Gets or sets the analysis date of the article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.EmbeddingHead">
             <summary>
-                Embedding vectoriel de l'en-tête de l'article.
+                Gets or sets the vector embedding of the article header for semantic search.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.EmbeddingBody">
             <summary>
-                Embedding vectoriel du corps de l'article.
+                Gets or sets the vector embedding of the article body for semantic search.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.Thumbnail">
             <summary>
-                URL de la miniature de l'article.
+                Gets or sets the URL of the article thumbnail.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.ThumbnailBase64">
             <summary>
-                Miniature de l'article encodée en base64.
+                Gets or sets the article thumbnail encoded in base64 format.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Database.Entities.Article.ArticleCategories">
             <summary>
-                Catégories associées à cet article.
+                Gets or sets the categories associated with this article.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Database.Entities.ArticleCategory">
@@ -665,81 +705,126 @@
             Niveau de profondeur dans la hiérarchie (0 = racine).
             </summary>
         </member>
+        <member name="T:Watch.Manager.Service.Database.Entities.SavedSearch">
+            <summary>
+                Entity representing a saved search in the database.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.Id">
+            <summary>
+                Gets or sets identifiant unique de la recherche sauvegardée.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.Name">
+            <summary>
+                Gets or sets name given to the saved search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.Description">
+            <summary>
+                Gets or sets optional description of the search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.FiltersJson">
+            <summary>
+                Gets or sets search filters serialized in JSON format.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.CreatedAt">
+            <summary>
+                Gets or sets creation date of the saved search (UTC).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.LastUsedAt">
+            <summary>
+                Gets or sets last usage date of the saved search (UTC).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.UseCount">
+            <summary>
+                Gets or sets number of times this search has been used.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Entities.SavedSearch.IsFavorite">
+            <summary>
+                Gets or sets a value indicating whether indicates whether this search is marked as favorite.
+            </summary>
+        </member>
         <member name="T:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions">
             <summary>
-            Extensions pour la gestion de la hiérarchie des catégories.
+                Extensions for managing category hierarchy.
             </summary>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.CalculateHierarchyPath(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Calcule le chemin hiérarchique complet d'une catégorie.
+                Calculates the full hierarchical path of a category.
             </summary>
-            <param name="category">La catégorie.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Le chemin hiérarchique (ex: "Parent/Enfant/Sous-enfant").</returns>
+            <param name="category">The category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>The hierarchical path (e.g., "Parent/Child/Sub-child").</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.CalculateHierarchyLevel(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Calcule le niveau de profondeur dans la hiérarchie.
+                Calculates the depth level in the hierarchy.
             </summary>
-            <param name="category">La catégorie.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Le niveau de profondeur (0 = racine).</returns>
+            <param name="category">The category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>The depth level (0 = root).</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetAncestors(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Obtient tous les ancêtres d'une catégorie.
+                Gets all ancestors of a category.
             </summary>
-            <param name="category">La catégorie.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Liste des catégories ancêtres (du plus proche au plus éloigné).</returns>
+            <param name="category">The category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>List of ancestor categories (from closest to farthest).</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetAllDescendants(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Obtient tous les descendants d'une catégorie de manière récursive.
+                Gets all descendants of a category recursively.
             </summary>
-            <param name="category">La catégorie parent.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Liste de tous les descendants.</returns>
+            <param name="category">The parent category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>List of all descendant categories.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.IsAncestorOf(Watch.Manager.Service.Database.Entities.Category,Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Vérifie si une catégorie est un ancêtre d'une autre catégorie.
+                Checks if a category is an ancestor of another category.
             </summary>
-            <param name="potentialAncestor">La catégorie potentiellement ancêtre.</param>
-            <param name="category">La catégorie à vérifier.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>True si potentialAncestor est un ancêtre de category.</returns>
+            <param name="potentialAncestor">The potential ancestor category.</param>
+            <param name="category">The category to check.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>True if <paramref name="potentialAncestor" /> is an ancestor of <paramref name="category" />.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetEffectiveKeywords(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Obtient les mots-clés effectifs d'une catégorie (incluant l'héritage).
+                Gets the effective keywords of a category (including inheritance).
             </summary>
-            <param name="category">La catégorie.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Liste des mots-clés effectifs.</returns>
+            <param name="category">The category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>List of effective keywords.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.GetEffectiveConfidenceThreshold(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Obtient le seuil de confiance effectif d'une catégorie (incluant l'héritage).
+                Gets the effective confidence threshold of a category (including inheritance).
             </summary>
-            <param name="category">La catégorie.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
-            <returns>Le seuil de confiance effectif.</returns>
+            <param name="category">The category.</param>
+            <param name="allCategories">All available categories.</param>
+            <returns>The effective confidence threshold.</returns>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.UpdateDescendantsHierarchyPaths(Watch.Manager.Service.Database.Entities.Category,System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Met à jour les chemins hiérarchiques de tous les descendants d'une catégorie.
+                Updates the hierarchical paths of all descendants of a category.
             </summary>
-            <param name="category">La catégorie parent.</param>
-            <param name="allCategories">Toutes les catégories disponibles.</param>
+            <param name="category">The parent category.</param>
+            <param name="allCategories">All available categories.</param>
         </member>
         <member name="M:Watch.Manager.Service.Database.Extensions.CategoryHierarchyExtensions.ToHierarchicalTree(System.Collections.Generic.IEnumerable{Watch.Manager.Service.Database.Entities.Category})">
             <summary>
-            Obtient une représentation en arbre hiérarchique des catégories.
+                Gets a hierarchical tree representation of the categories.
             </summary>
-            <param name="categories">Les catégories à organiser.</param>
-            <returns>Les catégories racines avec leurs enfants organisés en arbre.</returns>
+            <param name="categories">The categories to organize.</param>
+            <returns>The root categories with their children organized as a tree.</returns>
         </member>
         <member name="T:Watch.Manager.Service.Database.Extensions.DatabaseExtensions">
             <summary>
@@ -765,78 +850,6 @@
             <inheritdoc />
         </member>
         <member name="M:Watch.Manager.Service.Database.Migrations.InitDatabase.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.AddThumbnail">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddThumbnail.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.ThumbnailBase64">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.ThumbnailBase64.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.AddCategoriesSupport">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoriesSupport.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoriesSupport.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoriesSupport.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.AddAutoclassification">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddAutoclassification.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.UpdateStringLength">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.UpdateStringLength.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Watch.Manager.Service.Database.Migrations.AddCategoryHierarchyEnhancements.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:Watch.Manager.Service.Database.Models.ArticleResultDto">
@@ -892,6 +905,280 @@
         <member name="P:Watch.Manager.Service.Database.Models.ArticleResultDto.Categories">
             <summary>
             Gets or sets the categories assigned to this article.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.ArticleSearchFilters">
+            <summary>
+                Model representing advanced search filters for articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.SearchTerms">
+            <summary>
+                Gets text search terms (title, summary, content).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.Tags">
+            <summary>
+                Gets tags to include in the search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.Authors">
+            <summary>
+                Gets authors to filter by.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.CategoryIds">
+            <summary>
+                Gets category IDs to include.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.CategoryNames">
+            <summary>
+                Gets category names to include (alternative to IDs).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.DateFrom">
+            <summary>
+                Gets start date for filtering by analysis date.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.DateTo">
+            <summary>
+                Gets end date for filtering by analysis date.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.MinScore">
+            <summary>
+                Gets minimum score for vector search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.Limit">
+            <summary>
+                Gets maximum number of results to return.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.Offset">
+            <summary>
+                Gets offset for pagination.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.SortBy">
+            <summary>
+                Gets result sorting criteria.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchFilters.SortOrder">
+            <summary>
+                Gets sort order (ascending or descending).
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.ArticleSearchResult">
+            <summary>
+                Represents the result of an article search, including pagination metadata.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.Articles">
+            <summary>
+                Gets the articles found that match the search criteria.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.TotalCount">
+            <summary>
+                Gets the total number of articles matching the filters (without pagination).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.Count">
+            <summary>
+                Gets the number of articles returned in this page.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.Offset">
+            <summary>
+                Gets the offset used for this search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.Limit">
+            <summary>
+                Gets the limit used for this search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.ArticleSearchResult.Facets">
+            <summary>
+                Gets the search facets with counts by category.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SavedSearchModel">
+            <summary>
+                Model representing a saved search for a user.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.Id">
+            <summary>
+                Gets the unique identifier of the saved search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.Name">
+            <summary>
+                Gets the name given to the saved search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.Description">
+            <summary>
+                Gets the optional description of the saved search.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.FiltersJson">
+            <summary>
+                Gets the search filters serialized as JSON.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.CreatedAt">
+            <summary>
+                Gets the creation date of the saved search (UTC).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.LastUsedAt">
+            <summary>
+                Gets the last usage date of the saved search (UTC).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.UseCount">
+            <summary>
+                Gets the number of times this search has been used.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SavedSearchModel.IsFavorite">
+            <summary>
+                Gets a value indicating whether this search is marked as favorite.
+            </summary>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Models.SavedSearchModel.FromFilters(System.String,Watch.Manager.Service.Database.Models.ArticleSearchFilters,System.String)">
+            <summary>
+                Creates a new <see cref="T:Watch.Manager.Service.Database.Models.SavedSearchModel" /> instance from filters.
+            </summary>
+            <param name="name">The name of the saved search.</param>
+            <param name="filters">The filters to save.</param>
+            <param name="description">The optional description.</param>
+            <returns>
+                A new instance of <see cref="T:Watch.Manager.Service.Database.Models.SavedSearchModel" /> initialized with the provided filters and metadata.
+            </returns>
+        </member>
+        <member name="M:Watch.Manager.Service.Database.Models.SavedSearchModel.GetFilters">
+            <summary>
+                Gets the deserialized search filters.
+            </summary>
+            <returns>
+                The <see cref="T:Watch.Manager.Service.Database.Models.ArticleSearchFilters" /> instance if deserialization succeeds; otherwise, <c>null</c>.
+            </returns>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SearchFacets.AuthorFacet">
+            <summary>
+                Facet representing the number of articles per author.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.AuthorFacet.AuthorName">
+            <summary>
+                Gets the author's name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.AuthorFacet.Count">
+            <summary>
+                Gets the number of articles for this author.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet">
+            <summary>
+                Facet representing the number of articles per category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet.CategoryId">
+            <summary>
+                Gets the category ID.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet.CategoryName">
+            <summary>
+                Gets the category name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet.Count">
+            <summary>
+                Gets the number of articles in this category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet.Color">
+            <summary>
+                Gets the color associated with the category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.CategoryFacet.Icon">
+            <summary>
+                Gets the icon associated with the category.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SearchFacets.DateFacet">
+            <summary>
+                Facet representing the temporal distribution of articles.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.DateFacet.Period">
+            <summary>
+                Gets period (YYYY-MM for monthly, YYYY for yearly).
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.DateFacet.Count">
+            <summary>
+                Gets number of articles in this period.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.DateFacet.PeriodStart">
+            <summary>
+                Gets start date of the period.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.DateFacet.PeriodEnd">
+            <summary>
+                Gets end date of the period.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SearchFacets.SearchFacets">
+            <summary>
+                Search facets with article counts by criteria.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.SearchFacets.Categories">
+            <summary>
+                Gets article counts by category.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.SearchFacets.Tags">
+            <summary>
+                Gets article counts by tag.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.SearchFacets.Authors">
+            <summary>
+                Gets article counts by author.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.SearchFacets.DateDistribution">
+            <summary>
+                Gets article distribution by period.
+            </summary>
+        </member>
+        <member name="T:Watch.Manager.Service.Database.Models.SearchFacets.TagFacet">
+            <summary>
+                Facet representing the number of articles per tag.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.TagFacet.TagName">
+            <summary>
+                Gets tag name.
+            </summary>
+        </member>
+        <member name="P:Watch.Manager.Service.Database.Models.SearchFacets.TagFacet.Count">
+            <summary>
+                Gets number of articles with this tag.
             </summary>
         </member>
     </members>

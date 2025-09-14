@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -29,6 +29,8 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" />
         <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="Microsoft.KernelMemory.AI.Tiktoken" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
+        <PackageReference Include="StyleCop.Analyzers" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Watch.Manager.Service.Database\Watch.Manager.Service.Database.csproj" />

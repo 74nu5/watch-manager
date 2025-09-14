@@ -1,207 +1,211 @@
-namespace Watch.Manager.Service.Database.Extensions;
+﻿namespace Watch.Manager.Service.Database.Extensions;
 
 using Watch.Manager.Service.Database.Entities;
 
 /// <summary>
-/// Extensions pour la gestion de la hiérarchie des catégories.
+///     Extensions for managing category hierarchy.
 /// </summary>
-public static class CategoryHierarchyExtensions
+internal static class CategoryHierarchyExtensions
 {
     /// <summary>
-    /// Calcule le chemin hiérarchique complet d'une catégorie.
+    ///     Calculates the full hierarchical path of a category.
     /// </summary>
-    /// <param name="category">La catégorie.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Le chemin hiérarchique (ex: "Parent/Enfant/Sous-enfant").</returns>
+    /// <param name="category">The category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>The hierarchical path (e.g., "Parent/Child/Sub-child").</returns>
     public static string CalculateHierarchyPath(this Category category, IEnumerable<Category> allCategories)
     {
         var pathSegments = new List<string>();
         var currentCategory = category;
 
+        var categories = allCategories.ToList();
+
         while (currentCategory != null)
         {
             pathSegments.Insert(0, currentCategory.Name);
             currentCategory = currentCategory.ParentId.HasValue
-                ? allCategories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value)
-                : null;
+                                      ? categories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value)
+                                      : null;
         }
 
         return string.Join("/", pathSegments);
     }
 
     /// <summary>
-    /// Calcule le niveau de profondeur dans la hiérarchie.
+    ///     Calculates the depth level in the hierarchy.
     /// </summary>
-    /// <param name="category">La catégorie.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Le niveau de profondeur (0 = racine).</returns>
+    /// <param name="category">The category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>The depth level (0 = root).</returns>
     public static int CalculateHierarchyLevel(this Category category, IEnumerable<Category> allCategories)
     {
         var level = 0;
         var currentCategory = category;
 
+        var categories = allCategories.ToList();
+
         while (currentCategory?.ParentId != null)
         {
             level++;
-            currentCategory = allCategories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value);
+            currentCategory = categories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value);
         }
 
         return level;
     }
 
     /// <summary>
-    /// Obtient tous les ancêtres d'une catégorie.
+    ///     Gets all ancestors of a category.
     /// </summary>
-    /// <param name="category">La catégorie.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Liste des catégories ancêtres (du plus proche au plus éloigné).</returns>
+    /// <param name="category">The category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>List of ancestor categories (from closest to farthest).</returns>
     public static IEnumerable<Category> GetAncestors(this Category category, IEnumerable<Category> allCategories)
     {
         var ancestors = new List<Category>();
         var currentCategory = category;
+        var categories = allCategories.ToList();
 
-        while (currentCategory?.ParentId != null)
+        while (currentCategory.ParentId != null)
         {
-            var parent = allCategories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value);
+            var parent = categories.FirstOrDefault(c => c.Id == currentCategory.ParentId.Value);
+
             if (parent != null)
             {
                 ancestors.Add(parent);
                 currentCategory = parent;
+                continue;
             }
-            else
-            {
-                break;
-            }
+
+            break;
         }
 
         return ancestors;
     }
 
     /// <summary>
-    /// Obtient tous les descendants d'une catégorie de manière récursive.
+    ///     Gets all descendants of a category recursively.
     /// </summary>
-    /// <param name="category">La catégorie parent.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Liste de tous les descendants.</returns>
+    /// <param name="category">The parent category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>List of all descendant categories.</returns>
     public static IEnumerable<Category> GetAllDescendants(this Category category, IEnumerable<Category> allCategories)
     {
         var descendants = new List<Category>();
-        var directChildren = allCategories.Where(c => c.ParentId == category.Id);
+        var categories = allCategories.ToList();
+        var directChildren = categories.Where(c => c.ParentId == category.Id);
 
         foreach (var child in directChildren)
         {
             descendants.Add(child);
-            descendants.AddRange(child.GetAllDescendants(allCategories));
+            descendants.AddRange(child.GetAllDescendants(categories));
         }
 
         return descendants;
     }
 
     /// <summary>
-    /// Vérifie si une catégorie est un ancêtre d'une autre catégorie.
+    ///     Checks if a category is an ancestor of another category.
     /// </summary>
-    /// <param name="potentialAncestor">La catégorie potentiellement ancêtre.</param>
-    /// <param name="category">La catégorie à vérifier.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>True si potentialAncestor est un ancêtre de category.</returns>
+    /// <param name="potentialAncestor">The potential ancestor category.</param>
+    /// <param name="category">The category to check.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>True if <paramref name="potentialAncestor" /> is an ancestor of <paramref name="category" />.</returns>
     public static bool IsAncestorOf(this Category potentialAncestor, Category category, IEnumerable<Category> allCategories)
-    {
-        return category.GetAncestors(allCategories).Any(a => a.Id == potentialAncestor.Id);
-    }
+        => category.GetAncestors(allCategories).Any(a => a.Id == potentialAncestor.Id);
 
     /// <summary>
-    /// Obtient les mots-clés effectifs d'une catégorie (incluant l'héritage).
+    ///     Gets the effective keywords of a category (including inheritance).
     /// </summary>
-    /// <param name="category">La catégorie.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Liste des mots-clés effectifs.</returns>
+    /// <param name="category">The category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>List of effective keywords.</returns>
     public static string[] GetEffectiveKeywords(this Category category, IEnumerable<Category> allCategories)
     {
         var keywords = new HashSet<string>(category.Keywords);
 
-        if (category.InheritFromParent && category.ParentId.HasValue)
+        if (category is { InheritFromParent: true, ParentId: not null })
         {
             var ancestors = category.GetAncestors(allCategories);
+
             foreach (var ancestor in ancestors)
             {
-                if (ancestor.InheritFromParent || ancestor.ParentId == null) // Les racines héritent toujours
+                // Roots always inherit
+                if (ancestor.InheritFromParent || ancestor.ParentId == null)
                 {
                     foreach (var keyword in ancestor.Keywords)
-                    {
                         _ = keywords.Add(keyword);
-                    }
                 }
             }
         }
 
-        return keywords.ToArray();
+        return [.. keywords];
     }
 
     /// <summary>
-    /// Obtient le seuil de confiance effectif d'une catégorie (incluant l'héritage).
+    ///     Gets the effective confidence threshold of a category (including inheritance).
     /// </summary>
-    /// <param name="category">La catégorie.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
-    /// <returns>Le seuil de confiance effectif.</returns>
+    /// <param name="category">The category.</param>
+    /// <param name="allCategories">All available categories.</param>
+    /// <returns>The effective confidence threshold.</returns>
     public static double GetEffectiveConfidenceThreshold(this Category category, IEnumerable<Category> allCategories)
     {
         if (category.ConfidenceThreshold.HasValue)
-        {
             return category.ConfidenceThreshold.Value;
-        }
 
-        if (category.InheritFromParent && category.ParentId.HasValue)
+        if (category is { InheritFromParent: true, ParentId: not null })
         {
-            var parent = allCategories.FirstOrDefault(c => c.Id == category.ParentId.Value);
+            var categories = allCategories.ToList();
+            var parent = categories.FirstOrDefault(c => c.Id == category.ParentId.Value);
             if (parent != null)
-            {
-                return parent.GetEffectiveConfidenceThreshold(allCategories);
-            }
+                return parent.GetEffectiveConfidenceThreshold(categories);
         }
 
-        return 0.7; // Valeur par défaut
+        return 0.7; // Default value
     }
 
     /// <summary>
-    /// Met à jour les chemins hiérarchiques de tous les descendants d'une catégorie.
+    ///     Updates the hierarchical paths of all descendants of a category.
     /// </summary>
-    /// <param name="category">La catégorie parent.</param>
-    /// <param name="allCategories">Toutes les catégories disponibles.</param>
+    /// <param name="category">The parent category.</param>
+    /// <param name="allCategories">All available categories.</param>
     public static void UpdateDescendantsHierarchyPaths(this Category category, IEnumerable<Category> allCategories)
     {
-        var descendants = category.GetAllDescendants(allCategories);
+        var categories = allCategories.ToList();
+        var descendants = category.GetAllDescendants(categories);
+
         foreach (var descendant in descendants)
         {
-            descendant.HierarchyPath = descendant.CalculateHierarchyPath(allCategories);
-            descendant.HierarchyLevel = descendant.CalculateHierarchyLevel(allCategories);
+            descendant.HierarchyPath = descendant.CalculateHierarchyPath(categories);
+            descendant.HierarchyLevel = descendant.CalculateHierarchyLevel(categories);
         }
     }
 
     /// <summary>
-    /// Obtient une représentation en arbre hiérarchique des catégories.
+    ///     Gets a hierarchical tree representation of the categories.
     /// </summary>
-    /// <param name="categories">Les catégories à organiser.</param>
-    /// <returns>Les catégories racines avec leurs enfants organisés en arbre.</returns>
+    /// <param name="categories">The categories to organize.</param>
+    /// <returns>The root categories with their children organized as a tree.</returns>
     public static IEnumerable<Category> ToHierarchicalTree(this IEnumerable<Category> categories)
     {
         var categoryList = categories.ToList();
         var categoryDict = categoryList.ToDictionary(c => c.Id, c => c);
 
-        // Organiser les enfants
+        // Organize children
         foreach (var category in categoryList)
         {
-            if (category.ParentId.HasValue && categoryDict.TryGetValue(category.ParentId.Value, out var parent))
+            if (!category.ParentId.HasValue || !categoryDict.TryGetValue(category.ParentId.Value, out var parent))
+                continue;
+
+            if (parent.Children is not List<Category> children)
             {
-                if (parent.Children is not List<Category> children)
-                {
-                    parent.Children = new List<Category>();
-                    children = (List<Category>)parent.Children;
-                }
-                children.Add(category);
+                parent.Children = [];
+                children = (List<Category>)parent.Children;
             }
+
+            children.Add(category);
         }
 
-        // Trier les enfants par DisplayOrder puis par nom
+        // Sort children by DisplayOrder then by name
         foreach (var category in categoryList)
         {
             if (category.Children is List<Category> children)
@@ -214,10 +218,10 @@ public static class CategoryHierarchyExtensions
             }
         }
 
-        // Retourner seulement les catégories racines, triées
+        // Return only root categories, sorted
         return categoryList
-            .Where(c => c.ParentId == null)
-            .OrderBy(c => c.DisplayOrder)
-            .ThenBy(c => c.Name);
+              .Where(c => c.ParentId == null)
+              .OrderBy(c => c.DisplayOrder)
+              .ThenBy(c => c.Name);
     }
 }

@@ -1,4 +1,4 @@
-# Instructions pour les agents IA - Watch Manager
+﻿# Instructions pour les agents IA - Watch Manager
 
 ## Architecture et contexte
 
@@ -149,7 +149,7 @@ if (useOllama) builder.AddOllama(apiService);
 - **Resilience** : HTTP clients avec retry policies (temporairement désactivé)
 
 ### Documentation et maintenance
-- **XML documentation** : Obligatoire pour toutes les API publiques
+- **XML documentation** : Obligatoire pour toutes les API publiques EN ANGLAIS
 - **StyleCop** : Configuration stricte avec suppressions ciblées
 - **EditorConfig** : Formatage uniforme, UTF-8 BOM, CRLF sur Windows
 - **CORS policies** : Séparées pour développement local (7020) et production Azure

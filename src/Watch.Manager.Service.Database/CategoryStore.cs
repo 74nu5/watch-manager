@@ -9,26 +9,26 @@ using Watch.Manager.Service.Database.Entities;
 using Watch.Manager.Service.Database.Extensions;
 
 /// <summary>
-/// Implémentation du service de gestion des catégories.
+///     Implementation of the category management service.
 /// </summary>
 internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesContext context) : ICategoryStore
 {
     /// <inheritdoc />
-    public async Task<IEnumerable<Category>> GetAllCategoriesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
+    public async Task<Category[]> GetAllCategoriesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Récupération de toutes les catégories. IncludeInactive: {IncludeInactive}", includeInactive);
 
         var query = context.Categories
-            .Include(c => c.Parent)
-            .Include(c => c.Children)
-            .AsQueryable();
+                           .Include(c => c.Parent)
+                           .Include(c => c.Children)
+                           .AsQueryable();
 
         if (!includeInactive)
             query = query.Where(c => c.IsActive);
 
         return await query
                     .OrderBy(c => c.Name)
-                    .ToListAsync(cancellationToken)
+                    .ToArrayAsync(cancellationToken)
                     .ConfigureAwait(false);
     }
 
@@ -38,10 +38,10 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Récupération de la catégorie avec l'ID: {CategoryId}", id);
 
         return await context.Categories
-            .Include(c => c.Parent)
-            .Include(c => c.Children)
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
-            .ConfigureAwait(false);
+                            .Include(c => c.Parent)
+                            .Include(c => c.Children)
+                            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+                            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -52,10 +52,10 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         category.CreatedAt = DateTime.UtcNow;
         category.UpdatedAt = DateTime.UtcNow;
 
-        // Calculer le chemin hiérarchique et le niveau
+        // Calculate hierarchy path and level
         if (category.ParentId.HasValue)
         {
-            var allCategories = await context.Categories.ToListAsync(cancellationToken).ConfigureAwait(false);
+            var allCategories = await context.Categories.ToArrayAsync(cancellationToken).ConfigureAwait(false);
             category.HierarchyPath = category.CalculateHierarchyPath(allCategories);
             category.HierarchyLevel = category.CalculateHierarchyLevel(allCategories);
         }
@@ -82,16 +82,16 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
 
         category.UpdatedAt = DateTime.UtcNow;
 
-        // Recalculer la hiérarchie si nécessaire
+        // Recalculate hierarchy if needed
         if (hierarchyChanged)
         {
             var allCategories = await context.Categories.Where(c => c.Id != category.Id).ToListAsync(cancellationToken).ConfigureAwait(false);
-            allCategories.Add(category); // Ajouter la catégorie mise à jour
+            allCategories.Add(category); // Add the updated category
 
             category.HierarchyPath = category.CalculateHierarchyPath(allCategories);
             category.HierarchyLevel = category.CalculateHierarchyLevel(allCategories);
 
-            // Mettre à jour les descendants si le nom ou le parent a changé
+            // Update descendants if name or parent changed
             category.UpdateDescendantsHierarchyPaths(allCategories);
         }
 
@@ -108,9 +108,9 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Suppression de la catégorie: {CategoryId}", id);
 
         var category = await context.Categories
-            .Include(c => c.Children)
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
-            .ConfigureAwait(false);
+                                    .Include(c => c.Children)
+                                    .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+                                    .ConfigureAwait(false);
 
         if (category == null)
         {
@@ -118,22 +118,22 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
             return false;
         }
 
-        // Vérifier s'il y a des sous-catégories
-        if (category.Children.Any())
+        // Check for subcategories
+        if (category.Children.Count != 0)
         {
             logger.LogWarning("Impossible de supprimer la catégorie {CategoryId}: elle contient des sous-catégories", id);
             throw new InvalidOperationException("Impossible de supprimer une catégorie qui contient des sous-catégories.");
         }
 
-        // Supprimer toutes les relations avec les articles
+        // Remove all article-category relations
         var articleCategories = await context.ArticleCategories
-            .Where(ac => ac.CategoryId == id)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+                                             .Where(ac => ac.CategoryId == id)
+                                             .ToListAsync(cancellationToken)
+                                             .ConfigureAwait(false);
 
         context.ArticleCategories.RemoveRange(articleCategories);
 
-        // Supprimer la catégorie
+        // Remove the category
         _ = context.Categories.Remove(category);
         _ = await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -147,9 +147,9 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Récupération des catégories racines. IncludeInactive: {IncludeInactive}", includeInactive);
 
         var query = context.Categories
-            .Where(c => c.ParentId == null)
-            .Include(c => c.Children.Where(child => includeInactive || child.IsActive))
-            .AsQueryable();
+                           .Where(c => c.ParentId == null)
+                           .Include(c => c.Children.Where(child => includeInactive || child.IsActive))
+                           .AsQueryable();
 
         if (!includeInactive)
             query = query.Where(c => c.IsActive);
@@ -184,10 +184,10 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
     {
         logger.LogInformation("Assignation de la catégorie {CategoryId} à l'article {ArticleId}", categoryId, articleId);
 
-        // Vérifier si l'article existe
+        // Check if article exists
         var articleExists = await context.Articles
-            .AnyAsync(a => a.Id == articleId, cancellationToken)
-            .ConfigureAwait(false);
+                                         .AnyAsync(a => a.Id == articleId, cancellationToken)
+                                         .ConfigureAwait(false);
 
         if (!articleExists)
         {
@@ -195,29 +195,30 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
             return false;
         }
 
-        // Vérifier si la catégorie existe
+        // Check if category exists
         var categoryExists = await this.CategoryExistsAsync(categoryId, cancellationToken).ConfigureAwait(false);
+
         if (!categoryExists)
         {
             logger.LogWarning("Catégorie non trouvée: {CategoryId}", categoryId);
             return false;
         }
 
-        // Vérifier si l'assignation existe déjà
+        // Check if assignment already exists
         var existingAssignment = await context.ArticleCategories
-            .FirstOrDefaultAsync(ac => ac.ArticleId == articleId && ac.CategoryId == categoryId, cancellationToken)
-            .ConfigureAwait(false);
+                                              .FirstOrDefaultAsync(ac => ac.ArticleId == articleId && ac.CategoryId == categoryId, cancellationToken)
+                                              .ConfigureAwait(false);
 
         if (existingAssignment != null)
         {
-            // Mettre à jour l'assignation existante
+            // Update existing assignment
             existingAssignment.IsManual = isManual;
             existingAssignment.ConfidenceScore = confidenceScore;
             existingAssignment.AssignedAt = DateTime.UtcNow;
         }
         else
         {
-            // Créer une nouvelle assignation
+            // Create new assignment
             var articleCategory = new ArticleCategory
             {
                 ArticleId = articleId,
@@ -241,8 +242,8 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Suppression de l'assignation: Article {ArticleId} -> Catégorie {CategoryId}", articleId, categoryId);
 
         var articleCategory = await context.ArticleCategories
-            .FirstOrDefaultAsync(ac => ac.ArticleId == articleId && ac.CategoryId == categoryId, cancellationToken)
-            .ConfigureAwait(false);
+                                           .FirstOrDefaultAsync(ac => ac.ArticleId == articleId && ac.CategoryId == categoryId, cancellationToken)
+                                           .ConfigureAwait(false);
 
         if (articleCategory == null)
         {
@@ -279,16 +280,16 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         if (!includeChildren)
         {
             return await context.ArticleCategories
-                .CountAsync(ac => ac.CategoryId == categoryId, cancellationToken)
-                .ConfigureAwait(false);
+                                .CountAsync(ac => ac.CategoryId == categoryId, cancellationToken)
+                                .ConfigureAwait(false);
         }
 
-        // Récupérer tous les IDs des catégories enfants
+        // Get all child category IDs
         var categoryIds = await this.GetCategoryAndChildrenIdsAsync(categoryId, cancellationToken).ConfigureAwait(false);
 
         return await context.ArticleCategories
-            .CountAsync(ac => categoryIds.Contains(ac.CategoryId), cancellationToken)
-            .ConfigureAwait(false);
+                            .CountAsync(ac => categoryIds.Contains(ac.CategoryId), cancellationToken)
+                            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -297,35 +298,11 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Récupération des titres d'articles liés à la catégorie: {CategoryId}", categoryId);
 
         return await context.ArticleCategories
-            .Where(ac => ac.CategoryId == categoryId)
-            .Include(ac => ac.Article)
-            .Select(ac => ac.Article.Title)
-            .ToArrayAsync(cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Récupère l'ID d'une catégorie et tous les IDs de ses sous-catégories de manière récursive.
-    /// </summary>
-    /// <param name="categoryId">ID de la catégorie parent.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des IDs de catégories.</returns>
-    private async Task<List<int>> GetCategoryAndChildrenIdsAsync(int categoryId, CancellationToken cancellationToken)
-    {
-        var categoryIds = new List<int> { categoryId };
-        var children = await context.Categories
-            .Where(c => c.ParentId == categoryId)
-            .Select(c => c.Id)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        foreach (var childId in children)
-        {
-            var childIds = await this.GetCategoryAndChildrenIdsAsync(childId, cancellationToken).ConfigureAwait(false);
-            categoryIds.AddRange(childIds);
-        }
-
-        return categoryIds;
+                            .Where(ac => ac.CategoryId == categoryId)
+                            .Include(ac => ac.Article)
+                            .Select(ac => ac.Article.Title)
+                            .ToArrayAsync(cancellationToken)
+                            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -360,23 +337,23 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Category>> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
+    public async Task<Category[]> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Récupération des catégories en arbre hiérarchique. IncludeInactive: {IncludeInactive}", includeInactive);
 
         var query = context.Categories.AsQueryable()
-            .Include(c => c.Children)
-            .Where(c => c.ParentId == null);
+                           .Include(c => c.Children)
+                           .Where(c => c.ParentId == null);
 
         if (!includeInactive)
             query = query.Where(c => c.IsActive);
 
-        var categories = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var categories = await query.ToArrayAsync(cancellationToken).ConfigureAwait(false);
         return categories;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Category>> GetCategoryDescendantsAsync(int categoryId, bool includeInactive = false, CancellationToken cancellationToken = default)
+    public async Task<Category[]> GetCategoryDescendantsAsync(int categoryId, bool includeInactive = false, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Récupération des descendants de la catégorie: {CategoryId}", categoryId);
 
@@ -384,13 +361,13 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
 
         if (category == null)
-            return Enumerable.Empty<Category>();
+            return [];
 
-        return category.GetAllDescendants(allCategories);
+        return [.. category.GetAllDescendants(allCategories)];
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Category>> GetCategoryAncestorsAsync(int categoryId, CancellationToken cancellationToken = default)
+    public async Task<Category[]> GetCategoryAncestorsAsync(int categoryId, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Récupération des ancêtres de la catégorie: {CategoryId}", categoryId);
 
@@ -398,9 +375,9 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         var category = allCategories.FirstOrDefault(c => c.Id == categoryId);
 
         if (category == null)
-            return Enumerable.Empty<Category>();
+            return [];
 
-        return category.GetAncestors(allCategories);
+        return [.. category.GetAncestors(allCategories)];
     }
 
     /// <inheritdoc />
@@ -418,7 +395,7 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         if (category == null || newParent == null)
             return false;
 
-        // Vérifier si la nouvelle catégorie parent est un descendant de la catégorie actuelle
+        // Check if the new parent is a descendant of the current category
         return category.IsAncestorOf(newParent, allCategories);
     }
 
@@ -428,9 +405,11 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         logger.LogInformation("Réorganisation de {Count} catégories", categoryOrders.Count);
 
         var updateCount = 0;
+
         foreach (var (categoryId, order) in categoryOrders)
         {
             var category = await context.Categories.FindAsync([categoryId], cancellationToken).ConfigureAwait(false);
+
             if (category != null && category.DisplayOrder != order)
             {
                 category.DisplayOrder = order;
@@ -446,5 +425,29 @@ internal sealed class CategoryStore(ILogger<CategoryStore> logger, ArticlesConte
         }
 
         return updateCount;
+    }
+
+    /// <summary>
+    ///     Retrieves the ID of a category and all its child category IDs recursively.
+    /// </summary>
+    /// <param name="categoryId">The parent category ID.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>List of category IDs.</returns>
+    private async Task<List<int>> GetCategoryAndChildrenIdsAsync(int categoryId, CancellationToken cancellationToken)
+    {
+        var categoryIds = new List<int> { categoryId };
+        var children = await context.Categories
+                                    .Where(c => c.ParentId == categoryId)
+                                    .Select(c => c.Id)
+                                    .ToListAsync(cancellationToken)
+                                    .ConfigureAwait(false);
+
+        foreach (var childId in children)
+        {
+            var childIds = await this.GetCategoryAndChildrenIdsAsync(childId, cancellationToken).ConfigureAwait(false);
+            categoryIds.AddRange(childIds);
+        }
+
+        return categoryIds;
     }
 }

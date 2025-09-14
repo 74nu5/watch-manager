@@ -78,15 +78,23 @@ public static partial class Extensions
 
         _ = builder.Services.AddOpenTelemetry()
                    .WithMetrics(metrics => _ = metrics.AddAspNetCoreInstrumentation()
+                                                      .AddProcessInstrumentation()
                                                       .AddHttpClientInstrumentation()
-                                                      .AddRuntimeInstrumentation())
+                                                      .AddRuntimeInstrumentation()
+                                                      .AddSqlClientInstrumentation())
                    .WithTracing(tracing =>
                     {
                         if (builder.Environment.IsDevelopment())
                             _ = tracing.SetSampler(new AlwaysOnSampler());
 
                         _ = tracing.AddAspNetCoreInstrumentation()
-                                   .AddHttpClientInstrumentation();
+                                   .AddHttpClientInstrumentation()
+                                   .AddSqlClientInstrumentation()
+                                   .AddEntityFrameworkCoreInstrumentation(options =>
+                                    {
+                                        options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
+                                        options.SetDbStatementForText = builder.Environment.IsDevelopment();
+                                    });
                     });
 
         _ = builder.AddOpenTelemetryExporters();

@@ -1,4 +1,4 @@
-namespace Watch.Manager.Web.Services.Models;
+﻿namespace Watch.Manager.Web.Services.Models;
 
 /// <summary>
 /// Modèle pour représenter une catégorie dans l'interface web.
@@ -48,7 +48,7 @@ public sealed class CategoryModel
     /// <summary>
     /// Sous-catégories.
     /// </summary>
-    public List<CategoryModel> Children { get; set; } = new();
+    public List<CategoryModel> Children { get; set; } = [];
 
     /// <summary>
     /// Nombre d'articles dans cette catégorie.
@@ -58,7 +58,7 @@ public sealed class CategoryModel
     /// <summary>
     /// Liste des articles liés à cette catégorie.
     /// </summary>
-    public List<string> LinkedArticles { get; set; } = new();
+    public List<string> LinkedArticles { get; set; } = [];
 
     /// <summary>
     /// Date de création.

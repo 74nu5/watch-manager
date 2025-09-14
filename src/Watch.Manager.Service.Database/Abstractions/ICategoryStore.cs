@@ -1,168 +1,168 @@
-namespace Watch.Manager.Service.Database.Abstractions;
+﻿namespace Watch.Manager.Service.Database.Abstractions;
 
 using Watch.Manager.Service.Database.Entities;
 
 /// <summary>
-/// Interface pour la gestion des catégories.
+///     Interface for managing categories.
 /// </summary>
 public interface ICategoryStore
 {
     /// <summary>
-    /// Récupère toutes les catégories.
+    ///     Retrieves all categories.
     /// </summary>
-    /// <param name="includeInactive">Inclut les catégories inactives.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des catégories.</returns>
-    Task<IEnumerable<Category>> GetAllCategoriesAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>An array of all categories.</returns>
+    Task<Category[]> GetAllCategoriesAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère une catégorie par son identifiant.
+    ///     Retrieves a category by its identifier.
     /// </summary>
-    /// <param name="id">Identifiant de la catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>La catégorie ou null si non trouvée.</returns>
+    /// <param name="id">The category identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The category if found; otherwise, null.</returns>
     Task<Category?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Crée une nouvelle catégorie.
+    ///     Creates a new category.
     /// </summary>
-    /// <param name="category">La catégorie à créer.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>La catégorie créée.</returns>
+    /// <param name="category">The category to create.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The created category.</returns>
     Task<Category> CreateCategoryAsync(Category category, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Met à jour une catégorie existante.
+    ///     Updates an existing category.
     /// </summary>
-    /// <param name="category">La catégorie à mettre à jour.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>La catégorie mise à jour.</returns>
+    /// <param name="category">The category to update.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated category.</returns>
     Task<Category> UpdateCategoryAsync(Category category, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Supprime une catégorie.
+    ///     Deletes a category.
     /// </summary>
-    /// <param name="id">Identifiant de la catégorie à supprimer.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True si la suppression a réussi.</returns>
+    /// <param name="id">The identifier of the category to delete.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the deletion succeeded; otherwise, false.</returns>
     Task<bool> DeleteCategoryAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère les catégories racines (sans parent).
+    ///     Retrieves root categories (categories without a parent).
     /// </summary>
-    /// <param name="includeInactive">Inclut les catégories inactives.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des catégories racines avec leurs enfants.</returns>
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A collection of root categories with their children.</returns>
     Task<IEnumerable<Category>> GetRootCategoriesAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Vérifie si une catégorie existe.
+    ///     Checks if a category exists.
     /// </summary>
-    /// <param name="id">Identifiant de la catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True si la catégorie existe.</returns>
+    /// <param name="id">The category identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the category exists; otherwise, false.</returns>
     Task<bool> CategoryExistsAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Vérifie si un nom de catégorie existe déjà.
+    ///     Checks if a category name already exists.
     /// </summary>
-    /// <param name="name">Nom de la catégorie.</param>
-    /// <param name="excludeId">Identifiant à exclure de la vérification.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True si le nom existe déjà.</returns>
+    /// <param name="name">The category name.</param>
+    /// <param name="excludeId">An identifier to exclude from the check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the name already exists; otherwise, false.</returns>
     Task<bool> CategoryNameExistsAsync(string name, int? excludeId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Assigne une catégorie à un article.
+    ///     Assigns a category to an article.
     /// </summary>
-    /// <param name="articleId">Identifiant de l'article.</param>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="isManual">Indique si l'assignation est manuelle.</param>
-    /// <param name="confidenceScore">Score de confiance pour les assignations automatiques.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True si l'assignation a réussi.</returns>
+    /// <param name="articleId">The article identifier.</param>
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="isManual">Indicates if the assignment is manual.</param>
+    /// <param name="confidenceScore">Confidence score for automatic assignments.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the assignment succeeded; otherwise, false.</returns>
     Task<bool> AssignCategoryToArticleAsync(int articleId, int categoryId, bool isManual = true, double? confidenceScore = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retire une catégorie d'un article.
+    ///     Removes a category from an article.
     /// </summary>
-    /// <param name="articleId">Identifiant de l'article.</param>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True si la suppression a réussi.</returns>
+    /// <param name="articleId">The article identifier.</param>
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the removal succeeded; otherwise, false.</returns>
     Task<bool> RemoveCategoryFromArticleAsync(int articleId, int categoryId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère les catégories d'un article.
+    ///     Retrieves the categories assigned to an article.
     /// </summary>
-    /// <param name="articleId">Identifiant de l'article.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des catégories de l'article.</returns>
+    /// <param name="articleId">The article identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A collection of categories assigned to the article.</returns>
     Task<IEnumerable<Category>> GetArticleCategoriesAsync(int articleId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Compte le nombre d'articles dans une catégorie.
+    ///     Counts the number of articles in a category.
     /// </summary>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="includeChildren">Inclut les articles des sous-catégories.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Nombre d'articles.</returns>
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="includeChildren">Whether to include articles from subcategories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The number of articles in the category.</returns>
     Task<int> GetArticleCountInCategoryAsync(int categoryId, bool includeChildren = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère les titres des articles liés à une catégorie.
+    ///     Retrieves the titles of articles linked to a category.
     /// </summary>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des titres d'articles.</returns>
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>An array of article titles.</returns>
     Task<string[]> GetLinkedArticleTitlesAsync(int categoryId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Met à jour les chemins hiérarchiques de toutes les catégories.
+    ///     Updates the hierarchy paths of all categories.
     /// </summary>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Nombre de catégories mises à jour.</returns>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The number of categories updated.</returns>
     Task<int> UpdateAllHierarchyPathsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère les catégories organisées en arbre hiérarchique.
+    ///     Retrieves categories organized as a hierarchical tree.
     /// </summary>
-    /// <param name="includeInactive">Inclut les catégories inactives.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Catégories organisées en arbre.</returns>
-    Task<IEnumerable<Category>> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>An array of categories organized as a tree.</returns>
+    Task<Category[]> GetCategoriesAsTreeAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère tous les descendants d'une catégorie.
+    ///     Retrieves all descendants of a category.
     /// </summary>
-    /// <param name="categoryId">Identifiant de la catégorie parent.</param>
-    /// <param name="includeInactive">Inclut les catégories inactives.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des descendants.</returns>
-    Task<IEnumerable<Category>> GetCategoryDescendantsAsync(int categoryId, bool includeInactive = false, CancellationToken cancellationToken = default);
+    /// <param name="categoryId">The parent category identifier.</param>
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>An array of descendant categories.</returns>
+    Task<Category[]> GetCategoryDescendantsAsync(int categoryId, bool includeInactive = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Récupère les ancêtres d'une catégorie (breadcrumb).
+    ///     Retrieves the ancestors of a category (breadcrumb).
     /// </summary>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Liste des ancêtres (du plus proche au plus éloigné).</returns>
-    Task<IEnumerable<Category>> GetCategoryAncestorsAsync(int categoryId, CancellationToken cancellationToken = default);
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>An array of ancestor categories, from closest to farthest.</returns>
+    Task<Category[]> GetCategoryAncestorsAsync(int categoryId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Vérifie s'il y aurait des références circulaires lors du changement de parent.
+    ///     Checks if changing the parent would create a circular reference.
     /// </summary>
-    /// <param name="categoryId">Identifiant de la catégorie.</param>
-    /// <param name="newParentId">Identifiant du nouveau parent.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>True s'il y aurait une référence circulaire.</returns>
+    /// <param name="categoryId">The category identifier.</param>
+    /// <param name="newParentId">The new parent identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if a circular reference would be created; otherwise, false.</returns>
     Task<bool> WouldCreateCircularReferenceAsync(int categoryId, int newParentId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Réorganise l'ordre d'affichage des catégories.
+    ///     Reorders the display order of categories.
     /// </summary>
-    /// <param name="categoryOrders">Dictionnaire des ordres d'affichage par ID de catégorie.</param>
-    /// <param name="cancellationToken">Token d'annulation.</param>
-    /// <returns>Nombre de catégories mises à jour.</returns>
+    /// <param name="categoryOrders">A dictionary of display orders by category ID.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The number of categories updated.</returns>
     Task<int> ReorderCategoriesAsync(Dictionary<int, int> categoryOrders, CancellationToken cancellationToken = default);
 }

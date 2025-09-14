@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="src/Watch.Manager.ApiService/Watch.Manager.ApiService.csproj" />
+    <Project Path="src/Watch.Manager.Service.Analyse/Watch.Manager.Service.Analyse.csproj" />
+    <Project Path="src/Watch.Manager.Service.Database/Watch.Manager.Service.Database.csproj" />
+    <Project Path="src/Watch.Manager.Service.Migrations/Watch.Manager.Service.Migrations.csproj" />
+  </Folder>
+  <Folder Name="/Common/">
+    <Project Path="src/Watch.Manager.Common/Watch.Manager.Common.csproj" />
+  </Folder>
+  <Folder Name="/Host/">
+    <Project Path="src/Watch.Manager.AppHost/Watch.Manager.AppHost.csproj" />
+    <Project Path="src/Watch.Manager.ServiceDefaults/Watch.Manager.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="src/Watch.Manager.Tests/Watch.Manager.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Web/">
+    <Project Path="src/Watch.Manager.Web.Services/Watch.Manager.Web.Services.csproj" />
+    <Project Path="src/Watch.Manager.Web/Watch.Manager.Web.csproj" />
+  </Folder>
+  <Folder Name="/Éléments de solution/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="Roadmap.md" />
+    <File Path="stylecop.json" />
+  </Folder>
+</Solution>

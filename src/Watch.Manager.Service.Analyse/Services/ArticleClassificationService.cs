@@ -242,7 +242,7 @@ internal sealed class ArticleClassificationService : IArticleClassificationServi
 
             if (embedding != null)
             {
-                category.Embedding = embedding;
+                category.Embedding = new(embedding);
                 category.UpdatedAt = DateTime.UtcNow;
                 updatedCount++;
 
@@ -436,7 +436,7 @@ internal sealed class ArticleClassificationService : IArticleClassificationServi
         }
 
         // 3. Bonus pour les catégories avec historique de classification manuelle similaire
-        var historicalScore = await this.CalculateHistoricalScore(article, category, cancellationToken).ConfigureAwait(false);
+        var historicalScore = await this.CalculateHistoricalScoreAsync(article, category, cancellationToken).ConfigureAwait(false);
 
         if (historicalScore > 0)
         {
@@ -457,18 +457,16 @@ internal sealed class ArticleClassificationService : IArticleClassificationServi
             return 0;
 
         // Utiliser l'embedding existant de l'article (combinaison head + body)
-        var articleEmbedding = CombineEmbeddings(article.EmbeddingHead, article.EmbeddingBody);
+        var articleEmbedding = CombineEmbeddings(article.EmbeddingHead.Memory.ToArray(), article.EmbeddingBody.Memory.ToArray());
 
         // Calculer la similarité cosinus
-        return CalculateCosineSimilarity(articleEmbedding, category.Embedding);
+        return CalculateCosineSimilarity(articleEmbedding, category.Embedding.Value.Memory.ToArray());
     }
 
     /// <summary>
     ///     Calcule un score basé sur l'historique de classification.
     /// </summary>
-    private async Task<double> CalculateHistoricalScore(Article article,
-                                                        Category category,
-                                                        CancellationToken cancellationToken)
+    private async Task<double> CalculateHistoricalScoreAsync(Article article, Category category, CancellationToken cancellationToken)
     {
         // Rechercher des articles similaires déjà classifiés dans cette catégorie
         var similarClassifications = await this.context.ArticleCategories

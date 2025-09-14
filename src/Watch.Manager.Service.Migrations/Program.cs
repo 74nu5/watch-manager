@@ -5,12 +5,11 @@ using Watch.Manager.ServiceDefaults;
 var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
 
+builder.AddDatabaseServices();
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddOpenTelemetry()
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
-
-builder.AddDatabaseServices();
 
 var host = builder.Build();
 host.Run();

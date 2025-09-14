@@ -1,24 +1,21 @@
-@using Watch.Manager.Web.Services.Models
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
-
-<div class="tree-node" data-level="@Category.HierarchyLevel">
-    <div class="node-content @(IsSelected ? "selected" : "")">
-        @if (HasChildren)
+﻿@using Watch.Manager.Web.Services.Models
+<div class="tree-node" data-level="@(this.Category.HierarchyLevel)">
+    <div class="node-content @(this.IsSelected ? "selected" : "")">
+        @if (this.HasChildren)
         {
             <FluentButton
                 Appearance="Appearance.Stealth"
                 IconOnly="true"
-                @onclick="ToggleExpanded"
+                @onclick="this.ToggleExpanded"
                 Class="expand-button"
-                Title="@(IsExpanded ? "Réduire" : "Développer")">
-                @if (IsExpanded)
+                Title="@(this.IsExpanded ? "Réduire" : "Développer")">
+                @if (this.IsExpanded)
                 {
-                    <FluentIcon Value="@(new Size16.ChevronDown())" />
+                    <FluentIcon Value="@(new Size16.ChevronDown())"/>
                 }
                 else
                 {
-                    <FluentIcon Value="@(new Size16.ChevronRight())" />
+                    <FluentIcon Value="@(new Size16.ChevronRight())"/>
                 }
             </FluentButton>
         }
@@ -27,18 +24,18 @@
             <div class="spacer"></div>
         }
 
-        <div class="category-info" @onclick="SelectCategory">
-            <span class="category-icon">@(string.IsNullOrEmpty(Category.Icon) ? "📁" : Category.Icon)</span>
-            <span class="category-name">@Category.Name</span>
+        <div class="category-info" @onclick="this.SelectCategory">
+            <span class="category-icon">@(string.IsNullOrEmpty(this.Category.Icon) ? "📁" : this.Category.Icon)</span>
+            <span class="category-name">@(this.Category.Name)</span>
 
-            @if (Category.ArticleCount > 0)
+            @if (this.Category.ArticleCount > 0)
             {
                 <FluentBadge Appearance="Appearance.Neutral" Class="article-count">
-                    @Category.ArticleCount
+                    @(this.Category.ArticleCount)
                 </FluentBadge>
             }
 
-            @if (!Category.IsActive)
+            @if (!this.Category.IsActive)
             {
                 <FluentBadge Appearance="Appearance.Neutral" Class="inactive-badge">
                     Inactive
@@ -46,41 +43,41 @@
             }
         </div>
 
-        @if (ShowActions)
+        @if (this.ShowActions)
         {
             <div class="node-actions">
                 <FluentButton
                     Appearance="Appearance.Stealth"
                     IconOnly="true"
-                    @onclick="() => OnCategoryEdit.InvokeAsync(Category)"
+                    @onclick="() => this.OnCategoryEdit.InvokeAsync(this.Category)"
                     Title="Modifier">
-                    <FluentIcon Value="@(new Size16.Edit())" />
+                    <FluentIcon Value="@(new Size16.Edit())"/>
                 </FluentButton>
                 <FluentButton
                     Appearance="Appearance.Stealth"
                     IconOnly="true"
-                    @onclick="() => OnCategoryDelete.InvokeAsync(Category)"
+                    @onclick="() => this.OnCategoryDelete.InvokeAsync(this.Category)"
                     Title="Supprimer">
-                    <FluentIcon Value="@(new Size16.Delete())" />
+                    <FluentIcon Value="@(new Size16.Delete())"/>
                 </FluentButton>
             </div>
         }
     </div>
 
-    @if (HasChildren && IsExpanded)
+    @if (this.HasChildren && this.IsExpanded)
     {
         <div class="children-container">
-            @foreach (var child in Category.Children.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
+            @foreach (var child in this.Category.Children.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name))
             {
                 <CategoryTreeNode
                     Category="child"
-                    SelectedCategoryId="SelectedCategoryId"
-                    OnCategorySelected="OnCategorySelected"
-                    OnCategoryEdit="OnCategoryEdit"
-                    OnCategoryDelete="OnCategoryDelete"
-                    ShowActions="ShowActions"
-                    ExpandedCategories="ExpandedCategories"
-                    OnToggleExpanded="OnToggleExpanded" />
+                    SelectedCategoryId="this.SelectedCategoryId"
+                    OnCategorySelected="this.OnCategorySelected"
+                    OnCategoryEdit="this.OnCategoryEdit"
+                    OnCategoryDelete="this.OnCategoryDelete"
+                    ShowActions="this.ShowActions"
+                    ExpandedCategories="this.ExpandedCategories"
+                    OnToggleExpanded="this.OnToggleExpanded"/>
             }
         </div>
     }
@@ -189,57 +186,69 @@
 </style>
 
 @code {
-    /// <summary>
-    /// La catégorie à afficher.
-    /// </summary>
-    [Parameter] public required CategoryModel Category { get; set; }
 
     /// <summary>
-    /// ID de la catégorie actuellement sélectionnée.
+    ///     La catégorie à afficher.
     /// </summary>
-    [Parameter] public int? SelectedCategoryId { get; set; }
+    [Parameter]
+    public required CategoryModel Category { get; set; }
 
     /// <summary>
-    /// Callback déclenché lors de la sélection d'une catégorie.
+    ///     ID de la catégorie actuellement sélectionnée.
     /// </summary>
-    [Parameter] public EventCallback<CategoryModel> OnCategorySelected { get; set; }
+    [Parameter]
+    public int? SelectedCategoryId { get; set; }
 
     /// <summary>
-    /// Callback déclenché lors de l'édition d'une catégorie.
+    ///     Callback déclenché lors de la sélection d'une catégorie.
     /// </summary>
-    [Parameter] public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
+    [Parameter]
+    public EventCallback<CategoryModel> OnCategorySelected { get; set; }
 
     /// <summary>
-    /// Callback déclenché lors de la suppression d'une catégorie.
+    ///     Callback déclenché lors de l'édition d'une catégorie.
     /// </summary>
-    [Parameter] public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
+    [Parameter]
+    public EventCallback<CategoryModel> OnCategoryEdit { get; set; }
 
     /// <summary>
-    /// Affiche les actions (éditer, supprimer).
+    ///     Callback déclenché lors de la suppression d'une catégorie.
     /// </summary>
-    [Parameter] public bool ShowActions { get; set; } = true;
+    [Parameter]
+    public EventCallback<CategoryModel> OnCategoryDelete { get; set; }
 
     /// <summary>
-    /// Set des IDs de catégories actuellement développées.
+    ///     Affiche les actions (éditer, supprimer).
     /// </summary>
-    [Parameter] public required HashSet<int> ExpandedCategories { get; set; }
+    [Parameter]
+    public bool ShowActions { get; set; } = true;
 
     /// <summary>
-    /// Callback déclenché lors du basculement de l'état développé/réduit.
+    ///     Set des IDs de catégories actuellement développées.
     /// </summary>
-    [Parameter] public EventCallback<int> OnToggleExpanded { get; set; }
+    [Parameter]
+    public required HashSet<int> ExpandedCategories { get; set; }
 
-    private bool HasChildren => Category.Children?.Any() == true;
-    private bool IsExpanded => ExpandedCategories.Contains(Category.Id);
-    private bool IsSelected => SelectedCategoryId == Category.Id;
+    /// <summary>
+    ///     Callback déclenché lors du basculement de l'état développé/réduit.
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnToggleExpanded { get; set; }
+
+    private bool HasChildren => this.Category.Children.Any();
+
+    private bool IsExpanded => this.ExpandedCategories.Contains(this.Category.Id);
+
+    private bool IsSelected => this.SelectedCategoryId == this.Category.Id;
 
     private async Task ToggleExpanded()
     {
-        await OnToggleExpanded.InvokeAsync(Category.Id);
+        await this.OnToggleExpanded.InvokeAsync(this.Category.Id);
     }
 
     private async Task SelectCategory()
     {
-        await OnCategorySelected.InvokeAsync(Category);
+        await this.OnCategorySelected.InvokeAsync(this.Category);
     }
+
 }

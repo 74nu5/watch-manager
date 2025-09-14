@@ -44,9 +44,7 @@ builder.AddProject<Watch_Manager_Web>("webfrontend")
        .WaitFor(scalar)
        .WaitFor(migrations);
 
-
-scalar.WithApiReference(apiService)
-      .WithApiReference(migrations);
+scalar.WithApiReference(apiService);
 
 
 builder.Build().Run();

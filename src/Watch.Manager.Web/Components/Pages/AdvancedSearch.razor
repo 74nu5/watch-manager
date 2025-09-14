@@ -1,0 +1,463 @@
+﻿@page "/search/advanced"
+@using Watch.Manager.Common.Enumerations
+
+<PageTitle>Recherche avancée - Watch Manager</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="24" Class="advanced-search-container">
+    <!-- En-tête de page -->
+    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="12">
+        <FluentIcon Value="@(new Size24.Search())" Color="Color.Accent" />
+        <FluentLabel Typo="Typography.PageTitle">Recherche avancée</FluentLabel>
+    </FluentStack>
+
+    <!-- Layout principal -->
+    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="24" Class="main-layout">
+        <!-- Panneau de filtres -->
+        <FluentCard Class="filters-panel">
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="20">
+                <!-- En-tête des filtres -->
+                <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="8">
+                        <FluentIcon Value="@(new Size20.Filter())" />
+                        <FluentLabel Typo="Typography.Subject">Filtres</FluentLabel>
+                    </FluentStack>
+                    <FluentButton Appearance="Appearance.Stealth" 
+                                IconOnly="true"
+                                Title="Effacer tous les filtres"
+                                @onclick="this.ClearFiltersAsync">
+                        <FluentIcon Value="@(new Size16.Dismiss())" />
+                    </FluentButton>
+                </FluentStack>
+
+                <!-- Recherche textuelle -->
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                    <FluentLabel Typo="Typography.Body">
+                        <FluentIcon Value="@(new Size16.Search())" />
+                        Recherche textuelle
+                    </FluentLabel>
+                    <EditForm Model="this.searchFilters" OnValidSubmit="this.OnSearchTermsKeyPressAsync">
+                        <FluentTextField @bind-Value="this.searchFilters.SearchTerms"
+                                       Placeholder="Mots-clés, titre, résumé..."
+                                       @bind-Value:after="this.OnFiltersChangedAsync"
+                                       Style="width: 100%;" />
+                    </EditForm>
+                </FluentStack>
+
+                <!-- Sélection de catégories -->
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                    <FluentLabel Typo="Typography.Body">
+                        <FluentIcon Value="@(new Size16.Tag())" />
+                        Catégories
+                    </FluentLabel>
+                    @if (this.availableCategories != null)
+                    {
+                        <FluentStack Orientation="Orientation.Vertical" VerticalGap="6">
+                            @foreach (var category in this.availableCategories.Take(8))
+                            {
+                                <FluentCheckbox Value="@this.IsSelectedCategory(category.Id)"
+                                              @onchange="@((ChangeEventArgs e) => this.OnCategoryToggleAsync(category.Id, (bool)e.Value!))"
+                                              Label="@this.GetCategoryLabel(category)">
+                                </FluentCheckbox>
+                            }
+                        </FluentStack>
+                    }
+                </FluentStack>
+
+                <!-- Filtres de date -->
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                    <FluentLabel Typo="Typography.Body">
+                        <FluentIcon Value="@(new Size16.CalendarLtr())" />
+                        Période
+                    </FluentLabel>
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                        <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+                            <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em;">Du</FluentLabel>
+                            <FluentDatePicker @bind-Value="this.searchFilters.DateFrom"
+                                            @bind-Value:after="this.OnFiltersChangedAsync"
+                                            Style="width: 100%;" />
+                        </FluentStack>
+                        <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+                            <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em;">Au</FluentLabel>
+                            <FluentDatePicker @bind-Value="this.searchFilters.DateTo"
+                                            @bind-Value:after="this.OnFiltersChangedAsync"
+                                            Style="width: 100%;" />
+                        </FluentStack>
+                    </FluentStack>
+                </FluentStack>
+
+                <!-- Tags -->
+                @if (this.searchResult?.Facets?.Tags != null && this.searchResult.Facets.Tags.Any())
+                {
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                        <FluentLabel Typo="Typography.Body">
+                            <FluentIcon Value="@(new Size16.TagMultiple())" />
+                            Tags
+                        </FluentLabel>
+                        <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="4" VerticalGap="4">
+                            @foreach (var tag in this.searchResult.Facets.Tags.Take(6))
+                            {
+                                <FluentBadge Appearance="@(this.IsSelectedTag(tag.TagName) ? Appearance.Accent : Appearance.Neutral)"
+                                           Style="cursor: pointer;"
+                                           @onclick="@(() => this.ToggleTagAsync(tag.TagName))">
+                                    #@tag.TagName (@tag.Count)
+                                </FluentBadge>
+                            }
+                        </FluentStack>
+                    </FluentStack>
+                }
+
+                <!-- Auteurs -->
+                @if (this.searchResult?.Facets?.Authors != null && this.searchResult.Facets.Authors.Any())
+                {
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                        <FluentLabel Typo="Typography.Body">
+                            <FluentIcon Value="@(new Size16.Person())" />
+                            Auteurs
+                        </FluentLabel>
+                        <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="4" VerticalGap="4">
+                            @foreach (var author in this.searchResult.Facets.Authors.Take(6))
+                            {
+                                <FluentBadge Appearance="@(this.IsSelectedAuthor(author.AuthorName) ? Appearance.Accent : Appearance.Neutral)"
+                                           Style="cursor: pointer;"
+                                           @onclick="@(() => this.ToggleAuthorAsync(author.AuthorName))">
+                                    @author.AuthorName (@author.Count)
+                                </FluentBadge>
+                            }
+                        </FluentStack>
+                    </FluentStack>
+                }
+
+                <!-- Options de tri -->
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                    <FluentLabel Typo="Typography.Body">
+                        <FluentIcon Value="@(new Size16.ArrowSort())" />
+                        Tri
+                    </FluentLabel>
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                        <FluentSelect TOption="string" 
+                                    @bind-Value="@this.SelectedSortBy"
+                                    @bind-Value:after="this.OnSortByChangedAsync"
+                                    Style="width: 100%;">
+                            <FluentOption Value="@ArticleSortBy.AnalyzeDate.ToString()">Date d'analyse</FluentOption>
+                            <FluentOption Value="@ArticleSortBy.Title.ToString()">Titre</FluentOption>
+                            <FluentOption Value="@ArticleSortBy.Score.ToString()">Pertinence</FluentOption>
+                            <FluentOption Value="@ArticleSortBy.CategoryCount.ToString()">Nb. catégories</FluentOption>
+                        </FluentSelect>
+                        <FluentSelect TOption="string" 
+                                    @bind-Value="@this.SelectedSortOrder"
+                                    @bind-Value:after="this.OnSortOrderChangedAsync"
+                                    Style="width: 100%;">
+                            <FluentOption Value="@SortOrder.Descending.ToString()">Décroissant</FluentOption>
+                            <FluentOption Value="@SortOrder.Ascending.ToString()">Croissant</FluentOption>
+                        </FluentSelect>
+                    </FluentStack>
+                </FluentStack>
+            </FluentStack>
+        </FluentCard>
+
+        <!-- Zone de résultats -->
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="20" Class="results-panel">
+            <!-- En-tête des résultats -->
+            @if (this.searchResult != null)
+            {
+                <FluentCard Class="results-header">
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                        <FluentLabel Typo="Typography.Subject">
+                            @(this.searchResult.TotalCount) résultat@(this.searchResult.TotalCount > 1 ? "s" : "")
+                            @if (!string.IsNullOrWhiteSpace(this.searchFilters.SearchTerms))
+                            {
+                                <span style="color: var(--neutral-foreground-rest);"> pour "@(this.searchFilters.SearchTerms)"</span>
+                            }
+                        </FluentLabel>
+                        @if (this.searchResult.TotalCount > this.searchResult.Count)
+                        {
+                            <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em; color: var(--neutral-foreground-rest);">
+                                Affichage de @(this.searchResult.Offset + 1) à @(this.searchResult.Offset + this.searchResult.Count) sur @(this.searchResult.TotalCount)
+                            </FluentLabel>
+                        }
+                    </FluentStack>
+                </FluentCard>
+            }
+
+            @if (this.isLoading)
+            {
+                <FluentCard>
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center" VerticalGap="12">
+                        <FluentProgressRing />
+                        <FluentLabel>Recherche en cours...</FluentLabel>
+                    </FluentStack>
+                </FluentCard>
+            }
+
+            <!-- Résultats -->
+            @if (this.searchResult?.Articles != null && this.searchResult.Articles.Any())
+            {
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="16">
+                    @foreach (var article in this.searchResult.Articles)
+                    {
+                        <FluentCard Class="article-result-card">
+                            <FluentStack Orientation="Orientation.Vertical" HorizontalGap="20" VerticalAlignment="VerticalAlignment.Top">
+                                <!-- Miniature -->
+                                <div class="article-thumbnail">
+                                    <img src="@(article.Thumbnail)"
+                                         alt="@article.Title"
+                                         loading="lazy"
+                                         onerror="this.src='/images/default-thumbnail.png'">
+                                </div>
+
+                                <!-- Contenu principal -->
+                                <FluentStack Orientation="Orientation.Vertical" VerticalGap="12" Class="article-content">
+                                    <!-- Titre -->
+                                    <FluentAnchor Href="@article.Url.ToString()" Target="_blank" Appearance="Appearance.Hypertext">
+                                        <FluentLabel Typo="Typography.Subject" Class="article-title">@article.Title</FluentLabel>
+                                        <FluentIcon Value="@(new Size12.ArrowUpRight())" />
+                                    </FluentAnchor>
+
+                                    <!-- Métadonnées -->
+                                    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="16" VerticalAlignment="VerticalAlignment.Center" Wrap="true">
+                                        <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em; color: var(--neutral-foreground-rest);">
+                                            <FluentIcon Value="@(new Size12.Calendar())" />
+                                            @article.AnalyzeDate.ToString("dd/MM/yyyy")
+                                        </FluentLabel>
+                                        @if (article.Score.HasValue)
+                                        {
+                                            <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em; color: var(--neutral-foreground-rest);">
+                                                <FluentIcon Value="@(new Size12.Star())" />
+                                                @($"{article.Score.Value:P0}")
+                                            </FluentLabel>
+                                        }
+                                        <FluentLabel Typo="Typography.Body" Style="font-size: 0.8em; color: var(--neutral-foreground-rest);">
+                                            <FluentIcon Value="@(new Size12.Person())" />
+                                            @article.AuthorsJoin
+                                        </FluentLabel>
+                                    </FluentStack>
+
+                                    <!-- Résumé -->
+                                    <FluentLabel Typo="Typography.Body" Class="article-summary">
+                                        @article.Summary
+                                    </FluentLabel>
+
+                                    <!-- Tags et Catégories -->
+                                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="8">
+                                        <!-- Tags -->
+                                        @if (article.Tags.Any())
+                                        {
+                                            <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="4" VerticalGap="4">
+                                                @foreach (var tag in article.Tags.Take(8))
+                                                {
+                                                    <FluentBadge Appearance="Appearance.Neutral" Size="BadgeSize.Small">
+                                                        #@tag
+                                                    </FluentBadge>
+                                                }
+                                            </FluentStack>
+                                        }
+
+                                        <!-- Catégories -->
+                                        @if (article.Categories.Any())
+                                        {
+                                            <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="4" VerticalGap="4">
+                                                @foreach (var categoryName in article.Categories)
+                                                {
+                                                    var category = this.availableCategories?.FirstOrDefault(c => c.Name == categoryName);
+                                                    <FluentBadge Appearance="Appearance.Accent" 
+                                                               BackgroundColor="@(category?.Color ?? "#6c757d")"
+                                                               Color="white"
+                                                               Size="BadgeSize.Small">
+                                                        @if (!string.IsNullOrEmpty(category?.Icon))
+                                                        {
+                                                            <text>@category.Icon </text>
+                                                        }
+                                                        @categoryName
+                                                    </FluentBadge>
+                                                }
+                                            </FluentStack>
+                                        }
+                                    </FluentStack>
+                                </FluentStack>
+                            </FluentStack>
+                        </FluentCard>
+                    }
+                </FluentStack>
+
+                <!-- Pagination -->
+                @if (this.searchResult.TotalCount > PageSize)
+                {
+                    <FluentCard>
+                        @{
+                            var totalPages = (int)Math.Ceiling((double)this.searchResult.TotalCount / PageSize);
+                            var currentPage = (this.searchResult.Offset / PageSize) + 1;
+                        }
+
+                        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center" HorizontalGap="8" VerticalAlignment="VerticalAlignment.Center">
+                            <!-- Première page -->
+                            <FluentButton Appearance="Appearance.Stealth"
+                                        IconOnly="true"
+                                        Disabled="@(currentPage == 1)"
+                                        @onclick="@(() => this.ChangePageAsync(1))">
+                                <FluentIcon Value="@(new Size16.ChevronDoubleLeft())" />
+                            </FluentButton>
+
+                            <!-- Page précédente -->
+                            <FluentButton Appearance="Appearance.Stealth"
+                                        IconOnly="true"
+                                        Disabled="@(currentPage == 1)"
+                                        @onclick="@(() => this.ChangePageAsync(currentPage - 1))">
+                                <FluentIcon Value="@(new Size16.ChevronLeft())" />
+                            </FluentButton>
+
+                            <!-- Pages numérotées -->
+                            @for (int page = Math.Max(1, currentPage - 2); page <= Math.Min(totalPages, currentPage + 2); page++)
+                            {
+                                var pageNum = page;
+                                <FluentButton Appearance="@(pageNum == currentPage ? Appearance.Accent : Appearance.Stealth)"
+                                            @onclick="@(() => this.ChangePageAsync(pageNum))">
+                                    @pageNum
+                                </FluentButton>
+                            }
+
+                            <!-- Page suivante -->
+                            <FluentButton Appearance="Appearance.Stealth"
+                                        IconOnly="true"
+                                        Disabled="@(currentPage == totalPages)"
+                                        @onclick="@(() => this.ChangePageAsync(currentPage + 1))">
+                                <FluentIcon Value="@(new Size16.ChevronRight())" />
+                            </FluentButton>
+
+                            <!-- Dernière page -->
+                            <FluentButton Appearance="Appearance.Stealth"
+                                        IconOnly="true"
+                                        Disabled="@(currentPage == totalPages)"
+                                        @onclick="@(() => this.ChangePageAsync(totalPages))">
+                                <FluentIcon Value="@(new Size16.ChevronDoubleRight())" />
+                            </FluentButton>
+                        </FluentStack>
+                    </FluentCard>
+                }
+            }
+            else if (!this.isLoading && this.searchResult != null && !this.searchResult.Articles.Any())
+            {
+                <FluentCard>
+                    <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center" VerticalGap="16" Class="no-results">
+                        <FluentIcon Value="@(new Size48.Search())" Color="Color.Neutral" />
+                        <FluentLabel Typo="Typography.Subject" style="color: var(--neutral-foreground-rest);">
+                            Aucun résultat trouvé
+                        </FluentLabel>
+                        <FluentLabel Typo="Typography.Body" style="color: var(--neutral-foreground-rest);">
+                            Essayez de modifier vos critères de recherche.
+                        </FluentLabel>
+                    </FluentStack>
+                </FluentCard>
+            }
+        </FluentStack>
+    </FluentStack>
+</FluentStack>
+
+<style>
+    .advanced-search-container {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .main-layout {
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .filters-panel {
+        width: 320px;
+        min-width: 320px;
+        padding: 24px;
+        height: fit-content;
+        position: sticky;
+        top: 24px;
+        flex-shrink: 0;
+    }
+
+    .results-panel {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .results-header {
+        padding: 20px;
+    }
+
+    .article-result-card {
+        padding: 20px;
+    }
+
+    .article-thumbnail {
+        width: 140px;
+        height: 100px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: var(--neutral-layer-2);
+    }
+
+    .article-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .article-content {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .article-title {
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .article-summary {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.5;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .no-results {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    @@media (max-width: 768px) {
+        .advanced-search-container {
+            padding: 16px;
+        }
+        
+        .main-layout {
+            flex-direction: column;
+        }
+
+        .filters-panel {
+            width: 100%;
+            position: static;
+            margin-bottom: 20px;
+        }
+        
+        .article-result-card .article-thumbnail {
+            width: 100px;
+            height: 70px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .article-result-card fluent-stack[orientation="horizontal"] {
+            flex-direction: column;
+        }
+        
+        .article-thumbnail {
+            width: 100%;
+            height: 120px;
+        }
+    }
+</style>

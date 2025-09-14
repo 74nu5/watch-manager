@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 /// <summary>
 ///     Provides extension methods for configuring OpenAPI options.
@@ -70,19 +69,21 @@ internal static class OpenApiOptionsExtensions
             if (!metadata.OfType<IAuthorizeData>().Any())
                 return Task.CompletedTask;
 
-            _ = operation.Responses.TryAdd("401", new() { Description = "Unauthorized" });
-            _ = operation.Responses.TryAdd("403", new() { Description = "Forbidden" });
+            operation.Responses ??= [];
 
-            var oAuthScheme = new OpenApiSecurityScheme
+            _ = operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
+            _ = operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
+
+            var oAuthScheme = new OpenApiSecuritySchemeReference("oauth2")
             {
-                Reference = new() { Type = ReferenceType.SecurityScheme, Id = "oauth2" },
+                Reference = new() { Type = ReferenceType.SecurityScheme },
             };
 
             operation.Security =
             [
                 new()
                 {
-                    [oAuthScheme] = scopes,
+                    [oAuthScheme] = [.. scopes],
                 },
             ];
 
@@ -116,45 +117,13 @@ internal static class OpenApiOptionsExtensions
     /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
     public static OpenApiOptions ApplyApiVersionDescription(this OpenApiOptions options)
     {
-        _ = options.AddOperationTransformer((operation, context, _) =>
+        _ = options.AddOperationTransformer((operation, _, _) =>
         {
             // Find parameter named "api-version" and add a description to it
+            operation.Parameters ??= [];
             var apiVersionParameter = operation.Parameters.FirstOrDefault(p => p.Name == "api-version");
 
-            if (apiVersionParameter is null)
-                return Task.CompletedTask;
-
-            apiVersionParameter.Description = "The API version, in the format 'major.minor'.";
-            apiVersionParameter.Schema.Example = context.DocumentName switch
-            {
-                "v1" => new OpenApiString("1.0"),
-                "v2" => new OpenApiString("2.0"),
-                _ => apiVersionParameter.Schema.Example,
-            };
-
-            return Task.CompletedTask;
-        });
-
-        return options;
-    }
-
-    /// <summary>
-    ///     Sets the "nullable" property to false for all optional properties in OpenAPI schemas.
-    /// </summary>
-    /// <param name="options">The OpenAPI options.</param>
-    /// <returns>The updated <see cref="OpenApiOptions" />.</returns>
-    public static OpenApiOptions ApplySchemaNullableFalse(this OpenApiOptions options)
-    {
-        _ = options.AddSchemaTransformer((schema, _, _) =>
-        {
-            if (schema.Properties is null)
-                return Task.CompletedTask;
-
-            foreach (var property in schema.Properties)
-            {
-                if (schema.Required?.Contains(property.Key) != true)
-                    property.Value.Nullable = false;
-            }
+            var unused = apiVersionParameter?.Description = "The API version, in the format 'major.minor'.";
 
             return Task.CompletedTask;
         });
@@ -254,12 +223,13 @@ internal static class OpenApiOptionsExtensions
                     {
                         AuthorizationUrl = new($"{identityUrlExternal}/connect/authorize"),
                         TokenUrl = new($"{identityUrlExternal}/connect/token"),
-                        Scopes = scopes,
+                        Scopes = scopes!,
                     },
                 },
             };
 
             document.Components ??= new();
+            document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
             document.Components.SecuritySchemes.Add("oauth2", securityScheme);
             return Task.CompletedTask;
         }

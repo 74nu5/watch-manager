@@ -5,16 +5,17 @@ using System.Net;
 
 using Watch.Manager.ApiService.Parameters.Articles;
 using Watch.Manager.ApiService.ViewModels;
+using Watch.Manager.ApiService.ViewModels.SearchFacets;
 using Watch.Manager.Service.Analyse.Models;
 using Watch.Manager.Service.Database.Entities;
 
 /// <summary>
-/// Provides extension methods for mapping article-related endpoints to a <see cref="WebApplication" />.
+///     Provides extension methods for mapping article-related endpoints to a <see cref="WebApplication" />.
 /// </summary>
 public static class ArticleEndpoints
 {
     /// <summary>
-    /// Configures the application's endpoints for managing articles, including operations for saving, searching, retrieving thumbnails, and getting all tags.
+    ///     Configures the application's endpoints for managing articles, including operations for saving, searching, retrieving thumbnails, and getting all tags.
     /// </summary>
     /// <param name="app">The <see cref="WebApplication" /> instance to which the article endpoints will be added.</param>
     public static void MapArticleEndpoints(this WebApplication app)
@@ -29,6 +30,10 @@ public static class ArticleEndpoints
         _ = api.MapGet("/search", SearchArticleAsync)
                .WithName("SearchArticle")
                .WithSummary("Recherche les articles par texte ou tag.");
+
+        _ = api.MapGet("/search/advanced", AdvancedSearchArticleAsync)
+               .WithName("AdvancedSearchArticle")
+               .WithSummary("Recherche avancée d'articles avec filtres multicritères et facettes.");
 
         _ = api.MapGet("/thumbnail/{id:int}.png", GetArticleThumbnailAsync)
                .WithName("GetArticleThumbnail")
@@ -67,8 +72,8 @@ public static class ArticleEndpoints
                 Thumbnail = webSiteSource.Thumbnail,
                 ThumbnailBase64 = webSiteSource.ThumbnailBase64,
                 Title = analyzeResult.Title,
-                EmbeddingHead = embeddingsHead,
-                EmbeddingBody = embeddingsBody,
+                EmbeddingHead = new(embeddingsHead),
+                EmbeddingBody = new(embeddingsBody),
                 Tags = [.. analyzeResult.Tags],
                 AnalyzeDate = DateTime.UtcNow,
             };
@@ -84,15 +89,15 @@ public static class ArticleEndpoints
                     var categories = await analyzeParameter.CategoryStore.GetAllCategoriesAsync(false, cancellationToken).ConfigureAwait(false);
                     var categoryForClassification = categories.Where(c => c.IsActive)
                                                               .Select(c => new CategoryForClassification
-                                                               {
-                                                                   Id = c.Id,
-                                                                   Name = c.Name,
-                                                                   Description = c.Description,
-                                                                   Keywords = c.Keywords,
-                                                                   AutoThreshold = 0.7, // Seuil par défaut pour l'auto-assignation
-                                                                   ManualThreshold = 0.5, // Seuil par défaut pour les suggestions
-                                                                   IsActive = c.IsActive,
-                                                               });
+                                                              {
+                                                                  Id = c.Id,
+                                                                  Name = c.Name,
+                                                                  Description = c.Description,
+                                                                  Keywords = c.Keywords,
+                                                                  AutoThreshold = 0.7, // Seuil par défaut pour l'auto-assignation
+                                                                  ManualThreshold = 0.5, // Seuil par défaut pour les suggestions
+                                                                  IsActive = c.IsActive,
+                                                              });
 
                     // Classification de l'article
                     var articleContent = $"{article.Title}\n\n{article.Summary}";
@@ -172,5 +177,86 @@ public static class ArticleEndpoints
     {
         var tags = await p.ArticleAnalyseStore.GetAllTagsAsync(p.CancellationToken).ConfigureAwait(false);
         return Results.Ok(tags.Distinct(StringComparer.InvariantCultureIgnoreCase));
+    }
+
+    private static async Task<IResult> AdvancedSearchArticleAsync([AsParameters] AdvancedSearchArticleParameter p)
+    {
+        try
+        {
+            var filters = p.ToFilters();
+            var result = await p.AnalyseStore.AdvancedSearchArticlesAsync(filters, p.IncludeFacets, p.CancellationToken).ConfigureAwait(false);
+
+            var viewModel = new ArticleSearchResultViewModel
+            {
+                Articles =
+                [
+                    .. result.Articles.Select(article => new ArticleViewModel
+                    {
+                        Id = article.Id,
+                        Title = article.Title,
+                        Summary = article.Summary,
+                        Authors = article.Authors,
+                        Url = article.Url,
+                        Tags = article.Tags,
+                        AnalyzeDate = article.AnalyzeDate,
+                        Thumbnail = article.Thumbnail,
+                        Score = article.Score,
+                        Categories = article.Categories,
+                    }),
+                ],
+                TotalCount = result.TotalCount,
+                Count = result.Count,
+                Offset = result.Offset,
+                Limit = result.Limit,
+                Facets = result.Facets != null
+                                 ? new SearchFacetsViewModel
+                                 {
+                                     Categories =
+                                     [
+                                         .. result.Facets.Categories.Select(f => new CategoryFacetViewModel
+                                         {
+                                             CategoryId = f.CategoryId,
+                                             CategoryName = f.CategoryName,
+                                             Count = f.Count,
+                                             Color = f.Color,
+                                             Icon = f.Icon,
+                                         }),
+                                     ],
+                                     Tags =
+                                     [
+                                         .. result.Facets.Tags.Select(f => new TagFacetViewModel
+                                         {
+                                             TagName = f.TagName,
+                                             Count = f.Count,
+                                         }),
+                                     ],
+                                     Authors =
+                                     [
+                                         .. result.Facets.Authors.Select(f => new AuthorFacetViewModel
+                                         {
+                                             AuthorName = f.AuthorName,
+                                             Count = f.Count,
+                                         }),
+                                     ],
+                                     DateDistribution =
+                                     [
+                                         .. result.Facets.DateDistribution.Select(f => new DateFacetViewModel
+                                         {
+                                             Period = f.Period,
+                                             Count = f.Count,
+                                             PeriodStart = f.PeriodStart,
+                                             PeriodEnd = f.PeriodEnd,
+                                         }),
+                                     ],
+                                 }
+                                 : null,
+            };
+
+            return Results.Ok(viewModel);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem($"Erreur lors de la recherche avancée: {e.Message}");
+        }
     }
 }

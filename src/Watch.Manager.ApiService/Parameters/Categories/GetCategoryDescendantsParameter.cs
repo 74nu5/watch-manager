@@ -30,5 +30,5 @@ public sealed record GetCategoryDescendantsParameter
     /// <summary>
     /// Token d'annulation.
     /// </summary>
-    public CancellationToken CancellationToken { get; set; } = default;
+    public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 }

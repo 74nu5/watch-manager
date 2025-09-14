@@ -24,7 +24,7 @@ public sealed class Worker(IServiceProvider serviceProvider, IHostApplicationLif
     ///     Executes the background service logic: ensures the database exists, applies migrations, and seeds data.
     /// </summary>
     /// <param name="cancellationToken">Token to signal cancellation.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         using var activity = ActivitySource.StartActivity("Migrating database", ActivityKind.Client, default(ActivityContext));
@@ -34,6 +34,7 @@ public sealed class Worker(IServiceProvider serviceProvider, IHostApplicationLif
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ArticlesContext>();
 
+            //_ = await dbContext.Database.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
             await EnsureDatabaseAsync(dbContext, cancellationToken).ConfigureAwait(false);
             await RunMigrationAsync(dbContext, cancellationToken).ConfigureAwait(false);
 
@@ -76,6 +77,7 @@ public sealed class Worker(IServiceProvider serviceProvider, IHostApplicationLif
     {
         var strategy = dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
-            await dbContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
+                await dbContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(false)
+        ).ConfigureAwait(false);
     }
 }

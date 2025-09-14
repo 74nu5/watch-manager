@@ -1,8 +1,10 @@
-namespace Watch.Manager.Service.Database.Entities;
+﻿namespace Watch.Manager.Service.Database.Entities;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+
+using Microsoft.Data.SqlTypes;
 
 /// <summary>
 /// Représente une catégorie pour organiser les articles.
@@ -57,12 +59,12 @@ public sealed class Category
     /// <summary>
     /// Sous-catégories.
     /// </summary>
-    public ICollection<Category> Children { get; set; } = new List<Category>();
+    public ICollection<Category> Children { get; set; } = [];
 
     /// <summary>
     /// Articles associés à cette catégorie.
     /// </summary>
-    public ICollection<ArticleCategory> ArticleCategories { get; set; } = new List<ArticleCategory>();
+    public ICollection<ArticleCategory> ArticleCategories { get; set; } = [];
 
     /// <summary>
     /// Date de création de la catégorie.
@@ -92,7 +94,7 @@ public sealed class Category
     /// </summary>
     [Column(TypeName = "vector(1536)")]
     [JsonIgnore]
-    public float[]? Embedding { get; set; }
+    public SqlVector<float>? Embedding { get; set; }
 
     /// <summary>
     /// Seuil automatique pour la classification.

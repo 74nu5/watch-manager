@@ -48,7 +48,7 @@ public sealed class CategoryViewModel
     /// <summary>
     /// Gets or sets the child categories.
     /// </summary>
-    public List<CategoryViewModel> Children { get; set; } = new();
+    public List<CategoryViewModel> Children { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the number of articles in this category.
@@ -103,5 +103,5 @@ public sealed class CategoryViewModel
     /// <summary>
     /// Gets or sets the breadcrumb navigation path.
     /// </summary>
-    public List<CategoryBreadcrumbViewModel> Breadcrumbs { get; set; } = new();
+    public List<CategoryBreadcrumbViewModel> Breadcrumbs { get; set; } = [];
 }

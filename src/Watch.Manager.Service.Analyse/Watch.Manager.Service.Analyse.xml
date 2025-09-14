@@ -140,142 +140,142 @@
         </member>
         <member name="T:Watch.Manager.Service.Analyse.Models.CategoryForClassification">
             <summary>
-            Représente une catégorie utilisée pour la classification.
+                Represents a category used for classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Id">
             <summary>
-            Identifiant unique de la catégorie.
+                Gets or sets the unique identifier of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Name">
             <summary>
-            Nom de la catégorie.
+                Gets or sets the name of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Description">
             <summary>
-            Description de la catégorie.
+                Gets or sets the description of the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Keywords">
             <summary>
-            Mots-clés associés à la catégorie.
+                Gets or sets the keywords associated with the category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.AutoThreshold">
             <summary>
-            Seuil de confiance pour la classification automatique.
+                Gets or sets the confidence threshold for automatic classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.ManualThreshold">
             <summary>
-            Seuil de confiance pour la classification manuelle.
+                Gets or sets the confidence threshold for manual classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.Embedding">
             <summary>
-            Embedding vectoriel de la catégorie pour la comparaison sémantique.
+                Gets or sets the vector embedding of the category for semantic comparison.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategoryForClassification.IsActive">
             <summary>
-            Indique si la catégorie est active.
+                Gets or sets a value indicating whether the category is active.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult">
             <summary>
-            Représente une suggestion de catégorie avec un score de confiance.
+                Represents a category suggestion with a confidence score.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.CategoryId">
             <summary>
-            Identifiant de la catégorie suggérée.
+                Gets or sets the identifier of the suggested category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.CategoryName">
             <summary>
-            Nom de la catégorie suggérée.
+                Gets or sets the name of the suggested category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ConfidenceScore">
             <summary>
-            Score de confiance entre 0 et 1.
+                Gets or sets the confidence score between 0 and 1.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.Reason">
             <summary>
-            Raison de la suggestion (mots-clés correspondants, similarité sémantique, etc.).
+                Gets or sets the reason for the suggestion (matching keywords, semantic similarity, etc.).
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ExceedsAutoThreshold">
             <summary>
-            Indique si la suggestion dépasse le seuil automatique.
+                Gets or sets a value indicating whether the suggestion exceeds the automatic threshold.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.CategorySuggestionResult.ExceedsManualThreshold">
             <summary>
-            Indique si la suggestion dépasse le seuil manuel.
+                Gets or sets a value indicating whether the suggestion exceeds the manual threshold.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion">
             <summary>
-            Représente une suggestion de nouvelle catégorie à créer.
+                Represents a suggestion for a new category to be created.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedName">
             <summary>
-            Nom suggéré pour la nouvelle catégorie.
+                Gets or sets the suggested name for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedDescription">
             <summary>
-            Description suggérée pour la nouvelle catégorie.
+                Gets or sets the suggested description for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.SuggestedKeywords">
             <summary>
-            Mots-clés suggérés pour la nouvelle catégorie.
+                Gets or sets the suggested keywords for the new category.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.RelevanceScore">
             <summary>
-            Score de pertinence de la suggestion entre 0 et 1.
+                Gets or sets the relevance score of the suggestion between 0 and 1.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.NewCategorySuggestion.Justification">
             <summary>
-            Justification de la suggestion de nouvelle catégorie.
+                Gets or sets the justification for the new category suggestion.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult">
             <summary>
-            Représente les résultats de la classification automatique d'un article.
+                Represents the results of the automatic classification of an article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.ArticleId">
             <summary>
-            Identifiant de l'article classifié.
+                Gets or sets the identifier of the classified article.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.CategorySuggestions">
             <summary>
-            Suggestions de catégories existantes.
+                Gets or sets the suggestions for existing categories.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.NewCategorySuggestions">
             <summary>
-            Suggestions de nouvelles catégories à créer.
+                Gets or sets the suggestions for new categories to be created.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.OverallConfidence">
             <summary>
-            Score de confiance global de la classification.
+                Gets or sets the overall confidence score of the classification.
             </summary>
         </member>
         <member name="P:Watch.Manager.Service.Analyse.Models.ArticleClassificationResult.ClassificationDate">
             <summary>
-            Horodatage de la classification.
+                Gets or sets the timestamp of the classification.
             </summary>
         </member>
         <member name="T:Watch.Manager.Service.Analyse.Models.ClassificationOptions">
@@ -571,7 +571,7 @@
                 Calcule la similarité sémantique entre l'article et la catégorie.
             </summary>
         </member>
-        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateHistoricalScore(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
+        <member name="M:Watch.Manager.Service.Analyse.Services.ArticleClassificationService.CalculateHistoricalScoreAsync(Watch.Manager.Service.Database.Entities.Article,Watch.Manager.Service.Database.Entities.Category,System.Threading.CancellationToken)">
             <summary>
                 Calcule un score basé sur l'historique de classification.
             </summary>
@@ -843,6 +843,9 @@
         </member>
         <member name="M:Microsoft.Extensions.Configuration.Binder.SourceGeneration.BindingExtensions.Get``1(Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>Attempts to bind the configuration instance to a new instance of type T.</summary>
+        </member>
+        <member name="M:Microsoft.Extensions.Configuration.Binder.SourceGeneration.BindingExtensions.TryGetConfigurationValue(Microsoft.Extensions.Configuration.IConfiguration,System.String,System.String@)">
+            <summary>Tries to get the configuration value for the specified key.</summary>
         </member>
         <member name="M:Microsoft.Extensions.Configuration.Binder.SourceGeneration.BindingExtensions.ValidateConfigurationKeys(System.Type,System.Lazy{System.Collections.Generic.HashSet{System.String}},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Configuration.BinderOptions)">
             <summary>If required by the binder options, validates that there are no unknown keys in the input configuration object.</summary>

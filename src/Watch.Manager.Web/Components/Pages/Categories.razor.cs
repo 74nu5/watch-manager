@@ -12,10 +12,15 @@ using Watch.Manager.Web.Services.Models;
 /// <summary>
 ///     Page for managing categories, including creation, editing, deletion, and AI-based suggestions.
 /// </summary>
-public sealed partial class Categories : ComponentBase, IDisposable
+/// <remarks>
+///     Initializes a new instance of the <see cref="Categories" /> class.
+/// </remarks>
+/// <param name="analyzeService">The <see cref="AnalyzeService" /> used to interact with category data and AI functionalities.</param>
+/// <param name="toastService">The <see cref="IToastService" /> used to display notifications to the user.</param>
+public sealed partial class Categories(AnalyzeService analyzeService, IToastService toastService) : ComponentBase, IDisposable
 {
-    private readonly AnalyzeService analyzeService;
-    private readonly IToastService toastService;
+    private readonly AnalyzeService analyzeService = analyzeService;
+    private readonly IToastService toastService = toastService;
     private readonly CancellationTokenSource cts = new();
 
     private CategoryModel[] categories = [];
@@ -36,7 +41,12 @@ public sealed partial class Categories : ComponentBase, IDisposable
     private CategoryFormModel categoryForm = new();
     private string keywordsText = string.Empty;
     private int? selectedParent;
-    private string selectedParentString = string.Empty;
+
+    // AI Classification
+    private bool suggestingCategories;
+    private NewCategorySuggestion[] newCategorySuggestions = [];
+    private bool batchClassifying;
+    private BatchClassificationResult[] batchResults = [];
 
     /// <summary>
     /// Gets or sets the selected parent as string, synchronized with selectedParent.
@@ -47,36 +57,12 @@ public sealed partial class Categories : ComponentBase, IDisposable
         set
         {
             if (string.IsNullOrEmpty(value))
-            {
                 this.selectedParent = null;
-            }
             else if (int.TryParse(value, out var parentId))
-            {
                 this.selectedParent = parentId;
-            }
             else
-            {
                 this.selectedParent = null;
-            }
-            this.selectedParentString = value;
         }
-    }
-
-    // AI Classification
-    private bool suggestingCategories;
-    private NewCategorySuggestion[] newCategorySuggestions = [];
-    private bool batchClassifying;
-    private BatchClassificationResult[] batchResults = [];
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Categories" /> class.
-    /// </summary>
-    /// <param name="analyzeService">The <see cref="AnalyzeService" /> used to interact with category data and AI functionalities.</param>
-    /// <param name="toastService">The <see cref="IToastService" /> used to display notifications to the user.</param>
-    public Categories(AnalyzeService analyzeService, IToastService toastService)
-    {
-        this.analyzeService = analyzeService;
-        this.toastService = toastService;
     }
 
     /// <inheritdoc />
@@ -104,14 +90,9 @@ public sealed partial class Categories : ComponentBase, IDisposable
             // Load hierarchical categories for tree view
             var hierarchicalResult = await this.analyzeService.GetCategoriesAsTreeAsync(this.showInactive, this.cts.Token).ConfigureAwait(true);
             if (hierarchicalResult.ApiResultErrorType == null && string.IsNullOrEmpty(hierarchicalResult.Error))
-            {
                 this.hierarchicalCategories = hierarchicalResult.Result ?? [];
-            }
             else
-            {
-                // Fallback to flat list if hierarchical loading fails
-                this.hierarchicalCategories = this.categories;
-            }
+                this.hierarchicalCategories = this.categories; // Fallback to flat list if hierarchical loading fails
         }
         catch (Exception ex)
         {
@@ -170,34 +151,6 @@ public sealed partial class Categories : ComponentBase, IDisposable
     {
         this.categoryToDelete = category;
         this.hideDeleteDialog = false;
-    }
-
-    /// <summary>
-    ///     Toggles the active state of a category.
-    /// </summary>
-    /// <param name="category">The category to activate or deactivate.</param>
-    private async Task ToggleActiveCategoryAsync(CategoryModel category)
-    {
-        try
-        {
-            var result = await this.analyzeService.UpdateCategoryAsync(
-                             category.Id,
-                             isActive: !category.IsActive,
-                             cancellationToken: this.cts.Token).ConfigureAwait(true);
-
-            if (result.ApiResultErrorType != null || !string.IsNullOrEmpty(result.Error))
-            {
-                this.toastService.ShowError($"Erreur lors de la modification: {result.Error}");
-                return;
-            }
-
-            this.toastService.ShowSuccess($"Catégorie {(category.IsActive ? "désactivée" : "activée")} avec succès");
-            await this.LoadCategoriesAsync().ConfigureAwait(true);
-        }
-        catch (Exception ex)
-        {
-            this.toastService.ShowError($"Erreur: {ex.Message}");
-        }
     }
 
     /// <summary>
