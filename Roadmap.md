@@ -1,5 +1,4 @@
-﻿
-## 🗺️ Timeline des fonctionnalités
+﻿## 🗺️ Timeline des fonctionnalités
 
 ```mermaid
 timeline
@@ -85,11 +84,54 @@ Watch Manager a pour objectif de devenir **l'outil d'accompagnement ultime pour 
 
 #### 📅 Planification de veille
 - [ ] **Plans de veille personnalisés**
-  - Configuration de fréquence (quotidienne, hebdomadaire, mensuelle)
-  - Sélection automatique de sujets à approfondir
-  - Calendrier de veille intelligent
-  - Notifications et rappels
-  - Tableau de bord de suivi
+  
+  #### ⚙️ Configuration des plans de veille
+  - **Fréquences multiples** : Support de planifications quotidiennes, hebdomadaires, mensuelles et personnalisées
+  - **Profils de veille** : Création de profils thématiques (Frontend, Backend, DevOps, IA, etc.)
+  - **Quotas intelligents** : Définition du nombre d'articles par session selon le temps disponible
+  - **Horaires préférés** : Configuration des créneaux de veille optimaux selon l'emploi du temps
+  - **Seuils de pertinence** : Ajustement automatique du niveau de complexité selon l'expertise utilisateur
+  - **Exclusions temporaires** : Pause automatique pendant congés ou périodes chargées
+
+  #### 🎯 Sélection automatique de contenus
+  - **Algorithme de recommandation** : Sélection basée sur l'historique de lecture et les préférences utilisateur
+  - **Diversité thématique** : Équilibrage automatique entre sujets familiers et nouvelles découvertes
+  - **Priorisation intelligente** : Articles récents, tendances émergentes et sujets manqués prioritaires
+  - **Filtrage par niveau** : Adaptation du contenu selon le niveau technique (débutant, intermédiaire, expert)
+  - **Sources équilibrées** : Répartition entre différents types de sources (blogs, documentation, actualités)
+  - **Évitement des doublons** : Détection sémantique des contenus similaires déjà consultés
+
+  #### 📊 Calendrier de veille intelligent
+  - **Planning adaptatif** : Ajustement automatique selon la charge de travail et les événements calendrier
+  - **Synchronisation externe** : Intégration avec Google Calendar, Outlook, et autres agendas
+  - **Sessions de rattrapage** : Reprogrammation automatique des sessions manquées
+  - **Blocs de temps optimisés** : Suggestion de créneaux selon l'énergie cognitive disponible
+  - **Préparation de sessions** : Pré-chargement et organisation des articles avant chaque session
+  - **Métriques de planification** : Statistiques sur l'efficacité des créneaux choisis
+
+  #### 🔔 Notifications et rappels
+  - **Canaux multiples** : Notifications push, email, SMS selon les préférences et l'urgence
+  - **Personnalisation contextuelle** : Adaptation du ton et du contenu selon le moment de la journée
+  - **Rappels progressifs** : Séquence d'alertes douces avant les sessions planifiées
+  - **Résumés préparatoires** : Aperçu des articles sélectionnés 30 minutes avant la session
+  - **Alertes de tendances** : Notifications urgentes pour les sujets critiques ou tendances majeures
+  - **Feedback en temps réel** : Ajustement des notifications selon les réactions utilisateur
+
+  #### 📈 Tableau de bord de suivi
+  - **Métriques de progression** : Suivi des domaines couverts, lacunes identifiées, et objectifs atteints
+  - **Visualisations interactives** : Graphiques de progression, cartes de compétences, et timelines d'apprentissage
+  - **Analyse de performance** : Corrélation entre planning de veille et productivité professionnelle
+  - **Recommandations d'ajustement** : Suggestions d'optimisation basées sur les patterns de consommation
+  - **Rapports périodiques** : Synthèses hebdomadaires/mensuelles avec points clés et nouvelles découvertes
+  - **Objectifs gamifiés** : Système de challenges et récompenses pour maintenir la motivation
+
+  #### 🤖 Intelligence prédictive
+  - **Prédiction de pertinence** : Machine learning pour anticiper l'intérêt utilisateur sur de nouveaux contenus
+  - **Détection de lacunes** : Identification automatique des domaines techniques insuffisamment couverts
+  - **Anticipation des besoins** : Suggestions proactives basées sur l'évolution des projets utilisateur
+  - **Optimisation temporelle** : Apprentissage des moments optimaux pour différents types de contenus
+  - **Adaptation comportementale** : Évolution du système selon les changements d'habitudes et d'intérêts
+  - **Veille prédictive** : Identification précoce des technologies émergentes selon le profil utilisateur
 
 ## 🛠️ Améliorations techniques
 
