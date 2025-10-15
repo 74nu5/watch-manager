@@ -17,6 +17,11 @@ backlog/
 │   ├── 04-suivi-progression/          # Feature : Suivi de progression avancé
 │   ├── 05-randomisation/              # Feature : Mécanismes de randomisation intelligente
 │   └── 06-personnalisation/           # Feature : Personnalisation cognitive
+├── 02-integration-flux-rss/           # Epic : Intégration de flux RSS
+│   ├── epic.md                        # Description de l'epic
+│   ├── 01-gestion-flux-rss/           # Feature : Gestion des flux RSS (abonnements et synchronisation)
+│   ├── 02-lecture-affichage/          # Feature : Lecture et affichage des flux
+│   └── 03-importation-enrichissement/ # Feature : Importation automatique et enrichissement
 └── templates/                         # Templates pour épics, features et user stories
     ├── epic-template.md
     ├── feature-template.md
